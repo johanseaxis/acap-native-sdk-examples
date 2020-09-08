@@ -16,6 +16,8 @@ step-by-step instructions on how to run applications on the camera.
 ## Example applications
 Below is the list of examples available in the repository.
 
+* [axevent](./axevent/)
+  * The example code is written in C which illustrates both how to subscribe to different events and how to send an event.
 * [Larod](./larod/)
   * The example code is written in C which connects to [larod](./FAQs.md#WhatisLarod?) and loads a model, runs inference on it and then finally deletes the loaded model from [larod](./FAQs.md#WhatisLarod?).
 * [vdostream](./vdostream/)
