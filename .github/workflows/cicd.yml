@@ -1,0 +1,78 @@
+name: Build Applications
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      #- uses: actions/checkout@master
+      # this will enable shellCheck to be performed
+      # on every push to the repo.
+    #- name: Run ShellCheck
+      #uses: ludeeus/action-shellcheck@master
+      # If shellCheck complains about unnecessery things, ignore it.
+      #env:
+        #SHELLCHECK_OPTS: -e SC2153 -e SC2148
+    
+    # Run build script larod application
+    - name: Build larod application
+      run: |
+        cd larod
+        docker build --tag larod-simple-app:1.0 .
+        docker cp $(docker create larod-simple-app:1.0):/opt/app ./build
+        cd ..
+        
+    # Save larop application *.eap file as artifact
+    - uses: actions/upload-artifact@master
+      with:
+        name: larod application
+        path: larod/build/
+        
+    # Build VDO stream application
+    - name: Build vdo stream application
+      run: |        
+        cd vdostream
+        docker build --tag axisecp/vdoencodeclient:1.0 .
+        docker cp $(docker create axisecp/vdoencodeclient:1.0):/opt/app ./build
+        cd ..
+        
+    # Save VDO stream application *.eap file as artifact
+    - uses: actions/upload-artifact@master
+      with:
+        name: vdo stream application
+        path: vdostream/build/
+        
+    # Build VDO larod application to run on CPU
+    - name: Build VDO larod application to run on CPU
+      run: |        
+        cd vdo-larod
+        cp app/package.conf.cpu app/package.conf
+        ./build.sh vdo_larod:latest
+        cd ..
+        
+    # Save VDO larod application *.eap file as artifact
+    - uses: actions/upload-artifact@master
+      with:
+        name: CPU vdo-larod application
+        path: vdo-larod/build/
+        
+    # Build VDO larod application to run on TPU
+    - name: Build VDO larod application to run on TPU
+      run: |        
+        cd vdo-larod
+        cp app/package.conf.edgetpu app/package.conf
+        ./build.sh vdo_larod:latest 19.10
+        cd ..
+        
+    # Save VDO larod application *.eap file as artifact
+    - uses: actions/upload-artifact@master
+      with:
+        name: TPU vdo-larod application
+        path: vdo-larod/build/
