@@ -1,0 +1,44 @@
+FROM tensorflow/tensorflow:latest-gpu-py3
+
+
+ENV HTTPS_PROXY http://wwwproxy:3128
+ENV HTTP_PROXY http://wwwproxy:3128
+ENV https_proxy http://wwwproxy:3128
+ENV http_proxy http://wwwproxy:3128
+ENV TF_FORCE_GPU_ALLOW_GROWTH true
+
+# Get docker to be able to build ACAP inside this container
+RUN apt-get update
+RUN apt-get install -y apt-transport-https \
+                       ca-certificates \
+                       curl \
+                       software-properties-common
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+RUN apt-get update && apt-get install docker-ce -y
+
+# Get dataset
+RUN apt-get update && apt-get install -y wget
+RUN mkdir -p /env/data/images && mkdir -p /env/data/annotations
+RUN curl -o /env/data/images/val2017.zip http://images.cocodataset.org/zips/val2017.zip && \
+    unzip -q /env/data/images/val2017.zip -d /env/data/images/ && \
+    rm /env/data/images/val2017.zip
+RUN curl -o /env/data/annotations_trainval2017.zip http://images.cocodataset.org/annotations/annotations_trainval2017.zip && \
+    unzip -q /env/data/annotations_trainval2017.zip -d /env/data/ && \
+    rm /env/data/annotations_trainval2017.zip
+
+# Edge TPU Compiler installation
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list
+RUN apt-get update && apt-get install edgetpu-compiler -y
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Get specific python packages
+RUN pip3 install Pillow tensorflow==2.3.0
+
+COPY ./env /env
+WORKDIR /env
+
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES all
