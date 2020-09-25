@@ -40,18 +40,20 @@ but the process is the same irrespective of the dimensions or number of the outp
 The first output corresponds to a value indicating if there are people in the image and the second
 output to another value indicating if there are cars in the image. The input to the model is a scaled FP32 RGB image of shape (256, 256, 3).
 
-The model is trained on the MS COCO dataset, but just on the validation set for size purposes. After training for 5 epochs, it achieves something like X% training accuracy on the people output and X% training accuracy on the car output with 1.2 million parameters, which results in a model file size of 16 MB. The model is saved in Tensorflow's SavedModel format, which is the recommended option.
+The model is trained on the MS COCO dataset. After training for 5 epochs, it achieves something like 80% training accuracy on the people output and 75% training accuracy on the car output with 2.4 million parameters, which results in a model file size of 32 MB. The model is saved in Tensorflow's SavedModel format, which is the recommended option, in the [/env/models](/env/models) directory.
 
-Run the training process in the container by executing:
+You can either use the pretrained model, or run the training process yourself on the smaller validation dataset by executing:
 
  ```sh
  python training/train.py -i /env/data/images/val2017/ -a /env/data/annotations/instances_val2017.json
  ```
 
-While this example looks at the process from model creating to inference on a camera, pretrained models
-are available at e.g., https://www.tensorflow.org/lite/models and https://coral.ai/models/. The models from [coral.ai](https://coral.ai) are precompiled to run on the Edge TPU and thus does not require any further processing, such as quantization.
+ For better results when not using the pretrained model, you should download the much larger training dataset from [the MS COCO site](https://cocodataset.org/#download).
 
-When designing your model for an Edge TPU device, you can only use operations that have an Edge TPU implementation. The full list of such operations are available at https://coral.ai/docs/edgetpu/models-intro/#supported-operations.
+While this example looks at the process from model creation to inference on a camera, pretrained models
+are available at e.g., https://www.tensorflow.org/lite/models and https://coral.ai/models/. The models from [coral.ai](https://coral.ai) are precompiled to run on the Edge TPU and thus only require conversion to `.larod`, [as described further on](#converting-to-larod).
+
+When designing your model for an Edge TPU device, you should only use operations that have an Edge TPU implementation. The full list of such operations are available at https://coral.ai/docs/edgetpu/models-intro/#supported-operations.
 
 ## Model quantization
 To get good machine learning performance on low-power devices,
@@ -66,8 +68,8 @@ accuracy.
 | Chip     	| Supported precision 	|
 |----------	|------------------	    |
 | Edge TPU 	| INT8                 	|
-| CPU 	    | FP32, FP16            |
-| GPU       | FP32, FP16, INT8      |
+| Common CPUs  	    | FP32, INT8            |
+| Common GPUs       | FP32, FP16, INT8      |
 
 As noted in the first chapter, this example uses a camera equipped with an Edge TPU.
 As the Edge TPU chip __only__ uses INT8 precision, the model will need to be quantized from
@@ -75,29 +77,31 @@ As the Edge TPU chip __only__ uses INT8 precision, the model will need to be qua
 will be done during the conversion described in the next section.
 
 ## Model conversion
-To use the model on a camera, it needs to be converted. The conversion from the `SavedModel` model format is divided into three steps:
+To use the model on a camera, it needs to be converted. The conversion from the `SavedModel` model to the camera ready format is divided into three steps:
 1. Convert to Tensorflow Lite format (`.tflite`) with Edge TPU compatible data types, e.g., by using the supplied `convert.py` script
-2. Compile with the Edge TPU compiler to add Edge TPU compatibility
-3. Convert the `.tflite` model to `.larod` using the `convert_larod.py` script
+2. Compile the `.tflite` model with the Edge TPU compiler to add Edge TPU compatibility
+3. Convert the Edge TPU compiled `.tflite` model to `.larod` using the `convert_larod.py` script
+
+All the resulting pretrained original, converted and compiled models are available in the `/env/models` directory, so any instruction step can be performed at any time.
 
 #### From SavedModel to .tflite
 The model in this example is saved in the SavedModel format. This is Tensorflow's recommended option, but other formats can be converted to `.tflite` as well. The conversion to `.tflite` is done in Python
 using the Tensorflow package's [Tensorflow Lite converter](https://www.tensorflow.org/lite/guide/get_started#tensorflow_lite_converter).
 
 For quantization to 8-bit integer precision, measurements on the network during inference needs to be performed.
-Thus, the conversion process does not only require the model but also input data samples, which are provided with
-a data generator. These input data samples need to be of the data type FP32. Running the script below converts a specified SavedModel to a Tensorflow Lite model, given that
+Thus, the conversion process does not only require the model but also input data samples, which are provided using
+a data generator. These input data samples need to be of the FP32 data type. Running the script below converts a specified SavedModel to a Tensorflow Lite model, given that
 the dataset generator is defined such that it yields data samples that fits our model's inputs.
 
 This script is located in [env/convert_model.py](env/convert_model.py). We use it to convert our model by executing it with our model path, dataset path and output path supplied as arguments:
 ```sh
-python convert_model.py -i /env/saved_model -d /env/data/images/val2017 -o /env/converted_model.tflite
+python convert_model.py -i /env/models/saved_model -d /env/data/images/val2017 -o /env/models/converted_model.tflite
 ```
 
-
+This process can take a few minutes as the validation dataset is quite large.
 
 #### Compiling for Edge TPU
-After conversion to the `.tflite` format, the `.tflite` model needs to be compiled for the Edge TPU. This is done by installing and running the [Edge TPU compiler](https://coral.ai/docs/edgetpu/compiler/#download), as described below. _However, this is already done in the example container._
+After conversion to the `.tflite` format, the `.tflite` model needs to be compiled for the Edge TPU. This is done by installing and running the [Edge TPU compiler](https://coral.ai/docs/edgetpu/compiler/#download), as described below. The Edge TPU compilation tools are already installed in the example container.
 
 **Installation**
 ```sh
@@ -113,13 +117,13 @@ With the compiler installed, the model can be compiled by running `edgetpu_compi
 
 Our `.tflite` model is compiled for the Edge TPU by running:
 ```sh
-edgetpu_compiler -s converted_model.tflite
+edgetpu_compiler -s -o models models/converted_model.tflite
 ```
 
-Now there should be a compiled model called `converted_model_edgetpu.tflite` in the same directory. We move this to the `app` directory in order for the model to be packaged with the ACAP when it is built:
+Now there should be a compiled model called `converted_model_edgetpu.tflite` in the `models` directory. We copy this to the `app` directory in order for the model to be packaged with the ACAP when it is built:
 
 ```sh
-mv converted_model_edgetpu.tflite app/
+cp models/converted_model_edgetpu.tflite app/
 ```
 
 

@@ -17,21 +17,23 @@ parser.add_argument('-o', '--output', type=str, default='converted_model.tflite'
 
 args = parser.parse_args()
 
+
 # !! IMPORTANT !! You need to define this generator yourself to fit your model!
 # A data generator which produces samples from the model's domain
 # Calling yield on this generator should output samples of the same type and
 # shape as the inputs to the model
 def a_representative_datagenerator():
-  # List the samples to yield
-  samples = glob.glob(os.path.join(args.dataset, '*'))
-  for sample_path in samples:
-    # Load and preprocess the input data
-    sample = Image.open(sample_path).resize((256, 256))
-    if sample.mode != 'RGB':
-        continue
-    preprocessed_sample = np.array(sample, dtype=np.float32) / 255.
-    preprocessed_sample = np.expand_dims(preprocessed_sample, axis=0)
-    yield [preprocessed_sample]
+    # List the samples to yield
+    samples = glob.glob(os.path.join(args.dataset, '*'))
+    for sample_path in samples:
+        # Load and preprocess the input data
+        sample = Image.open(sample_path).resize((256, 256))
+        if sample.mode != 'RGB':
+            continue
+        preprocessed_sample = np.array(sample, dtype=np.float32) / 255.
+        preprocessed_sample = np.expand_dims(preprocessed_sample, axis=0)
+        yield [preprocessed_sample]
+
 
 # Create the converter. As we're converting a model of the
 # SavedModel format, we're using the from_saved_model function

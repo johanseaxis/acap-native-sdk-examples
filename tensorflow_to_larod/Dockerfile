@@ -27,6 +27,10 @@ RUN curl -o /env/data/annotations_trainval2017.zip http://images.cocodataset.org
     unzip -q /env/data/annotations_trainval2017.zip -d /env/data/ && \
     rm /env/data/annotations_trainval2017.zip
 
+# Get pretrained models
+RUN mkdir -p /env/models
+# CURL BINARIES TO MODELS DIR
+
 # Edge TPU Compiler installation
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list
