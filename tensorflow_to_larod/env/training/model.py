@@ -36,7 +36,7 @@ def create_model(blocks=5, kernel_size=3):
 
     x = Dense(64)(x)
     x = Activation('relu')(x)
-    person_pred = Dense(1, activation='sigmoid', name='person_pred')(x)
-    car_pred = Dense(1, activation='sigmoid', name='car_pred')(x)
+    person_pred = Dense(1, activation='sigmoid', name='A_person_pred')(x)
+    car_pred = Dense(1, activation='sigmoid', name='B_car_pred')(x)
 
     return Model(img_in, [person_pred, car_pred], name='person_car_indicator')

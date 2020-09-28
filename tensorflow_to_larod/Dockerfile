@@ -30,6 +30,7 @@ RUN curl -o /env/data/annotations_trainval2017.zip http://images.cocodataset.org
 # Get pretrained models
 RUN mkdir -p /env/models
 # CURL BINARIES TO MODELS DIR
+# RUN cp models/converted_model_edgetpu.tflite app/
 
 # Edge TPU Compiler installation
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -

@@ -35,10 +35,9 @@ In this example, we're going to be working within a Docker container. This is do
 ```
 
 ## The example model
-In this example, we'll train a simple model with two outputs. For this model, both outputs are scalar
-but the process is the same irrespective of the dimensions or number of the outputs.
-The first output corresponds to a value indicating if there are people in the image and the second
-output to another value indicating if there are cars in the image. The input to the model is a scaled FP32 RGB image of shape (256, 256, 3).
+In this example, we'll train a simple model with one input and two outputs. The input to the model is a scaled FP32 RGB image of shape (256, 256, 3), while both outputs are scalar values. However, the process is the same irrespective of the dimensions or number of inputs or outputs.
+The first output corresponds to the probability of if there are people in the image and the second
+output to the probability of there being cars in the image. __Currently (TF2.3), there is a bug in the `.tflite` conversion which orders the model outputs alphabetically based on their name. For this reason, our outputs are named with A and B prefixes, as to retain them in the order our ACAP expects.__
 
 The model is trained on the MS COCO dataset. After training for 5 epochs, it achieves something like 80% training accuracy on the people output and 75% training accuracy on the car output with 2.4 million parameters, which results in a model file size of 32 MB. The model is saved in Tensorflow's SavedModel format, which is the recommended option, in the `/env/models` directory.
 
@@ -128,7 +127,7 @@ cp models/converted_model_edgetpu.tflite app/
 
 
 #### Converting to .larod
-The model needs to be converted to `.larod` for the camera to use it. This is done by using the ACAP SDK tool ```convert-larod.py``` and running `convert-larod.py tflite <path_to_tflite_model>`. However, in this example, this is done during the [build step](#building-the-algorithms-application), as the ACAP build environment has the needed SDK installed, which makes doing the conversion process easy.
+The model needs to be converted to `.larod` for the camera to use it. This is done by using the ACAP SDK tool ```larod-convert.py``` and running `larod-convert.py tflite <path_to_tflite_model>`. However, in this example, this is done during the [build step](#building-the-algorithms-application), as the ACAP build environment has the needed SDK installed, which makes doing the conversion process easy.
 
 
 ## Designing the algorithm's application
