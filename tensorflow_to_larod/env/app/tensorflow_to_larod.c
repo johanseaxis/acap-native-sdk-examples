@@ -327,7 +327,6 @@ int main(int argc, char** argv) {
     }
 
     for (unsigned int i = 0; i < args.numFrames && !stopRunning; i++) {
-      syslog(LOG_INFO, "Fetched from VDO");
         struct timeval startTs, endTs;
         unsigned int elapsedMs = 0;
 
@@ -342,7 +341,6 @@ int main(int argc, char** argv) {
 
         // Covert image data from NV12 format to interleaved uint8_t RGB format.
         gettimeofday(&startTs, NULL);
-        syslog(LOG_INFO, "Converting data..");
 
         if (!convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight,
                                         (uint8_t*) larodInputAddr, args.width,
@@ -373,7 +371,6 @@ int main(int argc, char** argv) {
             goto end;
         }
 
-        syslog(LOG_INFO, "Running inference..");
         gettimeofday(&startTs, NULL);
         if (!larodRunInference(conn, infReq, &error)) {
             syslog(LOG_ERR, "Unable to run inference on model %s: %s (%d)",

@@ -39,13 +39,16 @@ class DataGenerator(tf.keras.utils.Sequence):
     def _reprocess_annotations(self, annotations):
         has_person = set()
         has_car = set()
+
+        # The car class is in fact car, bus and truck
+        car_labels = set([3, 6, 8])
         for annotation in annotations['annotations']:
             # The person category
             if annotation['category_id'] == 1:
                 has_person.add(annotation['image_id'])
 
-            # The car category
-            elif annotation['category_id'] == 3:
+            # The car / 4-wheeled vehicle category
+            elif annotation['category_id'] in car_labels:
                 has_car.add(annotation['image_id'])
 
         processed_annotations = []
