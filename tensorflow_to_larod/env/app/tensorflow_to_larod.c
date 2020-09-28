@@ -215,7 +215,7 @@ int main(int argc, char** argv) {
     int larodOutput2Fd = -1;
     args_t args;
 
-    // Open the syslog to report messages for "vdo_larod"
+    // Open the syslog to report messages for "tensorflow_to_larod"
     openlog("tensorflow_to_larod", LOG_PID|LOG_CONS, LOG_USER);
 
     syslog(LOG_INFO, "Starting ...");

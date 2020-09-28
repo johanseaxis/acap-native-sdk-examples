@@ -12,7 +12,7 @@ greater depth than the
 and [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master/vdo-larod) examples.
 
 ## Table of contents
-1. [The hardware used in this example](#the-hardware-used-in-this-example)
+1. [The hardware and software used in this example](#the-hardware-and-software-used-in-this-example)
 2. [Environment for building and training](#environment-for-building-and-training)
 3. [The example model](#the-example-model)
 4. [Model quantization](#model-quantization)
@@ -40,7 +40,7 @@ but the process is the same irrespective of the dimensions or number of the outp
 The first output corresponds to a value indicating if there are people in the image and the second
 output to another value indicating if there are cars in the image. The input to the model is a scaled FP32 RGB image of shape (256, 256, 3).
 
-The model is trained on the MS COCO dataset. After training for 5 epochs, it achieves something like 80% training accuracy on the people output and 75% training accuracy on the car output with 2.4 million parameters, which results in a model file size of 32 MB. The model is saved in Tensorflow's SavedModel format, which is the recommended option, in the [/env/models](/env/models) directory.
+The model is trained on the MS COCO dataset. After training for 5 epochs, it achieves something like 80% training accuracy on the people output and 75% training accuracy on the car output with 2.4 million parameters, which results in a model file size of 32 MB. The model is saved in Tensorflow's SavedModel format, which is the recommended option, in the `/env/models` directory.
 
 You can either use the pretrained model, or run the training process yourself on the smaller validation dataset by executing:
 
@@ -133,12 +133,12 @@ The model needs to be converted to `.larod` for the camera to use it. This is do
 
 ## Designing the algorithm's application
 
-To upload the algorithm to the camera, it needs to be packaged as an [ACAP](https://www.axis.com/products/analytics/acap) and compiled. As this ACAP is going to perform inference on images captured by the camera and output a prediction on if there are any persons or cars present in the image, some C code is needed. The ACAP code that is relevant to this example is located in [app/machine_learning_acap.c](env/app/tensorflow_to_larod.c). This code is similar to the [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master/vdo-larod) example, with emphasis put on the differences, such as input to and multiple outputs from the model as well as handling these predictions.
+To upload the algorithm to the camera, it needs to be packaged as an [ACAP](https://www.axis.com/products/analytics/acap) and compiled. As this ACAP is going to perform inference on images captured by the camera and output a prediction on if there are any persons or cars present in the image, some C code is needed. The ACAP code that is relevant to this example is located in [env/app/tensorflow_to_larod.c](env/app/tensorflow_to_larod.c). This code is similar to the [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master/vdo-larod) example, with emphasis put on the differences, such as input to and multiple outputs from the model as well as handling these predictions.
 
-In this section we will go over the _rough outline_ of what needs to be done to run inference for our model, but again, the full code is available in [env/app/machine_learning_acap.c](env/app/tensorflow_to_larod.c).
+In this section we will go over the _rough outline_ of what needs to be done to run inference for our model, but again, the full code is available in [env/app/tensorflow_to_larod.c](env/app/tensorflow_to_larod.c).
 
 #### Setting up a video stream
-First of all, the frame to perform our analytics operation on needs to be retrieved. We do this using the [libvdo](https://www.axis.com/techsup/developer_doc/acap3/3.1/api/vdostream/html/index.html) library. First, the most appropriate available stream for our needs is chosen with the [chooseStreamResolution](env/app/imgprovider.c#221) method. While any stream could be used, selecting the smallest stream which is still greater or equal to our requested resolution ensures that a minimal amount of time is spent on resizing.
+First of all, the frame to perform our analytics operation on needs to be retrieved. We do this using the [libvdo](https://www.axis.com/techsup/developer_doc/acap3/3.1/api/vdostream/html/index.html) library. First, the most appropriate available stream for our needs is chosen with the [chooseStreamResolution](env/app/imgprovider.c#L221) method. While any stream could be used, selecting the smallest stream which is still greater or equal to our requested resolution ensures that a minimal amount of time is spent on resizing.
 
 ```c
 unsigned int streamWidth = 0;
@@ -146,14 +146,14 @@ unsigned int streamHeight = 0;
 chooseStreamResolution(args.width, args.height, &streamWidth, &streamHeight);
 ```
 
-With our stream settings known, a stream can be set up. This is done by creating an ImgProvider, which enables fetching frames from our stream. The stream resolution is fed into the [createImgProvider](env/app/imgprovider.c#95) method, along with the selected output format and numFrames (Är detta Queue? Buffer? _RED UT DETTA_), which in turn returns an ImgProvider.
+With our stream settings known, a stream can be set up. This is done by creating an ImgProvider, which enables fetching frames from our stream. The stream resolution is fed into the [createImgProvider](env/app/imgprovider.c#L95) method, along with the number of frames to have available to the application and the selected [output format](https://www.axis.com/techsup/developer_doc/acap3/3.1/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246), which in turn returns an ImgProvider.
 
 ```c
 provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
 ```
 
 #### Setting up the larod interface
-Next, the [larod](https://www.axis.com/techsup/developer_doc/acap3/3.1/api/larod/html/larod_8h.html) interface needs to be set up. It is through this interface that the model is loaded and inference is performed. The setting up of larod is in part done in the [setupLarod](env/app/tensorflow_to_larod.c#138) method. This method creates a connection to larod, selects the hardware to use and loads the model.
+Next, the [larod](https://www.axis.com/techsup/developer_doc/acap3/3.1/api/larod/html/larod_8h.html) interface needs to be set up. It is through this interface that the model is loaded and inference is performed. The setting up of larod is in part done in the [setupLarod](env/app/tensorflow_to_larod.c#L138) method. This method creates a connection to larod, selects the hardware to use and loads the model.
 
 ```c
 int larodModelFd = -1;
@@ -162,7 +162,7 @@ larodModel* model = NULL;
 setupLarod(args.chip, larodModelFd, &conn, &model);
 ```
 
-The tensors inputted to and outputted from larod needs to be stored. To accomplish this, a temporary file will be created for each such tensor. The input to our model is a single 256x256x3 tensor, and as the data type is now INT8, each such value is one byte. Thus, with the [createAndMapTmpFile](env/app/tensorflow_to_larod.c#75) method, a file descriptor (*Har en FD allokerat minne?*) with 256x256x3 bytes of allocated space is produced. The two outputs of the model are in the same manner allocated a single byte each, as they both output one INT8 value, using the same method.
+The tensors inputted to and outputted from larod needs to be stored. To accomplish this, a temporary file will be created for each such tensor. The input to our model is a single 256x256x3 tensor, and as the data type is now INT8, each such value is one byte in size. Thus, with the [createAndMapTmpFile](env/app/tensorflow_to_larod.c#L75) method, a file descriptor with 256x256x3 bytes of allocated space is produced. The two outputs of the model are in the same manner allocated a single byte each, as they both output one INT8 value, using the same method.
 ```c
 char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
 char CONV_OUT1_FILE_PATTERN[] = "/tmp/larod.out1.test-XXXXXX";
@@ -180,7 +180,7 @@ createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, args.outputBytes, &larodOutput2Addr,
 ```
 
 The input and output tensors to use need to be mapped to the model. This is done using
-larodCreateModelInputs and larodCreateModelOutputs methods. The variables specifying the number of inputs and outputs
+`larodCreateModelInputs` and `larodCreateModelOutputs` methods. The variables specifying the number of inputs and outputs
 to the model are automatically configured according to the inputted model.
 
 ```c
@@ -191,7 +191,7 @@ outputTensors = larodCreateModelOutputs(model, &numOutputs, &error);
 ```
 
 Each tensor needs to be mapped to a file descriptor to allow IO. With the file descriptors produced previously,
-each tensor is given a mapping to a file descriptor using the larodSetTensorFd method.
+each tensor is given a mapping to a file descriptor using the `larodSetTensorFd` method.
 
 ```c
 larodSetTensorFd(inputTensors[0], larodInputFd, &error);
@@ -200,7 +200,7 @@ larodSetTensorFd(outputTensors[1], larodOutput2Fd, &error);
 ```
 
 The final stage before inference is creating an inference request for our task.
-This is done using the larodCreateInferenceRequest method, which is given information on the task
+This is done using the `larodCreateInferenceRequest` method, which is given information on the task
 to perform through the model, our tensors and information regarding the number of inputs and outputs.
 
 ```c
@@ -216,7 +216,7 @@ uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
 ```
 
 Axis cameras output images on the NV12 YUV format. As this is not normally used as input format to deep learning models,
-conversion to e.g., RGB might be needed. This can be done using ```libyuv```. However, if performance is a primary objective, training the model to use the YUV format directly should be considered, as each frame conversion takes a few milliseconds. To convert the NV12 stream to RGB, the `convertCropScaleU8yuvToRGB` from `imgconverter` is used, which in turn uses `libyuv`.
+conversion to e.g., RGB might be needed. This can be done using ```libyuv```. However, if performance is a primary objective, training the model to use the YUV format directly should be considered, as each frame conversion takes a few milliseconds. To convert the NV12 stream to RGB, the `convertCropScaleU8yuvToRGB` from `imgconverter` is used, which in turn uses the `libyuv` library.
 
 ```c
 convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight, (uint8_t*) larodInputAddr, args.width, args.height);
@@ -271,3 +271,4 @@ tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
 * @tf.function decorator
 * converter.allow_custom_ops = True
 * YUV-tränad modell
+* TF2.1 class weighting vs TF2.3 uint8 op implementations
