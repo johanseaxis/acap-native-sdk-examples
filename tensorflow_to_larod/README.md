@@ -162,7 +162,8 @@ larodModel* model = NULL;
 setupLarod(args.chip, larodModelFd, &conn, &model);
 ```
 
-The tensors inputted to and outputted from larod needs to be stored. To accomplish this, a temporary file will be created for each such tensor. The input to our model is a single 256x256x3 tensor, and as the data type is now INT8, each such value is one byte in size. Thus, with the [createAndMapTmpFile](env/app/tensorflow_to_larod.c#L75) method, a file descriptor with 256x256x3 bytes of allocated space is produced. The two outputs of the model are in the same manner allocated a single byte each, as they both output one INT8 value, using the same method.
+The tensors inputted to and outputted from larod needs to be stored. To accomplish this, a temporary file will be created for each such tensor. The input to our model is a single 256x256x3 tensor, and as the data type is now INT8, each such value is one byte in size. Thus, with the [createAndMapTmpFile](env/app/tensorflow_to_larod.c#L75) method, a file descriptor with 256x256x3 bytes of allocated space is produced. The two outputs of the model are in the same manner allocated a single byte each, as they both output one INT8 value, using the same method. If some non-Edge TPU operation is included in the model, the associated tensors might be of the e.g., the FP32 data type instead, in which case this will have to be factored in when choosing how much memory to allocate.
+
 ```c
 char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
 char CONV_OUT1_FILE_PATTERN[] = "/tmp/larod.out1.test-XXXXXX";
