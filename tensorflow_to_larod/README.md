@@ -237,18 +237,14 @@ The ACAP is built to specification by the `Makefile` in [app/Makefile](env/app/M
 After running this script, the `build` directory should have been populated. Inside it is an `.eap` file, which is your stand-alone ACAP build.
 
 ## Installing the algorithm's application
-To install an ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This is possible to do in two main ways: 1) through the camera GUI or 2) through SSH.
+To install an ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI.
 
-__Option 1)__ Outside of the example container, extract the `.eap` from the container by running:
+Outside of the example container, extract the `.eap` from the container by running:
 ```sh
 docker cp tensorflow_to_larod_app:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap tensorflow_to_larod.eap
 ```
 Then go to your camera -> Settings -> Apps -> Add -> Browse to `tensorflow_to_larod.eap` and press Install
 
-__Option 2)__ Run the ACAP upload and install script:
-```sh
-Something something .sh
-```
 
 ## Running the algorithm
 In the Apps view of the camera, press the icon for your ACAP. A window will pop up which allows you to start the application. Press the Start icon to run the algorithm.
