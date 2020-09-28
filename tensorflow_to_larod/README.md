@@ -82,7 +82,7 @@ To use the model on a camera, it needs to be converted. The conversion from the 
 2. Compile the `.tflite` model with the Edge TPU compiler to add Edge TPU compatibility
 3. Convert the Edge TPU compiled `.tflite` model to `.larod` using the `convert_larod.py` script
 
-All the resulting pretrained original, converted and compiled models are available in the `/env/models` directory, so any instruction step can be performed at any time.
+__All the resulting pretrained original, converted and compiled models are available in the `/env/models` directory, so any step in the process can be skipped.__
 
 #### From SavedModel to .tflite
 The model in this example is saved in the SavedModel format. This is Tensorflow's recommended option, but other formats can be converted to `.tflite` as well. The conversion to `.tflite` is done in Python
