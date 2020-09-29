@@ -6,6 +6,9 @@
     Usage: python convert_model.py -i <SavedModel path> \
         -d <dataset directory for data generation> [-o <.tflite output path>]
 """
+
+# Some code adapted from https://www.tensorflow.org/lite/performance/post_training_quantization
+
 import argparse
 import glob
 import numpy as np
@@ -27,10 +30,11 @@ parser.add_argument('-o', '--output', type=str,
 args = parser.parse_args()
 
 
-# !! IMPORTANT !! You need to define this generator yourself to fit your model!
+# !! IMPORTANT !! You need to define this generator yourself if you are using
+# a model different from the one defined in the example!
 def a_representative_datagenerator():
     """ A data generator which produces samples from the model's domain.
-        Calling yield on this generator should output samples of the same type
+        Calling this generator should output samples of the same type
         and shape as the inputs to the model, similar to those it has been
         trained on.
 
