@@ -21,10 +21,62 @@ and [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master
 7. [Installing the algorithm's application](#installing-the-algorithms-application)
 8. [Running the algorithm](#running-the-algorithm)
 
-## The hardware and software used in this example
-This example uses a camera equipped with an [Edge TPU](https://coral.ai/docs/edgetpu/faq/), which allows
-for good machine learning performance on the edge. Tensorflow 2.3.0 is used as to
-take advantage of newly released features related to the the model conversion process.
+## Prerequisites
+- Camera equipped with an [Edge TPU](https://coral.ai/docs/edgetpu/faq/)
+- Tensorflow 2.3.0
+- MS COCO dataset
+- Docker
+
+## Example structure
+```bash
+tensorflow_to_larod
+├── build.sh
+├── Dockerfile
+├── env
+│   ├── app
+│   │   ├── argparse.c
+│   │   ├── argparse.h
+│   │   ├── imgconverter.c
+│   │   ├── imgconverter.h
+│   │   ├── imgprovider.c
+│   │   ├── imgprovider.h
+│   │   ├── LICENSE
+│   │   ├── Makefile
+│   │   ├── package.conf
+│   │   └── tensorflow_to_larod.c
+│   ├── .dockerignore
+│   ├── build.sh
+│   ├── convert_model.py
+│   ├── Dockerfile
+│   ├── training
+│   │   ├── model.py
+│   │   ├── train.py
+│   │   └── utils.py
+│   └── yuv
+│       ├── 0001-Create-a-shared-library.patch
+│       ├── build.sh
+│       └── Dockerfile
+├── README.md
+└── run.sh
+```
+- **build.sh** -
+- **Dockerfile** -
+- **env/app/argparse.c** - This file parses the arguments to the application.
+- **env/app/imgconverter.c** - This file handles the libyuv part of the application.
+- **env/app/imgprovider.c** - This file handles the vdo part of the application.
+- **env/app/Makefile** -
+- **env/app/package.conf** -
+- **env/app/tensorflow_to_larod.c** -
+- **env/build.sh** -
+- **env/convert_model.py** -
+- **env/Dockerfile** -
+- **env/trainig/model.py** -
+- **env/trainig/train.py** -
+- **env/trainig/utils.py** -
+- **env/yuv/0001-Create-a-shared-library.patch** -
+- **env/yuv/build.sh** -
+- **env/yuv/Dockerfile** -
+- **run.sh** -
 
 
 ## Environment for building and training
@@ -41,7 +93,7 @@ output to the probability of there being cars in the image. __Currently (TF2.3),
 
 The model is trained on the MS COCO dataset. After training for 5 epochs, it achieves something like 80% training accuracy on the people output and 75% training accuracy on the car output with 2.4 million parameters, which results in a model file size of 32 MB. The model is saved in Tensorflow's SavedModel format, which is the recommended option, in the `/env/models` directory.
 
-You can either use the pretrained model, or run the training process yourself on the smaller validation dataset by executing:
+You can either use the pre-trained model, or run the training process yourself on the smaller validation dataset by executing:
 
  ```sh
  python training/train.py -i /env/data/images/val2017/ -a /env/data/annotations/instances_val2017.json
@@ -49,8 +101,8 @@ You can either use the pretrained model, or run the training process yourself on
 
  For better results when training your own model, you should download the much larger training dataset from [the MS COCO site](https://cocodataset.org/#download).
 
-While this example looks at the process from model creation to inference on a camera, pretrained models
-are available at e.g., https://www.tensorflow.org/lite/models and https://coral.ai/models/. The models from [coral.ai](https://coral.ai) are precompiled to run on the Edge TPU and thus only require conversion to `.larod`, [as described further on](#converting-to-larod).
+While this example looks at the process from model creation to inference on a camera, pre-trained models
+are available at e.g., https://www.tensorflow.org/lite/models and https://coral.ai/models/. The models from [coral.ai](https://coral.ai) are pre-compiled to run on the Edge TPU and thus only require conversion to `.larod`, [as described further on](#converting-to-larod).
 
 When designing your model for an Edge TPU device, you should only use operations that have an Edge TPU implementation. The full list of such operations are available at https://coral.ai/docs/edgetpu/models-intro/#supported-operations.
 
@@ -81,7 +133,7 @@ To use the model on a camera, it needs to be converted. The conversion from the 
 2. Compile the `.tflite` model with the Edge TPU compiler to add Edge TPU compatibility
 3. Convert the Edge TPU compiled `.tflite` model to `.larod` using the `larod-convert.py` script from the ACAP SDK
 
-__All the resulting pretrained original, converted and compiled models are available in the `/env/models` directory, so any step in the process can be skipped.__
+__All the resulting pre-trained original, converted and compiled models are available in the `/env/models` directory, so any step in the process can be skipped.__
 
 #### From SavedModel to .tflite
 The model in this example is saved in the SavedModel format. This is Tensorflow's recommended option, but other formats can be converted to `.tflite` as well. The conversion to `.tflite` is done in Python
@@ -223,7 +275,7 @@ convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight, (uint8_t*) larod
 ```
 
 
-Any other postprocessing steps should be done now, as the inference is next. Using the larod interface, inference is run with the `larodRunInference` method, which outputs the results to the specified output addresses. As we're using multiple outputs, with one file descriptors per output, the respective output will be available at the addresses we associated with the file descriptor. In the case of this example, our two output tensors from the inference can be read at `larodOutput1Addr` and `larodOutput2Addr` respectively.  
+Any other postprocessing steps should be done now, as the inference is next. Using the larod interface, inference is run with the `larodRunInference` method, which outputs the results to the specified output addresses. As we're using multiple outputs, with one file descriptors per output, the respective output will be available at the addresses we associated with the file descriptor. In the case of this example, our two output tensors from the inference can be read at `larodOutput1Addr` and `larodOutput2Addr` respectively.
 
 ## Building the algorithm's application
 A packaging file is needed to compile the ACAP. This is found in [app/package.conf](env/app/package.conf). For the scope of this tutorial, the `APPOPTS` and `OTHERFILES` keys are noteworthy. `APPOPTS` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](env/app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes>`. The file(s) specified in `OTHERFILES` simply tell the compiler what files to copy to the ACAP, such as our .larod model file.
