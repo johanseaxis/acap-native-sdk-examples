@@ -1,10 +1,24 @@
+""" train.py
+    Instantiates a data generator and a model and trains the model.
+
+    usage: train.py [-h] -i <path to dataset image dir> \
+        -a <path to dataset annotation json-file>
+"""
+
 import argparse
 import tensorflow as tf
 from model import create_model
-from utils import DataGenerator
+from utils import SimpleCOCODataGenerator as DataGenerator
 
 
 def train(image_dir, annotation_path):
+    """ Initiates a model and and trains it using a data generator. The model
+        is then saved to the output path.
+
+    Args:
+        image_dir (str): Path to the directory holding the dataset images.
+        annotation_path (str): Path to the dataset annotation json-file.
+    """
     person_car_indicator = create_model()
     person_car_indicator.compile(optimizer='adam', metrics=['binary_accuracy'],
                                  loss=['bce', 'bce'])

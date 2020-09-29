@@ -47,7 +47,7 @@ You can either use the pretrained model, or run the training process yourself on
  python training/train.py -i /env/data/images/val2017/ -a /env/data/annotations/instances_val2017.json
  ```
 
- For better results when not using the pretrained model, you should download the much larger training dataset from [the MS COCO site](https://cocodataset.org/#download).
+ For better results when training your own model, you should download the much larger training dataset from [the MS COCO site](https://cocodataset.org/#download).
 
 While this example looks at the process from model creation to inference on a camera, pretrained models
 are available at e.g., https://www.tensorflow.org/lite/models and https://coral.ai/models/. The models from [coral.ai](https://coral.ai) are precompiled to run on the Edge TPU and thus only require conversion to `.larod`, [as described further on](#converting-to-larod).
@@ -77,9 +77,9 @@ will be done during the conversion described in the next section.
 
 ## Model conversion
 To use the model on a camera, it needs to be converted. The conversion from the `SavedModel` model to the camera ready format is divided into three steps:
-1. Convert to Tensorflow Lite format (`.tflite`) with Edge TPU compatible data types, e.g., by using the supplied `convert.py` script
+1. Convert to Tensorflow Lite format (`.tflite`) with Edge TPU compatible data types, e.g., by using the supplied `convert_model.py` script
 2. Compile the `.tflite` model with the Edge TPU compiler to add Edge TPU compatibility
-3. Convert the Edge TPU compiled `.tflite` model to `.larod` using the `convert_larod.py` script
+3. Convert the Edge TPU compiled `.tflite` model to `.larod` using the `larod-convert.py` script from the ACAP SDK
 
 __All the resulting pretrained original, converted and compiled models are available in the `/env/models` directory, so any step in the process can be skipped.__
 
@@ -259,12 +259,11 @@ tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
 
 
 # Improvements
-* Göra script för 3-stegs conversion till 1
-* Icke-NN funktioner (ex NMS)
-* Custom objects (savedmodel löser?)
-* 2D output för overlay/pixelklassificering
-* Olika output tensor-dimensioner för ett verkligare use case
-* @tf.function decorator
-* converter.allow_custom_ops = True
-* YUV-tränad modell
-* TF2.1 class weighting vs TF2.3 uint8 op implementations
+* Provide script for the making the three model conversion steps into one (perhaps not in example scope)
+* Interaction with non-neural network operations (eg NMS)
+* Custom objects
+* 2D output for showing overlay of eg pixel classifications
+* Different output tensor dimensions for a more realistic use case
+* Usage of the @tf.function decorator
+* Usage of converter.allow_custom_ops
+* TF2.1 has class weighting which currently is needed to get good training, TF2.3 has uint8 op implementations for quantization and dequantization, which is needed to convert the whole model
