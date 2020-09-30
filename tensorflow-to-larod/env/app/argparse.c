@@ -35,8 +35,6 @@ const struct argp_option opts[] = {
      "from the library. If not specified, the default chip for a new "
      "connection will be used.",
      0},
-    {"num-frames", 'n', "NUM_FRAMES", 0,
-     "How many frames to run inferences on. Default is 100 frames.", 0},
     {"help", 'h', NULL, 0, "Print this help text and exit.", 0},
     {"usage", KEY_USAGE, NULL, 0, "Print short usage message and exit.", 0},
     {0}};
@@ -49,8 +47,8 @@ const struct argp argp = {
     "format which are converted to interleaved rgb format and then sent to "
     "larod for inference on MODEL. OUTPUT_SIZE denotes the size in bytes of "
     "the tensor output by MODEL.\n\nExample call:\n"
-    "larod-vdo-example-app /tmp/mobilenet_v2_1.0_224_quant.larod 224 224 "
-    "1001 -c 2\nwhere 2 here refers to the tflite cpu backend. The numbers for "
+    "/usr/local/packages/tensorflow_to_larod/model/converted_model.larod 256 "
+    "256 1 -c 4\nwhere 4 here refers to the Edge TPU backend. The numbers for "
     "each type of chip can be found at the top of the file larod.h.",
     NULL,
     NULL,
@@ -74,15 +72,6 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
             argp_failure(state, EXIT_FAILURE, ret, "invalid chip type");
         }
         args->chip = (larodChip) chip;
-        break;
-    }
-    case 'n': {
-        unsigned long long numFrames;
-        int ret = parsePosInt(arg, &numFrames, UINT_MAX);
-        if (ret) {
-            argp_failure(state, EXIT_FAILURE, ret, "invalid number of frames");
-        }
-        args->numFrames = (unsigned int) numFrames;
         break;
     }
     case 'h':
@@ -123,7 +112,6 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
         args->width = 0;
         args->height = 0;
         args->outputBytes = 0;
-        args->numFrames = 100;
         args->chip = 0;
         args->modelFile = NULL;
         break;

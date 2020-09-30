@@ -326,7 +326,7 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    for (unsigned int i = 0; i < args.numFrames && !stopRunning; i++) {
+    while (true) {
         struct timeval startTs, endTs;
         unsigned int elapsedMs = 0;
 
@@ -387,7 +387,7 @@ int main(int argc, char** argv) {
         uint8_t* car_pred = (uint8_t*) larodOutput2Addr;
 
         syslog(LOG_INFO, "Person detected: %.2f%% - Car detected: %.2f%%",
-               (float) person_pred[0] / 2.5f, (float) car_pred[0]  / 2.5f);
+               (float) person_pred[0] / 2.55f, (float) car_pred[0]  / 2.55f);
 
         // Release frame reference to provider.
         returnFrame(provider, buf);
