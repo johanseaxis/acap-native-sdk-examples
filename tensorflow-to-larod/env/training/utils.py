@@ -18,7 +18,7 @@ class SimpleCOCODataGenerator(Sequence):
         a given image.
     """
     def __init__(self, samples_dir, annotation_path, data_shape=(256, 256),
-                 batch_size=16, shuffle=True):
+                 batch_size=16, shuffle=True, balance=True):
         """ Initializes the data generator.
 
         Args:
@@ -30,6 +30,8 @@ class SimpleCOCODataGenerator(Sequence):
             batch_size (int, optional): The number of samples per batch.
             shuffle (bool, optional): Whether to shuffle the dataset sample
                 order after each epoch.
+            balance (bool, optional): Whether to oversample the data in order
+                reduce the effect of imbalanced classes
         """
         self.samples_dir = samples_dir
         annotations = json.load(open(annotation_path, 'r'))
@@ -37,6 +39,7 @@ class SimpleCOCODataGenerator(Sequence):
         self.data_shape = data_shape
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.balance = balance
         self.on_epoch_end()
 
     def __len__(self):
@@ -56,20 +59,31 @@ class SimpleCOCODataGenerator(Sequence):
         X, y = self._generate_batch(batch_annotations)
         return X, y
 
-    def on_epoch_end(self):
+    def on_epoch_end(self, weights=[1, 1, 1, 3]):
         """ Function executed at the end of an epoch. Shuffles the dataset
             sample order if self.shuffle is True and balances the data
-            by performing oversampling.
+            by performing oversampling. A bit of a hacky balancing solution due
+            to Tensorflow r2.3 not supporting class_weight for multiple outputs
+
+            Args:
+                weights (int array): An integer array where each element
+                    corresponds to the sample weighting of a class
         """
-        self.indices = set(np.arange(len(self.annotations)))
-        not_has_person = self.indices.difference(self.sample_classes['has_person'])
-        not_has_car = self.indices.difference(self.sample_classes['has_car'])
-        classes = [not_has_person, not_has_car,
-                   self.sample_classes['has_person'],
-                   self.sample_classes['has_car']]
-        samples_per_class = np.max([len(c) for c in classes])
-        [self.indices.update(np.random.choice(c, size=samples_per_class))
-         for c in classes]
+        self.indices = np.arange(len(self.annotations))
+        if self.balance:
+            indices_set = set(self.indices)
+            not_has_person = indices_set - self.sample_classes['has_person']
+            not_has_car = indices_set - self.sample_classes['has_car']
+            classes = [not_has_person,
+                       self.sample_classes['has_person'],
+                       not_has_car,
+                       self.sample_classes['has_car']]
+            samples_per_class = np.max([len(c) for c in classes])
+            self.indices = np.concatenate([np.random.choice(list(c),
+               size=int(weights[idx] * samples_per_class)) for idx, c
+               in enumerate(classes)])
+        if self.shuffle is True:
+            np.random.shuffle(self.indices)
 
     def _reprocess_annotations(self, annotations):
         """ Extracts information from the given dataset which is relevant to
