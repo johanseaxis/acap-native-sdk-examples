@@ -86,7 +86,7 @@ The following instructions can be executed to simply run the example. Each step 
 1. Build and run the example environment:
 ```sh
 ./build_env.sh
-./run_env.sh
+./run_env.sh <a_name_for_your_env>
 ```
 2. Train a Tensorflow model:
 ```sh
@@ -114,7 +114,7 @@ cp models/converted_model_edgetpu.tflite app/
 
 8. In the new terminal, copy the ACAP `.eap` file from the example environment:
 ```sh
-docker cp tensorflow_to_larod_app:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap tensorflow_to_larod.eap
+docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap tensorflow_to_larod.eap
 ```
 9. Install and start the ACAP on your camera through the GUI
 
@@ -126,10 +126,10 @@ tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
 ```
 
 ## Environment for building and training
-In this example, we're going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. To start the environment, navigate to the example's env folder, run the build script and then the run script, as seen below:
+In this example, we're going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. To start the environment, navigate to the example's env folder, run the build script and then the run script with what you want to name the environment as an argument, as seen below:
 ```sh
 ./build_env.sh
-./run_env.sh
+./run_env.sh <a_name_for_your_env>
 ```
 
 ## The example model
@@ -339,8 +339,10 @@ To install an ACAP, the `.eap` file in the `build` directory needs to be uploade
 
 Outside of the example environment, extract the `.eap` from the environment by running:
 ```sh
-docker cp tensorflow_to_larod_app:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap tensorflow_to_larod.eap
+docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap tensorflow_to_larod.eap
 ```
+
+where `<a_name_for_your_env>` is the same name as you used to start your environment with the `./run_env.sh` script.
 Then go to your camera -> Settings -> Apps -> Add -> Browse to `tensorflow_to_larod.eap` and press Install
 
 
