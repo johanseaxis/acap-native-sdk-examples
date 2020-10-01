@@ -1,25 +1,28 @@
 *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # From Tensorflow model to larod inference on camera
-In this example, we look at the process of running machine learning models on
-Axis cameras. We go through the steps needed from the training of the model
+## Overview
+In this example, we look at the process of running a Tensorflow model on
+an Axis camera equipped with an Edge TPU. We go through the steps needed from the training of the model
 to actually running inference on a camera by interfacing with the
 [larod API](https://www.axis.com/techsup/developer_doc/acap3/3.1/api/larod/html/larod_8h.html).
 This example is somewhat more comprehensive and covers e.g.,
-model conversion, image formats and models with multiple output tensors in
+model conversion, model quantization, image formats and models with multiple output tensors in
 greater depth than the
 [larod](https://github.com/AxisCommunications/acap3-examples/tree/master/larod)
 and [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master/vdo-larod) examples.
 
 ## Table of contents
-1. [The hardware and software used in this example](#the-hardware-and-software-used-in-this-example)
-2. [Environment for building and training](#environment-for-building-and-training)
-3. [The example model](#the-example-model)
-4. [Model quantization](#model-quantization)
-5. [Model conversion](#model-conversion)
-6. [Building the algorithm's application](#building-the-algorithms-application)
-7. [Installing the algorithm's application](#installing-the-algorithms-application)
-8. [Running the algorithm](#running-the-algorithm)
+1. [Prerequisites](#prerequisites)
+2. [Structure of this example](#structure-of-this-example)
+3. [Quickstart](#quickstart)
+4. [Environment for building and training](#environment-for-building-and-training)
+5. [The example model](#the-example-model)
+6. [Model quantization](#model-quantization)
+7. [Model conversion](#model-conversion)
+8. [Building the algorithm's application](#building-the-algorithms-application)
+9. [Installing the algorithm's application](#installing-the-algorithms-application)
+10. [Running the algorithm](#running-the-algorithm)
 
 ## Prerequisites
 - Camera equipped with an [Edge TPU](https://coral.ai/docs/edgetpu/faq/)
@@ -27,10 +30,10 @@ and [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master
 - MS COCO dataset
 - Docker
 
-## Example structure
+## Structure of this example
 ```bash
 tensorflow_to_larod
-├── build.sh
+├── build_env.sh
 ├── Dockerfile
 ├── env
 │   ├── app
@@ -45,7 +48,7 @@ tensorflow_to_larod
 │   │   ├── package.conf
 │   │   └── tensorflow_to_larod.c
 │   ├── .dockerignore
-│   ├── build.sh
+│   ├── build_acap.sh
 │   ├── convert_model.py
 │   ├── Dockerfile
 │   ├── training
@@ -57,33 +60,76 @@ tensorflow_to_larod
 │       ├── build.sh
 │       └── Dockerfile
 ├── README.md
-└── run.sh
+└── run_env.sh
 ```
-- **build.sh** -
-- **Dockerfile** -
-- **env/app/argparse.c** - This file parses the arguments to the application.
-- **env/app/imgconverter.c** - This file handles the libyuv part of the application.
-- **env/app/imgprovider.c** - This file handles the vdo part of the application.
-- **env/app/Makefile** -
-- **env/app/package.conf** -
-- **env/app/tensorflow_to_larod.c** -
-- **env/build.sh** -
-- **env/convert_model.py** -
-- **env/Dockerfile** -
-- **env/trainig/model.py** -
-- **env/trainig/train.py** -
-- **env/trainig/utils.py** -
-- **env/yuv/0001-Create-a-shared-library.patch** -
-- **env/yuv/build.sh** -
-- **env/yuv/Dockerfile** -
-- **run.sh** -
+- **build_env.sh** - Builds the environment in which this example is run.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **env/app/argparse.c/h** - Implementation of argument parser, written in C.
+- **env/app/imgconverter.c/h** - Implementation of libyuv parts, written in C.
+- **env/app/imgprovider.c/h** - Implementation of vdo parts, written in C.
+- **env/app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
+- **env/app/package.conf** - Defines the ACAP and its configuration.
+- **env/app/tensorflow_to_larod.c** - The file implementing the core functionality of the ACAP.
+- **env/build_acap.sh** - Builds the ACAP and the .eap file.
+- **env/convert_model.py** - A script used to convert Tensorflow models to quantized Tensorflow Lite models.
+- **env/Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **env/training/model.py** - Defines the Tensorflow model used in this example.
+- **env/training/train.py** - Defines the model training procedure of this example.
+- **env/training/utils.py** - Contains a datagenerator which specifies how data is loaded to the training process.
+- **env/yuv/** - Folder containing files for building libyuv.
+- **run_env.sh** - Runs the environment in which this example is run.
 
+
+## Quickstart
+The following instructions can be executed to simply run the example. Each step is described in greater detail in the following sections.
+
+1. Build and run the example environment:
+```sh
+./build_env.sh
+./run_env.sh <a_name_for_your_env>
+```
+2. Train a Tensorflow model:
+```sh
+python training/train.py -i /env/data/images/val2017/ -a /env/data/annotations/instances_val2017.json
+```
+3. Quantize the Tensorflow model and convert it to `.tflite`:
+```sh
+python convert_model.py -i /env/models/saved_model -d /env/data/images/val2017 -o /env/models/converted_model.tflite
+```
+4. Compile the converted model to work on the Edge TPU:
+```sh
+edgetpu_compiler -s -o models models/converted_model.tflite
+```
+5. Copy the compiled converted model to the `app` directory:
+```sh
+cp models/converted_model_edgetpu.tflite app/
+```
+
+6. Compile the ACAP:
+```sh
+./build_acap.sh tensorflow_to_larod_acap:1.0
+```
+
+7. Open a new terminal
+
+8. In the new terminal, copy the ACAP `.eap` file from the example environment:
+```sh
+docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap tensorflow_to_larod.eap
+```
+9. Install and start the ACAP on your camera through the GUI
+
+10. SSH to the camera
+
+11. View its log to see the ACAP output:
+```sh
+tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
+```
 
 ## Environment for building and training
-In this example, we're going to be working within a Docker container. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. To start the container, navigate to the example's env folder, run the build script and then the run script, as seen below:
+In this example, we're going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. To start the environment, navigate to the example's env folder, run the build script and then the run script with what you want to name the environment as an argument, as seen below:
 ```sh
-./build.sh
-./run.sh
+./build_env.sh
+./run_env.sh <a_name_for_your_env>
 ```
 
 ## The example model
@@ -152,7 +198,7 @@ python convert_model.py -i /env/models/saved_model -d /env/data/images/val2017 -
 This process can take a few minutes as the validation dataset is quite large.
 
 #### Compiling for Edge TPU
-After conversion to the `.tflite` format, the `.tflite` model needs to be compiled for the Edge TPU. This is done by installing and running the [Edge TPU compiler](https://coral.ai/docs/edgetpu/compiler/#download), as described below. The Edge TPU compilation tools are already installed in the example container.
+After conversion to the `.tflite` format, the `.tflite` model needs to be compiled for the Edge TPU. This is done by installing and running the [Edge TPU compiler](https://coral.ai/docs/edgetpu/compiler/#download), as described below. The Edge TPU compilation tools are already installed in the example environment.
 
 **Installation**
 ```sh
@@ -280,10 +326,10 @@ Any other postprocessing steps should be done now, as the inference is next. Usi
 ## Building the algorithm's application
 A packaging file is needed to compile the ACAP. This is found in [app/package.conf](env/app/package.conf). For the scope of this tutorial, the `APPOPTS` and `OTHERFILES` keys are noteworthy. `APPOPTS` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](env/app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes>`. The file(s) specified in `OTHERFILES` simply tell the compiler what files to copy to the ACAP, such as our .larod model file.
 
-The ACAP is built to specification by the `Makefile` in [app/Makefile](env/app/Makefile). It is also this file which specifies the last step in the model conversion process, namely converting the `.tflite` to `.larod` by using the `convert_larod.py`-tool described earlier. With the [Makefile](env/app/Makefile) and [package.conf](env/app/package.conf) files set up, the ACAP can be built by running the build script in the container:
+The ACAP is built to specification by the `Makefile` in [app/Makefile](env/app/Makefile). It is also this file which specifies the last step in the model conversion process, namely converting the `.tflite` to `.larod` by using the `convert_larod.py`-tool described earlier. With the [Makefile](env/app/Makefile) and [package.conf](env/app/package.conf) files set up, the ACAP can be built by running the build script in the example environment:
 
 ```sh
-./build.sh tensorflow_to_larod_acap:1.0
+./build_acap.sh tensorflow_to_larod_acap:1.0
 ```
 
 After running this script, the `build` directory should have been populated. Inside it is an `.eap` file, which is your stand-alone ACAP build.
@@ -291,10 +337,12 @@ After running this script, the `build` directory should have been populated. Ins
 ## Installing the algorithm's application
 To install an ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI.
 
-Outside of the example container, extract the `.eap` from the container by running:
+Outside of the example environment, extract the `.eap` from the environment by running:
 ```sh
-docker cp tensorflow_to_larod_app:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap tensorflow_to_larod.eap
+docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap tensorflow_to_larod.eap
 ```
+
+where `<a_name_for_your_env>` is the same name as you used to start your environment with the `./run_env.sh` script.
 Then go to your camera -> Settings -> Apps -> Add -> Browse to `tensorflow_to_larod.eap` and press Install
 
 

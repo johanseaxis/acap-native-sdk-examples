@@ -32,11 +32,15 @@ args = parser.parse_args()
 
 # !! IMPORTANT !! You need to define this generator yourself if you are using
 # a model different from the one defined in the example!
-def a_representative_datagenerator():
+def a_representative_datagenerator(n_samples_to_yield=1000):
     """ A data generator which produces samples from the model's domain.
         Calling this generator should output samples of the same type
         and shape as the inputs to the model, similar to those it has been
         trained on.
+
+        Args:
+            n_samples_to_yield (int): The number of samples for this generator
+                to yield. 
 
     Yields:
         np.float32 array: An RGB image from the dataset directory, which has
@@ -46,7 +50,9 @@ def a_representative_datagenerator():
             shape (1, 256, 256, 3).
     """
     samples = glob.glob(os.path.join(args.dataset, '*'))
-    for sample_path in samples:
+    sample_set = np.random.choice(samples, size=n_samples_to_yield,
+                                  replace=False)
+    for sample_path in sample_set:
         sample = Image.open(sample_path).resize((256, 256))
         if sample.mode != 'RGB':
             continue
