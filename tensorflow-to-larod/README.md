@@ -16,7 +16,7 @@ and [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master
 1. [Prerequisites](#prerequisites)
 2. [Structure of this example](#structure-of-this-example)
 3. [Quickstart](#quickstart)
-4. [Environment for building and training](#environment-for-building-and-raining)
+4. [Environment for building and training](#environment-for-building-and-training)
 5. [The example model](#the-example-model)
 6. [Model quantization](#model-quantization)
 7. [Model conversion](#model-conversion)

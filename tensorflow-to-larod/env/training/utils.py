@@ -58,11 +58,18 @@ class SimpleCOCODataGenerator(Sequence):
 
     def on_epoch_end(self):
         """ Function executed at the end of an epoch. Shuffles the dataset
-            sample order if self.shuffle is True.
+            sample order if self.shuffle is True and balances the data
+            by performing oversampling.
         """
-        self.indices = np.arange(len(self.annotations))
-        if self.shuffle is True:
-            np.random.shuffle(self.indices)
+        self.indices = set(np.arange(len(self.annotations)))
+        not_has_person = self.indices.difference(self.sample_classes['has_person'])
+        not_has_car = self.indices.difference(self.sample_classes['has_car'])
+        classes = [not_has_person, not_has_car,
+                   self.sample_classes['has_person'],
+                   self.sample_classes['has_car']]
+        samples_per_class = np.max([len(c) for c in classes])
+        [self.indices.update(np.random.choice(c, size=samples_per_class))
+         for c in classes]
 
     def _reprocess_annotations(self, annotations):
         """ Extracts information from the given dataset which is relevant to
@@ -90,6 +97,7 @@ class SimpleCOCODataGenerator(Sequence):
             elif annotation['category_id'] in car_labels:
                 has_car.add(annotation['image_id'])
 
+        self.sample_classes = {'has_car': set(), 'has_person': set()}
         processed_annotations = []
         for image in annotations['images']:
             sample = {'file_name': image['file_name'],
@@ -100,6 +108,11 @@ class SimpleCOCODataGenerator(Sequence):
             file_exists = os.path.exists(img_path)
 
             if file_exists and Image.open(img_path).mode == 'RGB':
+                sample_idx = len(processed_annotations)
+                if image['id'] in has_person:
+                    self.sample_classes['has_person'].add(sample_idx)
+                if image['id'] in has_car:
+                    self.sample_classes['has_car'].add(sample_idx)
                 processed_annotations.append(sample)
         return np.array(processed_annotations)
 
