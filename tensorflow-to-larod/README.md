@@ -26,9 +26,9 @@ and [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master
 
 ## Prerequisites
 - Camera equipped with an [Edge TPU](https://coral.ai/docs/edgetpu/faq/)
-- Tensorflow 2.3.0
-- MS COCO dataset
-- Docker
+- NVIDIA GPU and drivers [compatible with Tensorflow r2.3](https://www.tensorflow.org/install/source#gpu)
+- [Docker](https://docs.docker.com/get-docker/)
+- [NVIDIA container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian)
 
 ## Structure of this example
 ```bash
@@ -88,7 +88,7 @@ The following instructions can be executed to simply run the example. Each step 
 ./build_env.sh
 ./run_env.sh <a_name_for_your_env>
 ```
-2. Train a Tensorflow model:
+2. Train a Tensorflow model _(optional, pre-trained models available)_:
 ```sh
 python training/train.py -i /env/data/images/val2017/ -a /env/data/annotations/instances_val2017.json
 ```
@@ -126,7 +126,7 @@ tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
 ```
 
 ## Environment for building and training
-In this example, we're going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. To start the environment, navigate to the example's env folder, run the build script and then the run script with what you want to name the environment as an argument, as seen below:
+In this example, we're going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. To start the environment, navigate to the example's env folder, run the build script and then the run script with what you want to name the environment as an argument. The build script forwards the environment variables `http_proxy` and `https_proxy` to the environment to allow proxy setups. The scripts are run as seen below:
 ```sh
 ./build_env.sh
 ./run_env.sh <a_name_for_your_env>

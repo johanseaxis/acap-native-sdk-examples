@@ -1,10 +1,12 @@
 FROM tensorflow/tensorflow:latest-gpu-py3
 
+ARG http_proxy
+ARG https_proxy
 
-ENV HTTPS_PROXY http://wwwproxy:3128
-ENV HTTP_PROXY http://wwwproxy:3128
-ENV https_proxy http://wwwproxy:3128
-ENV http_proxy http://wwwproxy:3128
+ENV HTTPS_PROXY ${https_proxy}
+ENV HTTP_PROXY ${http_proxy}
+ENV https_proxy ${https_proxy}
+ENV http_proxy ${http_proxy}
 ENV TF_FORCE_GPU_ALLOW_GROWTH true
 
 # Get docker to be able to build ACAP inside this container
