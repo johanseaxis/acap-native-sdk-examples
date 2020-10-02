@@ -1,12 +1,11 @@
 """ model.py
     Defines the model's structure and configuration.
 """
-
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
 
 
-def _residual_block(x, n_filters):
+def _residual_block(x, n_filters, strides=1):
     """ Produces a residual convolutional block as seen in
         https://en.wikipedia.org/wiki/Residual_neural_network
 
@@ -19,14 +18,14 @@ def _residual_block(x, n_filters):
     """
     shortcut = x
 
-    x = Conv2D(n_filters, 3, strides=2, padding='same')(x)
+    x = Conv2D(n_filters, 3, strides=strides, padding='same')(x)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
 
     x = Conv2D(n_filters, 3,  padding='same')(x)
     x = BatchNormalization()(x)
 
-    shortcut = Conv2D(n_filters, 1, strides=2, padding='same')(shortcut)
+    shortcut = Conv2D(n_filters, 1, strides=strides, padding='same')(shortcut)
     shortcut = BatchNormalization()(shortcut)
 
     x = Add()([shortcut, x])
@@ -49,9 +48,9 @@ def create_model(blocks=5, n_filters=8):
     img_in = Input(shape=(256, 256, 3))
 
     x = img_in
-
     for block_index in range(blocks):
         x = _residual_block(x, n_filters * 2 ** block_index)
+        x = _residual_block(x, n_filters * 2 ** (block_index + 1), strides=2)
     x = Conv2D(256, 3, strides=2, activation='relu')(x)
     x = Flatten()(x)
 
