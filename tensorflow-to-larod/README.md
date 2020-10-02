@@ -137,7 +137,7 @@ In this example, we'll train a simple model with one input and two outputs. The 
 The first output corresponds to the probability of if there are people in the image and the second
 output to the probability of there being cars in the image. __Currently (TF2.3), there is a bug in the `.tflite` conversion which orders the model outputs alphabetically based on their name. For this reason, our outputs are named with A and B prefixes, as to retain them in the order our ACAP expects.__
 
-The model is trained on the MS COCO dataset. After training for 5 epochs, it achieves something like 80% training accuracy on the people output and 75% training accuracy on the car output with 2.4 million parameters, which results in a model file size of 32 MB. The model is saved in Tensorflow's SavedModel format, which is the recommended option, in the `/env/models` directory.
+The model is trained on the MS COCO dataset. After training for 10 epochs, it achieves something like 80% validation accuracy on the people output and 90% validation accuracy on the car output with 1.6 million parameters, which results in a model file size of 22 MB. The model is saved in Tensorflow's SavedModel format, which is the recommended option, in the `/env/models` directory.
 
 You can either use the pre-trained model, or run the training process yourself on the smaller validation dataset by executing:
 
@@ -354,6 +354,10 @@ With the algorithm started, we can view the output by either pressing "App log" 
 tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
 ```
 
+Placing yourself in the middle of the cameras field of view should ideally make the log read something like:
+```sh
+[ INFO    ] tensorflow_to_larod[1893]: Person detected: 98.2% - Car detected: 1.98%
+```
 ## License
 **[Apache License 2.0](../LICENSE)**
 
@@ -362,8 +366,8 @@ tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
 * Provide script for the making the three model conversion steps into one (perhaps not in example scope)
 * Interaction with non-neural network operations (eg NMS)
 * Custom objects
-* 2D output for showing overlay of eg pixel classifications
+* 2D output for showing overlay of e.g., pixel classifications
 * Different output tensor dimensions for a more realistic use case
 * Usage of the @tf.function decorator
 * Usage of converter.allow_custom_ops
-* TF2.1 has class weighting which currently is needed to get good training, TF2.3 has uint8 op implementations for quantization and dequantization, which is needed to convert the whole model
+* Quantization-aware training

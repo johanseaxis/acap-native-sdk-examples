@@ -24,7 +24,7 @@ def train(image_dir, annotation_path):
                                  loss=['bce', 'bce'])
     person_car_indicator.summary()
     data_generator = DataGenerator(image_dir, annotation_path, batch_size=32)
-    person_car_indicator.fit(data_generator, epochs=5)
+    person_car_indicator.fit(data_generator, epochs=10)
 
     tf.saved_model.save(person_car_indicator, 'models/saved_model')
 
