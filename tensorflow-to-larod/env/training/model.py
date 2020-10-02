@@ -3,6 +3,7 @@
 """
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
+from tensorflow.keras import backend as K
 
 
 def _residual_block(x, n_filters, strides=1):
@@ -33,7 +34,7 @@ def _residual_block(x, n_filters, strides=1):
     return x
 
 
-def create_model(blocks=5, n_filters=8):
+def create_model(blocks=4, n_filters=16):
     """ Defines and instantiates a model.
 
     Args:
@@ -51,11 +52,14 @@ def create_model(blocks=5, n_filters=8):
     for block_index in range(blocks):
         x = _residual_block(x, n_filters * 2 ** block_index)
         x = _residual_block(x, n_filters * 2 ** (block_index + 1), strides=2)
-    x = Conv2D(256, 3, strides=2, activation='relu')(x)
+
+    # Global max pooling is not supported on the Edge TPU yet
+    # but this is an equivalent procedure made of supported operations
+    side_size = K.int_shape(x)[-2]
+    x = MaxPooling2D(side_size)(x)
     x = Flatten()(x)
 
-    x = Dense(64)(x)
-    x = Activation('relu')(x)
+    x = Dense(64, activation='relu')(x)
     person_pred = Dense(1, activation='sigmoid', name='A_person_pred')(x)
     car_pred = Dense(1, activation='sigmoid', name='B_car_pred')(x)
 
