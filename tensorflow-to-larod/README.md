@@ -354,6 +354,10 @@ With the algorithm started, we can view the output by either pressing "App log" 
 tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
 ```
 
+Placing yourself in the middle of the cameras field of view should ideally make the log read something like:
+```sh
+[ INFO    ] tensorflow_to_larod[1893]: Person detected: 98.2% - Car detected: 1.98%
+```
 ## License
 **[Apache License 2.0](../LICENSE)**
 
