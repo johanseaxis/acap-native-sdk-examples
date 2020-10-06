@@ -215,7 +215,7 @@ bool convertCropScaleU8yuvToRGB(const uint8_t* nv12Data, unsigned int srcWidth,
     // 1. The crop area shall fill the input image either horizontally or
     //    vertically.
     // 2. The crop area shall have the same aspect ratio as the output image.
-    float destWHratio = (float) dstWidth / (float) dstHeight;
+    float destWHratio = (float) srcWidth / (float) srcHeight;
 
     float clipW = (float) srcWidth;
     float clipH = clipW / destWHratio;
