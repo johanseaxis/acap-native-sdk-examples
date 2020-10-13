@@ -51,7 +51,5 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Get specific python packages
 RUN pip3 install Pillow tensorflow==2.3.0
 
-
-
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES all

@@ -25,7 +25,7 @@ and [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master
 10. [Running the algorithm](#running-the-algorithm)
 
 ## Prerequisites
-- Camera equipped with an [Edge TPU](https://coral.ai/docs/edgetpu/faq/)
+- Axis camera equipped with an [Edge TPU](https://coral.ai/docs/edgetpu/faq/)
 - NVIDIA GPU and drivers [compatible with Tensorflow r2.3](https://www.tensorflow.org/install/source#gpu)
 - [Docker](https://docs.docker.com/get-docker/)
 - [NVIDIA container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian)
@@ -126,7 +126,7 @@ tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
 ```
 
 ## Environment for building and training
-In this example, we're going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. To start the environment, navigate to the example's env folder, run the build script and then the run script with what you want to name the environment as an argument. The build script forwards the environment variables `http_proxy` and `https_proxy` to the environment to allow proxy setups. The scripts are run as seen below:
+In this example, we're going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. To start the environment, run the build script and then the run script with what you want to name the environment as an argument. The build script forwards the environment variables `http_proxy` and `https_proxy` to the environment to allow proxy setups. The scripts are run as seen below:
 ```sh
 ./build_env.sh
 ./run_env.sh <a_name_for_your_env>
@@ -134,12 +134,12 @@ In this example, we're going to be working within a Docker container environment
 
 ## The example model
 In this example, we'll train a simple model with one input and two outputs. The input to the model is a scaled FP32 RGB image of shape (256, 256, 3), while both outputs are scalar values. However, the process is the same irrespective of the dimensions or number of inputs or outputs.
-The first output corresponds to the probability of if there are people in the image and the second
+The first output corresponds to the probability of there being people in the image and the second
 output to the probability of there being cars in the image. __Currently (TF2.3), there is a bug in the `.tflite` conversion which orders the model outputs alphabetically based on their name. For this reason, our outputs are named with A and B prefixes, as to retain them in the order our ACAP expects.__
 
 The model is trained on the MS COCO dataset. After training for 10 epochs, it achieves something like 80% validation accuracy on the people output and 90% validation accuracy on the car output with 1.6 million parameters, which results in a model file size of 22 MB. The model is saved in Tensorflow's SavedModel format, which is the recommended option, in the `/env/models` directory.
 
-You can either use the pre-trained model, or run the training process yourself on the smaller validation dataset by executing:
+You can either skip this step and use the pre-trained model available in `models/`, or run the training process yourself on the smaller validation dataset by executing:
 
  ```sh
  python training/train.py -i /env/data/images/val2017/ -a /env/data/annotations/instances_val2017.json
@@ -150,7 +150,7 @@ You can either use the pre-trained model, or run the training process yourself o
 While this example looks at the process from model creation to inference on a camera, pre-trained models
 are available at e.g., https://www.tensorflow.org/lite/models and https://coral.ai/models/. The models from [coral.ai](https://coral.ai) are pre-compiled to run on the Edge TPU and thus only require conversion to `.larod`, [as described further on](#converting-to-larod).
 
-When designing your model for an Edge TPU device, you should only use operations that have an Edge TPU implementation. The full list of such operations are available at https://coral.ai/docs/edgetpu/models-intro/#supported-operations.
+When designing your model for an Edge TPU device, you should only use operations that have an Edge TPU implementation. The full list of such operations is available at https://coral.ai/docs/edgetpu/models-intro/#supported-operations.
 
 ## Model quantization
 To get good machine learning performance on low-power devices,
@@ -188,9 +188,9 @@ using the Tensorflow package's [Tensorflow Lite converter](https://www.tensorflo
 For quantization to 8-bit integer precision, measurements on the network during inference needs to be performed.
 Thus, the conversion process does not only require the model but also input data samples, which are provided using
 a data generator. These input data samples need to be of the FP32 data type. Running the script below converts a specified SavedModel to a Tensorflow Lite model, given that
-the dataset generator is defined such that it yields data samples that fits our model's inputs.
+the dataset generator function in the script is defined such that it yields data samples that fits our model's inputs.
 
-This script is located in [env/convert_model.py](env/convert_model.py). We use it to convert our model by executing it with our model path, dataset path and output path supplied as arguments:
+This script is located in [/env/convert_model.py](env/convert_model.py). We use it to convert our model by executing it with our model path, dataset path and output path supplied as arguments:
 ```sh
 python convert_model.py -i /env/models/saved_model -d /env/data/images/val2017 -o /env/models/converted_model.tflite
 ```
@@ -210,7 +210,7 @@ sudo apt-get install edgetpu-compiler
 
 **Usage**
 
-With the compiler installed, the model can be compiled by running `edgetpu_compiler -s <model_path>`. By default, this will create a new `.tflite` model with the same name as the original model but with a `_edgetpu` suffix. The `-s` flag makes the compiler output additional information on what operations were compiled to be run on the Edge TPU and which, if any, were compiled to run on CPU. If you are seeing the QUANTIZATION and DEQUANTIZATION ops being mapped to the CPU, ensure that you are running a recent version of Tensorflow as, e.g. version 2.3.0 converts these operations to be performed on the Edge TPU.
+With the compiler installed, the model can be compiled by running `edgetpu_compiler -s <model_path>`. By default, this will create a new `.tflite` model with the same name as the original model but with a `_edgetpu` suffix. The `-s` flag makes the compiler output additional information on what operations were compiled to be run on the Edge TPU and which, if any, were compiled to run on CPU. If you are seeing the QUANTIZATION and DEQUANTIZATION ops being mapped to the CPU, ensure that you are running a recent version of Tensorflow as newer versions, e.g. 2.3.0, converts these operations to be performed on the Edge TPU.
 
 Our `.tflite` model is compiled for the Edge TPU by running:
 ```sh
@@ -230,9 +230,9 @@ The model needs to be converted to `.larod` for the camera to use it. This is do
 
 ## Designing the algorithm's application
 
-To upload the algorithm to the camera, it needs to be packaged as an [ACAP](https://www.axis.com/products/analytics/acap) and compiled. As this ACAP is going to perform inference on images captured by the camera and output a prediction on if there are any persons or cars present in the image, some C code is needed. The ACAP code that is relevant to this example is located in [env/app/tensorflow_to_larod.c](env/app/tensorflow_to_larod.c). This code is similar to the [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master/vdo-larod) example, with emphasis put on the differences, such as input to and multiple outputs from the model as well as handling these predictions.
+To upload the algorithm to the camera, it needs to be packaged as an [ACAP](https://www.axis.com/products/analytics/acap) and compiled. As this ACAP is going to perform inference on images captured by the camera and output a prediction on if there are any persons or cars present in the image, some C code is needed. The ACAP code that is relevant to this example is located in [/env/app/tensorflow_to_larod.c](env/app/tensorflow_to_larod.c). This code is similar to the [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master/vdo-larod) example, with emphasis put on the differences, such as input to and multiple outputs from the model as well as handling these predictions.
 
-In this section we will go over the _rough outline_ of what needs to be done to run inference for our model, but again, the full code is available in [env/app/tensorflow_to_larod.c](env/app/tensorflow_to_larod.c).
+In this section we will go over the _rough outline_ of what needs to be done to run inference for our model, but again, the full code is available in [/env/app/tensorflow_to_larod.c](env/app/tensorflow_to_larod.c).
 
 #### Setting up a video stream
 First of all, the frame to perform our analytics operation on needs to be retrieved. We do this using the [libvdo](https://www.axis.com/techsup/developer_doc/acap3/3.1/api/vdostream/html/index.html) library. First, the most appropriate available stream for our needs is chosen with the [chooseStreamResolution](env/app/imgprovider.c#L221) method. While any stream could be used, selecting the smallest stream which is still greater or equal to our requested resolution ensures that a minimal amount of time is spent on resizing.
@@ -259,7 +259,9 @@ larodModel* model = NULL;
 setupLarod(args.chip, larodModelFd, &conn, &model);
 ```
 
-The tensors inputted to and outputted from larod needs to be stored. To accomplish this, a temporary file will be created for each such tensor. The input to our model is a single 256x256x3 tensor, and as the data type is now INT8, each such value is one byte in size. Thus, with the [createAndMapTmpFile](env/app/tensorflow_to_larod.c#L75) method, a file descriptor with 256x256x3 bytes of allocated space is produced. The two outputs of the model are in the same manner allocated a single byte each, as they both output one INT8 value, using the same method. If some non-Edge TPU operation is included in the model, the associated tensors might be of the e.g., the FP32 data type instead, in which case this will have to be factored in when choosing how much memory to allocate.
+The tensors inputted to and outputted from larod needs to be stored. To accomplish this, a temporary file will be created for each such tensor. The input to our model is a single 256x256x3 tensor, and as the data type is now INT8, each such value is one byte in size. Thus, with the [createAndMapTmpFile](env/app/tensorflow_to_larod.c#L75) method, a file descriptor with 256x256x3 bytes of allocated space is produced to hold this input tensor. The two outputs of the model are in the same manner allocated a single byte each, as they both output one INT8 value, using the same method.
+
+If some non-Edge TPU operation is included in the model, the associated tensors might be of the e.g., the FP32 data type instead. In this case, this will have to be factored in when choosing how much memory to allocate.
 
 ```c
 char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
@@ -321,7 +323,21 @@ convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight, (uint8_t*) larod
 ```
 
 
-Any other postprocessing steps should be done now, as the inference is next. Using the larod interface, inference is run with the `larodRunInference` method, which outputs the results to the specified output addresses. As we're using multiple outputs, with one file descriptors per output, the respective output will be available at the addresses we associated with the file descriptor. In the case of this example, our two output tensors from the inference can be read at `larodOutput1Addr` and `larodOutput2Addr` respectively.
+Any other postprocessing steps should be done now, as the inference is next. Using the larod interface, inference is run with the `larodRunInference` method, which outputs the results to the specified output addresses.
+
+```c
+larodRunInference(conn, infReq, &error);
+```
+
+As we're using multiple outputs, with one file descriptor per output, the respective output will be available at the addresses we associated with the file descriptor. In the case of this example, our two output tensors from the inference can be read at `larodOutput1Addr` and `larodOutput2Addr` respectively. In this example, the resulting probabilities is outputted to the application's log with the `syslog` function.
+
+```c
+uint8_t* person_pred = (uint8_t*) larodOutput1Addr;
+uint8_t* car_pred = (uint8_t*) larodOutput2Addr;
+
+syslog(LOG_INFO, "Person detected: %.2f%% - Car detected: %.2f%%",
+       (float) person_pred[0] / 2.55f, (float) car_pred[0]  / 2.55f);
+```
 
 ## Building the algorithm's application
 A packaging file is needed to compile the ACAP. This is found in [app/package.conf](env/app/package.conf). For the scope of this tutorial, the `APPOPTS` and `OTHERFILES` keys are noteworthy. `APPOPTS` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](env/app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes>`. The file(s) specified in `OTHERFILES` simply tell the compiler what files to copy to the ACAP, such as our .larod model file.
@@ -343,7 +359,7 @@ docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf
 ```
 
 where `<a_name_for_your_env>` is the same name as you used to start your environment with the `./run_env.sh` script.
-Then go to your camera -> Settings -> Apps -> Add -> Browse to `tensorflow_to_larod.eap` and press Install
+Then go to your camera -> Settings -> Apps -> Add -> Browse to `tensorflow_to_larod.eap` and press Install.
 
 
 ## Running the algorithm
@@ -362,12 +378,10 @@ Placing yourself in the middle of the cameras field of view should ideally make 
 **[Apache License 2.0](../LICENSE)**
 
 
-# Improvements
-* Provide script for the making the three model conversion steps into one (perhaps not in example scope)
+# Future possible improvements
 * Interaction with non-neural network operations (eg NMS)
 * Custom objects
 * 2D output for showing overlay of e.g., pixel classifications
 * Different output tensor dimensions for a more realistic use case
 * Usage of the @tf.function decorator
-* Usage of converter.allow_custom_ops
 * Quantization-aware training
