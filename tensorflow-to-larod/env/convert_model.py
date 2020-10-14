@@ -1,7 +1,25 @@
-""" convert_model.py
-    Converts a saved Tensorflow SavedModel model to the Tensorflow Lite
-    format. The conversion is also set up to quantize the model to the INT8
-    precision, which allows usage on INT8 compatible devices.
+"""
+ * Copyright (C) 2020 Axis Communications AB, Lund, Sweden
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+"""
+
+
+"""
+Description of convert_model.py
+Converts a saved Tensorflow SavedModel model to the Tensorflow Lite
+format. The conversion is also set up to quantize the model to the INT8
+precision, which allows usage on INT8 compatible devices.
 
     Usage: python convert_model.py -i <SavedModel path> \
         -d <dataset directory for data generation> [-o <.tflite output path>]
@@ -40,7 +58,7 @@ def a_representative_datagenerator(n_samples_to_yield=1000):
 
         Args:
             n_samples_to_yield (int): The number of samples for this generator
-                to yield. 
+                to yield.
 
     Yields:
         np.float32 array: An RGB image from the dataset directory, which has
