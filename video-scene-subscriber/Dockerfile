@@ -4,9 +4,10 @@
 ARG ARCH=armv7hf
 ARG VERSION=master
 ARG UBUNTU_VERSION=19.10
+ARG REPO=docker-prod.se.axis.com/axisecp
 
-FROM docker-sandbox.se.axis.com/axisecp/acap-api:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} as api
-FROM docker-sandbox.se.axis.com/axisecp/acap-toolchain:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} as toolchain
+FROM ${REPO}/acap-api:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} as api
+FROM ${REPO}/acap-toolchain:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} as toolchain
 
 # Use PKG_ARCH=aarch64-poky-linux if ARCH=aarch64
 ARG PKG_ARCH=cortexa9hf-neon-poky-linux-gnueabi
