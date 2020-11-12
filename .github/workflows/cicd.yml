@@ -178,3 +178,25 @@ jobs:
         cd ..
         mkdir -p acap3/examples/video-scene-subscriber/build
         cp video-scene-subscriber/build/video_scene_subscriber_client_1_0_0_armv7hf.eap acap3/examples/video-scene-subscriber/build/video_scene_subscriber_client_1_0_0_armv7hf.eap
+        
+     #Run functional tests  
+    - name: Run functional tests
+      run: |
+         export WORKSPACE=$(pwd)
+         git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
+         cd recap  
+         git checkout topic/development/recaptest      
+         
+         export ATF_PYTHON=python3     
+         ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
+         python --version
+         
+         chmod +x test_starter.sh
+         ./test_starter.sh
+         ls recap/output
+   
+    # Save functional test report as artifact
+    - uses: actions/upload-artifact@master
+      with:
+        name: Test report 
+        path: recap/recap/output/report.xml 
