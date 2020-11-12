@@ -186,7 +186,6 @@ jobs:
          git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
          cd recap  
          git checkout topic/development/recaptest      
-         
          export ATF_PYTHON=python3     
          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
          python --version
