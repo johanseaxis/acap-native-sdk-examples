@@ -66,7 +66,9 @@ jobs:
         ./build.sh vdo_larod:latest
         cd ..
         mkdir -p acap3/examples/vdo-larod
+        ls vdo-larod/build
         cp vdo-larod/build/vdo_larod_cpu_1_0_0_armv7hf.eap acap3/examples/vdo-larod/vdo_larod_cpu_1_0_0_armv7hf.eap
+        ls acap3/examples/vdo-larod
         
     # Save VDO larod application *.eap file as artifact
   #  - uses: actions/upload-artifact@master
