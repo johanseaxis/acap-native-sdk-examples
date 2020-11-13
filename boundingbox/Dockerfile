@@ -2,9 +2,9 @@
 # Should be used for getting API and toolchain images
 # Currently, only aarch64 is supported
 ARG ARCH=aarch64
-ARG VERSION=master
+ARG VERSION=3.2
 ARG UBUNTU_VERSION=19.10
-ARG REPO=docker-prod.se.axis.com/axisecp
+ARG REPO=axisecp
 
 FROM ${REPO}/acap-api:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} as api
 FROM ${REPO}/acap-toolchain:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} as toolchain
