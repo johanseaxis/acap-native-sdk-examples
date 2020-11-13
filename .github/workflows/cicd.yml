@@ -65,6 +65,7 @@ jobs:
         cp app/package.conf.cpu app/package.conf
         ./build.sh vdo_larod:latest
         cd ..
+        pwd
         mkdir -p acap3/examples/vdo-larod
         cp vdo-larod/build/vdo_larod_cpu_1_0_0_armv7hf.eap acap3/examples/vdo-larod/vdo_larod_cpu_1_0_0_armv7hf.eap
         ls acap3/examples/vdo-larod
@@ -184,6 +185,7 @@ jobs:
     - name: Run functional tests
       run: |
          export WORKSPACE=$(pwd)
+         echo $WORKSPACE
          git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
          cd recap  
          git checkout topic/development/recaptest      
