@@ -27,7 +27,7 @@ jobs:
         export http_proxy=http://wwwproxy.se.axis.com:3128
         export https_proxy=http://wwwproxy.se.axis.com:3128
         cd larod
-        docker build --build-arg http_proxy=${https_proxy} --build-arg https_proxy=${https_proxy} --build-arg VERSION=${VERSION} --tag larod-simple-app:1.0 .
+        docker build --build-arg http_proxy=${https_proxy} --build-arg https_proxy=${https_proxy} --tag larod-simple-app:1.0 .
         docker cp $(docker create larod-simple-app:1.0):/opt/app ./build
         cd ..
         mkdir -p acap3/examples/larod/build
@@ -43,7 +43,7 @@ jobs:
     - name: Build vdo stream application
       run: |        
         cd vdostream
-        docker build --build-arg VERSION=${VERSION} --tag axisecp/vdoencodeclient:1.0 .
+        docker build --tag axisecp/vdoencodeclient:1.0 .
         docker cp $(docker create axisecp/vdoencodeclient:1.0):/opt/app ./build
         cd ..
         mkdir -p acap3/examples/vdostream/build
@@ -110,7 +110,7 @@ jobs:
     - name: Build subscribe to event application
       run: |
         cd axevent/subscribe_to_event
-        docker build --build-arg VERSION=${VERSION} --tag subscribe-to-event:1.0 .
+        docker build --tag subscribe-to-event:1.0 .
         docker cp $(docker create subscribe-to-event:1.0):/opt/app ./build
         cd ..
         cd ..
@@ -127,7 +127,7 @@ jobs:
     - name: Build subscribe to events application
       run: |     
         cd axevent/subscribe_to_events
-        docker build --build-arg VERSION=${VERSION} --tag subscribe-to-events:1.0 .
+        docker build --tag subscribe-to-events:1.0 .
         docker cp $(docker create subscribe-to-events:1.0):/opt/app ./build
         cd ..
         cd ..
@@ -145,7 +145,7 @@ jobs:
       run: |
         export ARCH=armv7hf        
         cd boundingbox
-        docker build --build-arg ARCH=${ARCH} --build-arg PKG_ARCH=cortexa9hf-neon-poky-linux-gnueabi --build-arg VERSION=${VERSION} --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} --tag boundingboxexample:1.0 .
+        docker build --build-arg ARCH=${ARCH} --build-arg PKG_ARCH=cortexa9hf-neon-poky-linux-gnueabi --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} --tag boundingboxexample:1.0 .
         docker cp $(docker create  boundingboxexample:1.0):/build/src/ build
         cd ..
         mkdir -p acap3/examples/boundingbox/build
@@ -155,7 +155,7 @@ jobs:
     - name: Build Object Detection application
       run: |
         cd subscribe-to-object-detection
-        docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} --build-arg VERSION=${VERSION} --tag vod:1.0 .
+        docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} --tag vod:1.0 .
         docker cp $(docker create vod:1.0):/opt/app ./build
         cd ..
         mkdir -p acap3/examples/subscribe-to-object-detection/build
@@ -165,7 +165,7 @@ jobs:
     - name: Build Video scene subscriber application
       run: |
         cd video-scene-subscriber
-        docker build --build-arg http_proxy=${https_proxy} --build-arg https_proxy=${https_proxy} --build-arg VERSION=${VERSION} --tag video-scene-subscriber:1.0 .
+        docker build --build-arg http_proxy=${https_proxy} --build-arg https_proxy=${https_proxy} --tag video-scene-subscriber:1.0 .
         docker cp $(docker create  video-scene-subscriber:1.0):/opt/app/ build
         cd ..
         mkdir -p acap3/examples/video-scene-subscriber/build
