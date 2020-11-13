@@ -24,7 +24,6 @@ jobs:
     # Run build script larod application
     - name: Build larod application
       run: |
-        export VERSION=3.2
         export http_proxy=http://wwwproxy.se.axis.com:3128
         export https_proxy=http://wwwproxy.se.axis.com:3128
         cd larod
@@ -42,8 +41,7 @@ jobs:
         
     # Build VDO stream application
     - name: Build vdo stream application
-      run: |      
-        export VERSION=3.2  
+      run: |        
         cd vdostream
         docker build --build-arg VERSION=${VERSION} --tag axisecp/vdoencodeclient:1.0 .
         docker cp $(docker create axisecp/vdoencodeclient:1.0):/opt/app ./build
@@ -59,8 +57,7 @@ jobs:
         
     # Build VDO larod application to run on CPU
     - name: Build VDO larod application to run on CPU
-      run: |    
-        export VERSION=3.2    
+      run: |      
         cd vdo-larod
         cp app/package.conf.cpu app/package.conf
         ./build.sh vdo_larod:latest
@@ -79,7 +76,6 @@ jobs:
     # Build VDO larod application to run on TPU
     - name: Build VDO larod application to run on TPU
       run: |    
-        export VERSION=3.2    
         cd vdo-larod
         cp app/package.conf.edgetpu app/package.conf
         ./build.sh vdo_larod:latest 19.10
@@ -96,7 +92,6 @@ jobs:
     # Build Send event application
     - name: Build Send event application
       run: |    
-        export VERSION=3.2    
         cd axevent/send_event
         docker build --tag send-event:1.0 .
         docker cp $(docker create send-event:1.0):/opt/app ./build
@@ -114,7 +109,6 @@ jobs:
     # Build Subscribe to event application
     - name: Build subscribe to event application
       run: |
-        export VERSION=3.2
         cd axevent/subscribe_to_event
         docker build --build-arg VERSION=${VERSION} --tag subscribe-to-event:1.0 .
         docker cp $(docker create subscribe-to-event:1.0):/opt/app ./build
@@ -132,7 +126,6 @@ jobs:
     # Build Subscribe to events application
     - name: Build subscribe to events application
       run: |     
-        export VERSION=3.2   
         cd axevent/subscribe_to_events
         docker build --build-arg VERSION=${VERSION} --tag subscribe-to-events:1.0 .
         docker cp $(docker create subscribe-to-events:1.0):/opt/app ./build
@@ -150,7 +143,6 @@ jobs:
     #Build Boundingbox application
     - name: Build Bounding application
       run: |
-        export VERSION=3.2
         export ARCH=armv7hf        
         cd boundingbox
         docker build --build-arg ARCH=${ARCH} --build-arg PKG_ARCH=cortexa9hf-neon-poky-linux-gnueabi --build-arg VERSION=${VERSION} --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} --tag boundingboxexample:1.0 .
@@ -162,7 +154,6 @@ jobs:
      #Build Object Detection application
     - name: Build Object Detection application
       run: |
-        export VERSION=3.2
         cd subscribe-to-object-detection
         docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} --build-arg VERSION=${VERSION} --tag vod:1.0 .
         docker cp $(docker create vod:1.0):/opt/app ./build
@@ -173,7 +164,6 @@ jobs:
     #Build Video scene subscriber application
     - name: Build Video scene subscriber application
       run: |
-        export VERSION=3.2
         cd video-scene-subscriber
         docker build --build-arg http_proxy=${https_proxy} --build-arg https_proxy=${https_proxy} --build-arg VERSION=${VERSION} --tag video-scene-subscriber:1.0 .
         docker cp $(docker create  video-scene-subscriber:1.0):/opt/app/ build
@@ -193,12 +183,12 @@ jobs:
          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
          python --version
          
-         chmod +x test_starter.sh
-         ./test_starter.sh
-         ls recap/output
+      #   chmod +x test_starter.sh
+      #   ./test_starter.sh
+      #   ls recap/output
    
     # Save functional test report as artifact
-    - uses: actions/upload-artifact@master
-      with:
-        name: Test report 
-        path: recap/recap/output/report.xml 
+  #  - uses: actions/upload-artifact@master
+  #    with:
+  #      name: Test report 
+  #      path: recap/recap/output/report.xml 
