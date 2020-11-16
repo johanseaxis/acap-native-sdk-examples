@@ -2,9 +2,9 @@
 # Should be used for getting API image
 # Currently, only armv7hf is supported
 ARG ARCH=armv7hf
-ARG VERSION=master
+ARG VERSION=3.2
 ARG UBUNTU_VERSION=19.10
-ARG REPO=docker-prod.se.axis.com/axisecp
+ARG REPO=axisecp
 
 FROM ${REPO}/acap-api:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} as api
 FROM ${REPO}/acap-toolchain:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} as toolchain
