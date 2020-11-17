@@ -20,6 +20,8 @@ Below is the list of examples available in the repository.
   * The example code is written in C which illustrates both how to subscribe to different events and how to send an event.
 * [Larod](./larod/)
   * The example code is written in C which connects to [larod](./FAQs.md#WhatisLarod?) and loads a model, runs inference on it and then finally deletes the loaded model from [larod](./FAQs.md#WhatisLarod?).
+* [licensekey](./licensekey/)
+  * The example code is written in C which illustrates how to check the licensekey status.
 * [subscribe-to-object-detection](./subscribe-to-object-detection/)
   * The example code is written in C and exemplifies how to subscribe to video object detection, filter detections based on calibration data and points out ways to optimize object detection.
 * [vdostream](./vdostream/)
