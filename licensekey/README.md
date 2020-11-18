@@ -1,6 +1,6 @@
  *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# A licenskey handler based ACAP3 application on an edge device
+# A licensekey handler based ACAP3 application on an edge device
 This README file explains how to build an ACAP3 application that uses the licensekey API. It is achieved by using the containerized Axis API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "licensekey_handler" application source code which can easily be compiled and run with the help of the tools and step by step below.
