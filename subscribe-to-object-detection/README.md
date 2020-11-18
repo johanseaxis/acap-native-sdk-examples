@@ -140,7 +140,7 @@ tail -f /var/info.log | grep subscribe_to_object_detection
 ...
 ```
 
-When the application starts, for each object available to detect on your device, calibration data is printed(see more under [VOD calibration API](#vod-calibration)) followed by the threshold chosen(see more under [Filter on score](#filter-score). Then, depending on if any objects are detected in the scene and the set threshold, detection data will be printed.
+When the application starts, for each object available to detect on your device, calibration data is printed(see more under [VOD calibration API](#vod-calibration-api)) followed by the threshold chosen(see more under [Filter on score](#filter-on-score). Then, depending on if any objects are detected in the scene and the set threshold, detection data will be printed.
 
 The video object detection subscriber API looks for objects a number of times per second and in each run a number of objects may have been detected. If any of the detected objects have a score above or equal to the object threshold they are printed to syslog, followed by a resume with a timestamp and how many objects of the total detected that were above or equal to threshold. A closer look at a detection print:
 
@@ -158,10 +158,10 @@ The video object detection subscriber API looks for objects a number of times pe
 * **bbox[l,r,t,b]=[left, right, top, bottom]** shows the bounding box coordinates of the detection
 
 
-## Object detection {#object-detection}
+## Object detection
 There are different factors that affect the result of video object detection.
 
-### Filter on score {#filter-score}
+### Filter on score
 A lot of information is available about object detection, but two basic parameters to know of are *precision* and *recall*, where 100 % precision means no false detections and 100 % recall means finding all objects. Each detection comes with a *score* that is a value of how certain it is that the detection was correct, the higher the score the better the detection.
 
 **N.b. the score is not in percentage. In this example, only detections with a score above or equal to a *threshold* will be printed to the syslog.**
@@ -169,7 +169,7 @@ A lot of information is available about object detection, but two basic paramete
 The chosen threshold for each object in the example is based on the highest value given by the calibration API. These values are hardcoded in the example code and may easily be changed to test what different thresholds means.
 
 
-#### VOD calibration API {#vod-calibration}
+#### VOD calibration API
 A calibration API is available on devices with VOD since firmware 9.80. The example prints all calibrations made for each object class and what a certain threshold for an object means in terms of trade-off between precision and recall.
 
 ```bash
