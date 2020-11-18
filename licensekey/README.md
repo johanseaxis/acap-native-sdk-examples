@@ -13,7 +13,7 @@ Licensekey status i.e. valid or invalid is logged in the Application log.
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
 ```bash
-vdostream
+licensekey
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
@@ -58,7 +58,7 @@ docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 The working dir now contains a build folder with the following files:
 
 ```bash
-vdostream
+licensekey
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
