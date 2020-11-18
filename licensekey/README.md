@@ -5,7 +5,9 @@ This README file explains how to build an ACAP3 application that uses the licens
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "licensekey_handler" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
-This example illustrates how to check the licensekey status. A licensekey is a signed file which has been generate for a specific device ID. Licensekey status i.e. valid or invalid is logged in the Application log.
+This example illustrates how to check the licensekey status. A licensekey is a signed file which has been generate for a specific device ID and application id. ACAP Service Portal is maintaining both licensekeys and application ids, see [Online manual](https://www.axis.com/products/online-manual/s00004#t10154653)
+
+Licensekey status i.e. valid or invalid is logged in the Application log.
 
 ## Getting started
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
@@ -113,6 +115,10 @@ or by clicking on the "**App log**" link in the device GUI.
 2020-11-17T10:26:42.539+01:00 axis-accc8e691c41 [ INFO    ] licensekey_handler[14660]: Licensekey is invalid
 2020-11-17T10:31:43.058+01:00 axis-accc8e691c41 [ INFO    ] licensekey_handler[14660]: Licensekey is invalid
 ```
+
+A valid licensekey for a registered application id is only accessible through ACAP Service Portal, see [Online manual](https://www.axis.com/products/online-manual/s00004#t10154653).
+
+Instructions how to install a valid licensekey is found on [Axis Developer Community](https://www.axis.com/products/online-manual/s00004#t10160863).
 
 ## License
 **[Apache License 2.0](../LICENSE)**
