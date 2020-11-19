@@ -30,7 +30,7 @@
 
 #define APP_ID           0
 #define MAJOR_VERSION    1
-#define MINOR_VERSION    1
+#define MINOR_VERSION    0
 
 // This is a very simplistic example, checking every 5 minutes
 #define CHECK_SECS       300
