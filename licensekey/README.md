@@ -3,7 +3,7 @@
 # A licensekey handler based ACAP3 application on an edge device
 This README file explains how to build an ACAP3 application that uses the licensekey API. It is achieved by using the containerized Axis API and toolchain images.
 
-Together with this README file, you should be able to find a directory called app. That directory contains the "licensekey_handler" application source code which can easily be compiled and run with the help of the tools and step by step below.
+Together with this README file, you should be able to find a directory called app. That directory contains the "licensekey" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
 This example illustrates how to check the licensekey status. A licensekey is a signed file which has been generate for a specific device ID and application id. ACAP Service Portal is maintaining both licensekeys and application ids, see [Online manual](https://www.axis.com/products/online-manual/s00004#t10154653)
 
@@ -18,6 +18,7 @@ licensekey
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── licensekey_handler.c
+|   └── package.conf
 ├── Dockerfile
 └── README.md
 ```
@@ -26,6 +27,7 @@ licensekey
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
 * **app/licensekey_handler.c** - Application to check licensekey status in C.
+* **app/package.conf** - Defines the application and its configuration.
 * **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
@@ -63,6 +65,7 @@ licensekey
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── licensekey_handler.c
+|   └── package.conf
 ├── Dockerfile
 └── README.md
 ├── build
@@ -74,10 +77,9 @@ licensekey
 │   ├── licensekey_handler*
 │   ├── licensekey_handler_1_0_0_armv7hf.eap
 │   ├── licensekey_handler_1_0_0_LICENSE.txt
-│   ├── licensekey_handler.c
+└── └── licensekey_handler.c
 ```
 
-* **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.
 * **build/licensekey_handler*** - Application executable binary file.
@@ -93,7 +95,7 @@ Browse to the following page (replace <axis_device_ip> with the IP number of you
 http://<axis_device_ip>/#settings/apps
 ```
 
-*Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
+*Goto your device web page above > Click on the tab **Apps** in the device GUI > Add **(+)** sign and browse to
 the newly built **licensekey_handler_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
 Application will run with default video compression format h264.
@@ -118,7 +120,11 @@ or by clicking on the "**App log**" link in the device GUI.
 
 A valid licensekey for a registered application id is only accessible through ACAP Service Portal, see [Online manual](https://www.axis.com/products/online-manual/s00004#t10154653).
 
-Instructions how to install a valid licensekey is found on [Axis Developer Community](https://www.axis.com/products/online-manual/s00004#t10160863).
+Support for installing licensekey though device web page is available, if LICENSEPAGE is set to "axis" in **package.conf** file, by the following steps:
+
+*Goto your device web page above > Click on the tab **Apps** in the device GUI > Click on the installed **licensekey_handler** application > Install the license with the **Install** button in the **Activate the license** part*
+
+More instructions how to install a valid licensekey is found on [Axis Developer Community](https://www.axis.com/products/online-manual/s00004#t10160863).
 
 ## License
 **[Apache License 2.0](../LICENSE)**
