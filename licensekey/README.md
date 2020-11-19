@@ -3,11 +3,11 @@
 # A licensekey handler based ACAP3 application on an edge device
 This README file explains how to build an ACAP3 application that uses the licensekey API. It is achieved by using the containerized Axis API and toolchain images.
 
-Together with this README file, you should be able to find a directory called app. That directory contains the "licensekey" application source code which can easily be compiled and run with the help of the tools and step by step below.
+Together with this README file, you should be able to find a directory called app. That directory contains the application source code which can easily be compiled and run with the help of the tools and step by step below.
 
-This example illustrates how to check the licensekey status. A licensekey is a signed file which has been generate for a specific device ID and application id. ACAP Service Portal is maintaining both licensekeys and application ids, see [Online manual](https://www.axis.com/products/online-manual/s00004#t10154653)
+This example illustrates how to check the license key status. A license key is a signed file which has been generated for a specific device ID and application ID. The ACAP Service Portal is maintaining both license keys and application IDs, see [Online manual](https://www.axis.com/products/online-manual/s00004#t10154653)
 
-Licensekey status i.e. valid or invalid is logged in the Application log.
+License key status i.e. valid or invalid is logged in the Application log.
 
 ## Getting started
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
