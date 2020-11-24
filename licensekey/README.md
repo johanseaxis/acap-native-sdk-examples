@@ -118,13 +118,13 @@ or by clicking on the "**App log**" link in the device GUI.
 2020-11-17T10:31:43.058+01:00 axis-accc8e691c41 [ INFO    ] licensekey_handler[14660]: Licensekey is invalid
 ```
 
-A valid licensekey for a registered application id is only accessible through ACAP Service Portal, see [Online manual](https://www.axis.com/products/online-manual/s00004#t10154653).
+A valid license key for a registered application ID is only accessible through ACAP Service Portal, see [Online manual](https://www.axis.com/products/online-manual/s00004#t10154653).
 
-Support for installing licensekey though device web page is available, if LICENSEPAGE is set to "axis" in **package.conf** file, by the following steps:
+Support for installing license key though device web page is available, if LICENSEPAGE is set to "axis" in **package.conf** file, by the following steps:
 
 *Goto your device web page above > Click on the tab **Apps** in the device GUI > Click on the installed **licensekey_handler** application > Install the license with the **Install** button in the **Activate the license** part*
 
-More instructions how to install a valid licensekey is found on [Axis Developer Community](https://www.axis.com/products/online-manual/s00004#t10160863).
+More instructions how to install a valid license key is found on [Axis Developer Community](https://www.axis.com/products/online-manual/s00004#t10160863).
 
 ## License
 **[Apache License 2.0](../LICENSE)**
