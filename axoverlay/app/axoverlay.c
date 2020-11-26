@@ -18,7 +18,7 @@
  * - axoverlay -
  *
  * This application demonstrates how the use the API axoverlay, by drawing
- * bounding boxes using 4-bit palette color format and text overlay using
+ * plain boxes using 4-bit palette color format and text overlay using
  * ARGB32 color format.
  *
  * Colorspace and alignment:
@@ -369,7 +369,7 @@ signal_handler_init(void)
 /**
  * brief Main function.
  *
- * This main function draws two bounding boxes and one text, using the
+ * This main function draws two plain boxes and one text, using the
  * API axoverlay.
  *
  * param argc Number of arguments.

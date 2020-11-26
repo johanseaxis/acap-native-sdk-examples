@@ -1,13 +1,13 @@
  *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# A axoverlay based ACAP3 application on an edge device
+# An axoverlay based ACAP3 application on an edge device
 This README file explains how to build an ACAP3 application that uses the axoverlay API. It is achieved by using the containerized Axis API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "axoverlay" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
-This example illustrates how to draw overlays in a video stream and Cairo is used as rendering API, see [documentation](https://www.cairographics.org/). In this example two bounding boxes in different colors and one overlay text are drawn.
+This example illustrates how to draw overlays in a video stream and Cairo is used as rendering API, see [documentation](https://www.cairographics.org/). In this example two plain boxes in different colors and one overlay text are drawn.
 
-It is preferable to use Palette color space for large overlays like bounding boxes, to lower the memory usage.
+It is preferable to use Palette color space for large overlays like plain boxes, to lower the memory usage.
 More detailed overlays like text overlays, should instead use ARGB32 color space.
 
 Different stream resolutions are logged in the Application log.
@@ -18,17 +18,17 @@ These instructions will guide you on how to execute the code. Below is the struc
 ```bash
 axoverlay
 ├── app
+│   ├── axoverlay.c
 │   ├── LICENSE
-│   ├── Makefile
-│   └── axoverlay.c
+│   └── Makefile
 ├── Dockerfile
 └── README.md
 ```
 
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+* **app/axoverlay.c** - Application to draw overlays using axoverlay in C.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
-* **app/axoverlay.c** - Application to draw overlays using axoverlay in C.
+* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
@@ -64,29 +64,29 @@ The working dir now contains a build folder with the following files:
 ```bash
 axoverlay
 ├── app
+│   ├── axoverlay.c
 │   ├── LICENSE
-│   ├── Makefile
-│   └── axoverlay.c
-├── Dockerfile
-└── README.md
+│   └── Makefile
 ├── build
+│   ├── axoverlay*
+│   ├── axoverlay_1_0_0_armv7hf.eap
+│   ├── axoverlay_1_0_0_LICENSE.txt
+│   ├── axoverlay.c
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── package.conf
 │   ├── package.conf.orig
-│   ├── param.conf
-│   ├── axoverlay*
-│   ├── axoverlay_1_0_0_armv7hf.eap
-│   ├── axoverlay_1_0_0_LICENSE.txt
-└── └── axoverlay.c
+│   └── param.conf
+├── Dockerfile
+└── README.md
 ```
 
-* **build/package.conf** - Defines the application and its configuration.
-* **build/package.conf.orig** - Defines the application and its configuration, original file.
-* **build/param.conf** - File containing application parameters.
 * **build/axoverlay*** - Application executable binary file.
 * **build/axoverlay_1_0_0_armv7hf.eap** - Application package .eap file.
 * **build/axoverlay_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+* **build/package.conf** - Defines the application and its configuration.
+* **build/package.conf.orig** - Defines the application and its configuration, original file.
+* **build/param.conf** - File containing application parameters.
 
 #### Install your application
 Installing your application on an Axis video device is as simple as:
@@ -119,8 +119,8 @@ tail -f /var/log/info.log | grep axoverlay
 ```
 ----- Contents of SYSTEM_LOG for 'axoverlay' -----
 
-2020-11-25T14:13:07.412+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[0]: starting axoverlay
-2020-11-25T14:13:07.661+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Max resolution (width x height): 1920 x 1080
+14:13:07.412 [ INFO    ] axoverlay[0]: starting axoverlay
+14:13:07.661 [ INFO    ] axoverlay[2906]: Max resolution (width x height): 1920 x 1080
 ```
 
 Overlays are shown when the stream has been started:
@@ -129,29 +129,29 @@ Overlays are shown when the stream has been started:
 
 ```
 ----- Contents of SYSTEM_LOG for 'axoverlay' -----
-2020-11-25T14:13:18.819+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Adjust callback for overlay: 1920 x 1080
-2020-11-25T14:13:18.819+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Adjust callback for stream: 1920 x 1080
-2020-11-25T14:13:19.039+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Render callback for camera: 1
-2020-11-25T14:13:19.039+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Render callback for overlay: 1920 x 1088
-2020-11-25T14:13:19.039+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Render callback for stream: 1920 x 1080
+14:13:18.819 [ INFO    ] axoverlay[2906]: Adjust callback for overlay: 1920 x 1080
+14:13:18.819 [ INFO    ] axoverlay[2906]: Adjust callback for stream: 1920 x 1080
+14:13:19.039 [ INFO    ] axoverlay[2906]: Render callback for camera: 1
+14:13:19.039 [ INFO    ] axoverlay[2906]: Render callback for overlay: 1920 x 1088
+14:13:19.039 [ INFO    ] axoverlay[2906]: Render callback for stream: 1920 x 1080
 ```
 
 > [!NOTE]
 > *In this case, overlay height has been adjusted to make the height divisible with 16.
 > This makes the overlay height (1088) larger than the stream height (1080).*
 
-In this example, an adjustment callback function is used to adapt the bounding boxes to the stream resolution. This makes the rendering of the bounding boxes correct.
+In this example, an adjustment callback function is used to adapt the plain boxes to the stream resolution. This makes the rendering of the plain boxes correct.
 It is possible to update the resolution by:
 
 *Goto your device web page above > Click on the tab **Stream** in the device GUI > Update **Resolution** dropdown menu to **1280x720 (16:9)***
 
 ```
 ----- Contents of SYSTEM_LOG for 'axoverlay' -----
-2020-11-25T14:28:28.112+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Adjust callback for overlay: 1920 x 1080
-2020-11-25T14:28:28.112+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Adjust callback for stream: 1280 x 720
-2020-11-25T14:28:28.225+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Render callback for camera: 1
-2020-11-25T14:28:28.225+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Render callback for overlay: 1280 x 720
-2020-11-25T14:28:28.225+01:00 axis-accc8efc9c84 [ INFO    ] axoverlay[2906]: Render callback for stream: 1280 x 720
+14:28:28.112 [ INFO    ] axoverlay[2906]: Adjust callback for overlay: 1920 x 1080
+14:28:28.112 [ INFO    ] axoverlay[2906]: Adjust callback for stream: 1280 x 720
+14:28:28.225 [ INFO    ] axoverlay[2906]: Render callback for camera: 1
+14:28:28.225 [ INFO    ] axoverlay[2906]: Render callback for overlay: 1280 x 720
+14:28:28.225 [ INFO    ] axoverlay[2906]: Render callback for stream: 1280 x 720
 ```
 
 ## License
