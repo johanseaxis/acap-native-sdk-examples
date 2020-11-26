@@ -18,7 +18,7 @@ subscribe-to-object-detection
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── subscribe_to_object_detection.c
+│   └── subscribe_to_object_detection.c
 ├── Dockerfile
 └── README.md
 ```
@@ -47,7 +47,7 @@ For reference please see: https://docs.docker.com/network/proxy/ and a
 docker build --tag <APP_IMAGE> .
 ```
 
-<APP_IMAGE> is the name to tag the image with, e.g., vod:1.0
+<APP_IMAGE> is the name to tag the image with, e.g., stod:1.0
 
 Copy the result from the container image to a local directory build:
 
@@ -72,7 +72,7 @@ subscribe-to-object-detection
 │   ├── subscribe_to_object_detection_1_0_0_armv7hf.eap
 │   ├── subscribe_to_object_detection_1_0_0_LICENSE.txt
 │   ├── subscribe_to_object_detection.c
-│   ├── video-object-detection.proto
+│   └── video-object-detection.proto
 ```
 * **generated** - Folder containing the [protobuf-c](https://github.com/protobuf-c/protobuf-c) generated C code.
 * **include** - Folder containing include files for libprotobuf-c.

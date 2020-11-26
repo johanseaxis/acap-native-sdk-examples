@@ -136,7 +136,7 @@ signal_handler(int signum)
  * brief Setup function for signals
  */
 static void
-setup_signals()
+setup_signals(void)
 {
     struct sigaction sa;
     sa.sa_flags = 0;
@@ -155,7 +155,7 @@ setup_signals()
  * brief Function that print calibration data to syslog
  */
 static bool
-print_calibration_data()
+print_calibration_data(void)
 {
     uint8_t *buffer = NULL;
     size_t size = 0;
