@@ -32,7 +32,7 @@ axoverlay
 * **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
-* The example is done for the armv7hf architecture.
+* ARTPEC-7 and ARTPEC-6 based devices.
 * It is not possible to combine different color spaces for ARTPEC-6.
 
 ### How to run the code
