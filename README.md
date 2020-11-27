@@ -31,9 +31,9 @@ Below is the list of examples available in the repository.
 
 
 ### DockerHub Images
-There are two types of Docker images here: the toolchain (SDK), and the API 3.1. These images can be used as the basis for custom built images for running your applications. The images needed are specified in the docker-compose files. All images are public and free to use for anyone.
-* [Toolchain](https://hub.docker.com/repository/docker/axisecp/acap-toolchain) -  An Ubuntu-based toolchain bundle with all tools for building and packaging an ACAP 3.1 application included.
-* [API 3.1](https://hub.docker.com/repository/docker/axisecp/acap-api) - An Ubuntu-based API bundle with all API components (header and library files) included.
+There are two types of Docker images here: the toolchain (SDK), and the API. These images can be used as the basis for custom built images for running your applications. The images needed are specified in the docker-compose files. All images are public and free to use for anyone.
+* [Toolchain](https://hub.docker.com/repository/docker/axisecp/acap-toolchain) -  An Ubuntu-based toolchain bundle with all tools for building and packaging an ACAP 3 application included.
+* [API](https://hub.docker.com/repository/docker/axisecp/acap-api) - An Ubuntu-based API bundle with all API components (header and library files) included.
 
  # Frequently asked questions
 Please visit [FAQs page](FAQs.md)  for frequently asked questions.
