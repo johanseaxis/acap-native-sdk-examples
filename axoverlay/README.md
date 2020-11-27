@@ -119,8 +119,8 @@ tail -f /var/log/info.log | grep axoverlay
 ```
 ----- Contents of SYSTEM_LOG for 'axoverlay' -----
 
-14:13:07.412 [ INFO    ] axoverlay[0]: starting axoverlay
-14:13:07.661 [ INFO    ] axoverlay[2906]: Max resolution (width x height): 1920 x 1080
+14:13:07.412 [ INFO ] axoverlay[0]: starting axoverlay
+14:13:07.661 [ INFO ] axoverlay[2906]: Max resolution (width x height): 1920 x 1080
 ```
 
 Overlays are shown when the stream has been started:
@@ -129,11 +129,11 @@ Overlays are shown when the stream has been started:
 
 ```
 ----- Contents of SYSTEM_LOG for 'axoverlay' -----
-14:13:18.819 [ INFO    ] axoverlay[2906]: Adjust callback for overlay: 1920 x 1080
-14:13:18.819 [ INFO    ] axoverlay[2906]: Adjust callback for stream: 1920 x 1080
-14:13:19.039 [ INFO    ] axoverlay[2906]: Render callback for camera: 1
-14:13:19.039 [ INFO    ] axoverlay[2906]: Render callback for overlay: 1920 x 1088
-14:13:19.039 [ INFO    ] axoverlay[2906]: Render callback for stream: 1920 x 1080
+14:13:18.819 [ INFO ] axoverlay[2906]: Adjust callback for overlay: 1920 x 1080
+14:13:18.819 [ INFO ] axoverlay[2906]: Adjust callback for stream: 1920 x 1080
+14:13:19.039 [ INFO ] axoverlay[2906]: Render callback for camera: 1
+14:13:19.039 [ INFO ] axoverlay[2906]: Render callback for overlay: 1920 x 1088
+14:13:19.039 [ INFO ] axoverlay[2906]: Render callback for stream: 1920 x 1080
 ```
 
 > [!NOTE]
@@ -147,11 +147,11 @@ It is possible to update the resolution by:
 
 ```
 ----- Contents of SYSTEM_LOG for 'axoverlay' -----
-14:28:28.112 [ INFO    ] axoverlay[2906]: Adjust callback for overlay: 1920 x 1080
-14:28:28.112 [ INFO    ] axoverlay[2906]: Adjust callback for stream: 1280 x 720
-14:28:28.225 [ INFO    ] axoverlay[2906]: Render callback for camera: 1
-14:28:28.225 [ INFO    ] axoverlay[2906]: Render callback for overlay: 1280 x 720
-14:28:28.225 [ INFO    ] axoverlay[2906]: Render callback for stream: 1280 x 720
+14:28:28.112 [ INFO ] axoverlay[2906]: Adjust callback for overlay: 1920 x 1080
+14:28:28.112 [ INFO ] axoverlay[2906]: Adjust callback for stream: 1280 x 720
+14:28:28.225 [ INFO ] axoverlay[2906]: Render callback for camera: 1
+14:28:28.225 [ INFO ] axoverlay[2906]: Render callback for overlay: 1280 x 720
+14:28:28.225 [ INFO ] axoverlay[2906]: Render callback for stream: 1280 x 720
 ```
 
 ## License
