@@ -7,7 +7,6 @@ FROM arm32v7/ubuntu:${UBUNTU_VERSION}
 ARG libyuv_version=5b6042fa0d211ebbd8b477c7f3855977c7973048
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
     make \
     g++
 
@@ -37,10 +36,3 @@ RUN mkdir -p /yuv/lib &&\
     cd /yuv/lib &&\
     ln -s libyuv.so.1 libyuv.so &&\
     ln -s libyuv.so.1 libyuv.so.1.0
-
-
-
-
-
-
-
