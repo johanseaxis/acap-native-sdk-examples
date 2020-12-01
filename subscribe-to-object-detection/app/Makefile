@@ -21,7 +21,7 @@ $(PROG1): $(OBJS1)
 
 proto:
 	mkdir -p generated
-	protoc-c video-object-detection.proto --c_out=./generated
+	protoc-c -I $(SDKTARGETSYSROOT)/usr/share/protobuf video-object-detection.proto --c_out=./generated
 
 clean:
 	rm -rf $(PROGS) *.o *.eap generated/
