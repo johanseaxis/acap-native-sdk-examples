@@ -39,10 +39,9 @@ jobs:
          git checkout topic/development/recaptest      
          export ATF_PYTHON=python3     
          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
-         python --version
-         export APPLICATIOM=send_event   
+         python --version 
          chmod +x test_starter.sh
-         ./test_starter.sh
+         ./test_starter.sh send_event
          ls recap/output
     # Save functional test report as artifact
     - uses: actions/upload-artifact@master
