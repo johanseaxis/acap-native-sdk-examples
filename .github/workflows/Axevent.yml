@@ -29,20 +29,6 @@ jobs:
         cd ..
         mkdir -p acap3/examples/axevent/send_event/build
         cp axevent/send_event/build/send_event_1_0_0_armv7hf.eap acap3/examples/axevent/send_event/build/send_event_1_0_0_armv7hf.eap
-
-    - name: Run functional tests
-      run: |
-         export WORKSPACE=$(pwd)
-         echo $WORKSPACE
-         git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
-         cd recap  
-         git checkout topic/development/recaptest      
-         export ATF_PYTHON=python3     
-         ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
-         python --version 
-         chmod +x test_starter.sh
-         ./test_starter.sh axevent
-         ls recap/output
          
    # Build Subscribe to event application
     - name: Build subscribe to event application
@@ -65,7 +51,20 @@ jobs:
         cd ..
         mkdir -p acap3/examples/axevent/subscribe_to_events/build
         cp axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap acap3/examples/axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap
-         
+       
+    - name: Run functional tests
+      run: |
+         export WORKSPACE=$(pwd)
+         echo $WORKSPACE
+         git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
+         cd recap  
+         git checkout topic/development/recaptest      
+         export ATF_PYTHON=python3     
+         ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
+         python --version 
+         chmod +x test_starter.sh
+         ./test_starter.sh axevent
+         ls recap/output
 
     # Save functional test report as artifact
     - uses: actions/upload-artifact@master
