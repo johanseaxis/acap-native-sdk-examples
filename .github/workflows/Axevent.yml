@@ -1,11 +1,9 @@
 name: Build Axevent Application
-
 on:
   push:
      paths:
       - 'axevent/**'
-
-
+      - ".github/workflows/**"
 jobs:
   build:
 
