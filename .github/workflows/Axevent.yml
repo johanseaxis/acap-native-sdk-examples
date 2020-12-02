@@ -1,9 +1,9 @@
-name: Build Axevent Application
+name: Build Send Event Application
 on:
   push:
      paths:
-      - 'axevent/**'
-      - ".github/workflows/**"
+      - 'axevent/send_event**'
+      - '.github/workflows/Axevent.yml'
 jobs:
   build:
 
@@ -29,28 +29,7 @@ jobs:
         cd ..
         mkdir -p acap3/examples/axevent/send_event/build
         cp axevent/send_event/build/send_event_1_0_0_armv7hf.eap acap3/examples/axevent/send_event/build/send_event_1_0_0_armv7hf.eap
-  
-    # Build Subscribe to event application
-    - name: Build subscribe to event application
-      run: |
-        cd axevent/subscribe_to_event
-        docker build --tag subscribe-to-event:1.0 .
-        docker cp $(docker create subscribe-to-event:1.0):/opt/app ./build
-        cd ..
-        cd ..
-        mkdir -p acap3/examples/axevent/subscribe_to_event/build
-        cp axevent/subscribe_to_event/build/subscribe_to_event_1_0_0_armv7hf.eap acap3/examples/axevent/subscribe_to_event/build/subscribe_to_event_1_0_0_armv7hf.eap
-   
-    # Build Subscribe to events application
-    - name: Build subscribe to events application
-      run: |     
-        cd axevent/subscribe_to_events
-        docker build --tag subscribe-to-events:1.0 .
-        docker cp $(docker create subscribe-to-events:1.0):/opt/app ./build
-        cd ..
-        cd ..
-        mkdir -p acap3/examples/axevent/subscribe_to_events/build
-        cp axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap acap3/examples/axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap
+
     - name: Run functional tests
       run: |
          export WORKSPACE=$(pwd)
@@ -61,7 +40,7 @@ jobs:
          export ATF_PYTHON=python3     
          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
          python --version
-         export APPLICATIOM = axevent         
+         export APPLICATIOM=send_event   
          chmod +x test_starter.sh
          ./test_starter.sh
          ls recap/output
