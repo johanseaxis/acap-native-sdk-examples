@@ -13,11 +13,11 @@ This example illustrates how to draw boundingboxes on different video channels.
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
 ```bash
-vdostream
+boundingbox
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── bbox_example.cc
+│   └── bbox_example.cc
 ├── Dockerfile
 └── README.md
 ```
@@ -53,28 +53,22 @@ docker build --tag <APP_IMAGE> .
 Copy the result from the container image to a local directory build:
 
 ```bash
-docker cp $(docker create  <APP_IMAGE>):/build/src/ build
+docker cp $(docker create  <APP_IMAGE>):/opt/app ./build
 ```
 
 The working dir now contains a build folder with the following files:
 
 ```bash
-vdostream
-├── app
-│   ├── LICENSE
-│   ├── Makefile
-│   ├── bbox_example.cc
-├── Dockerfile
-└── README.md
+boundingbox
 ├── build
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
-│   ├── bbox_example
+│   ├── bbox_example*
 │   ├── boundingbox_example_1_0_0_aarch64.eap
-│   ├── boundingbox_example_1_0_0_LICENSE.txt
+│   └── boundingbox_example_1_0_0_LICENSE.txt
 ```
 
 * **build/package.conf** - Defines the application and its configuration.

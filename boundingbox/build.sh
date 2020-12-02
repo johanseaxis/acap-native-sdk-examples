@@ -9,4 +9,4 @@ fi
 docker build --tag "$1" .
 
 rm -rf build/
-docker cp $(docker create "$1":latest):/build/src/ build
+docker cp $(docker create "$1":latest):/opt/app ./build
