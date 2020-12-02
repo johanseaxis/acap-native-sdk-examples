@@ -8,7 +8,7 @@ ARG REPO=axisecp
 
 FROM ${REPO}/acap-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
-# Building of the particular ACAP
+# Building the ACAP application
 COPY ./app /opt/app/
 WORKDIR /opt/app
 RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh
