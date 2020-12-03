@@ -4,8 +4,9 @@
 ARG http_proxy
 ARG https_proxy
 ARG ARCH=armv7hf
-ARG VERSION=3.1
+ARG VERSION=3.2
 ARG UBUNTU_VERSION=19.10
+ARG REPO=axisecp
 
 FROM builder-yuv:1.0-ubuntu${UBUNTU_VERSION} as yuv
 FROM ${REPO}/acap-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
