@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-/**
- * - machine_learning_acap -
- This application loads
- */
+ /**
+  * - tensorflow_to_larod -
+  *
+  * This application loads a larod model which takes an image as input and
+  * outputs two values corresponding to the probability of 1) persons in image
+  * and 2) cars in image.
+  *
+  * The application expects three arguments on the command line in the
+  * following order: MODEL WIDTH HEIGHT
+  *
+  * First argument, MODEL, is a string describing path to the model.
+  *
+  * Second argument, WIDTH, is an integer for the input width.
+  *
+  * Third argument, HEIGHT, is an integer for input height.
+  */
 
 #include <errno.h>
 #include <fcntl.h>
