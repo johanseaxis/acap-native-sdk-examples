@@ -30,17 +30,22 @@ jobs:
         cp axoverlay/build/axoverlay_1_0_0_armv7hf.eap acap3/examples/axoverlay/build/axoverlay_1_0_0_armv7hf.eap
         ls acap3/examples/axoverlay/build
     
-    #Run functional tests
-    # - name: Run functional tests
-    #  run: |
-    #     export WORKSPACE=$(pwd)
-    #     echo $WORKSPACE
-    #     git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
-    #     cd recap  
-    #     git checkout topic/development/recaptest      
-    #     export ATF_PYTHON=python3     
-    #     ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
-    #     python --version 
-    #     chmod +x test_starter.sh 
-    #     ./test_starter.sh axevent
-    #     ls recap/output
+    - name: Run functional tests
+      run: |
+         export WORKSPACE=$(pwd)
+         echo $WORKSPACE
+         git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
+         cd recap  
+         git checkout topic/development/recaptest      
+         export ATF_PYTHON=python3     
+         ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
+         python --version 
+         chmod +x test_starter.sh
+         ./test_starter.sh axoverlay
+         ls recap/output
+         
+    # Save functional test report as artifact
+    - uses: actions/upload-artifact@master
+      with:
+        name: Test report 
+        path: recap/recap/output/report.xml 
