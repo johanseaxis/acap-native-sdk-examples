@@ -131,6 +131,8 @@ In this example, we're going to be working within a Docker container environment
 ./build_env.sh
 ./run_env.sh <a_name_for_your_env>
 ```
+The environment can be started without GPU support by supplying the `--no-gpu` flag to the `run_env.sh` script after the environment name.
+
 Note that the MS COCO 2017 validation dataset is downloaded during the building of the environment. This is roughly 1GB in size which means this could take a few minutes to download.
 
 ## The example model
