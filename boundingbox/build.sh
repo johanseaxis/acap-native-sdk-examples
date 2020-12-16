@@ -1,5 +1,5 @@
 #!/bin/bash
-UBUNTU_VERSION=19.10
+UBUNTU_VERSION=20.04
 
 if [ $# -lt 1 ]; then
     echo "Argument should be: <APP_IMAGE>"
