@@ -1,37 +1,37 @@
-FROM acap3-sdk:latest
-
+# Specify the architecture at build time: armv7hf
+# Should be used for getting API and toolchain image
+# Currently, only armv7hf is supported
+ARG ARCH=armv7hf
 ARG VERSION=3.2
-ARG PKG_ARCH=cortexa9hf-neon-poky-linux-gnueabi
-ARG SYSROOT=/opt/axis/acapsdk/sysroots/cortexa9hf-neon-poky-linux-gnueabi
-ARG libyuv_version=5b6042fa0d211ebbd8b477c7f3855977c7973048
-ARG ARCH=armhf
+ARG UBUNTU_VERSION=20.04
+ARG REPO=axisecp
 
-   # TODO: Investigate why server certs can't be verified
+FROM ${REPO}/acap-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
+
+# Build libyuv
 WORKDIR /opt/build
-
-RUN GIT_SSL_NO_VERIFY=1 git clone -n https://chromium.googlesource.com/libyuv/libyuv
+ARG libyuv_version=5b6042fa0d211ebbd8b477c7f3855977c7973048
+# TODO: Investigate why server certs can't be verified
+RUN GIT_SSL_NO_VERIFY=1 git clone -n https://chromium.googlesource.com/libyuv/libyuv && \
+  cd libyuv && git checkout ${libyuv_version}
 
 WORKDIR /opt/build/libyuv
-
-RUN  git checkout ${libyuv_version}
-
 COPY yuv/*.patch /opt/build/libyuv
+RUN git apply *.patch && \
+  CXXFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
+  make -f linux.mk CXX=arm-linux-gnueabihf-g++ CC=arm-linux-gnueabihf-gcc && \
+  arm-linux-gnueabihf-strip --strip-unneeded libyuv.so*
 
-RUN git apply *.patch
- 
- RUN CXXFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
-    make -f linux.mk CXX=arm-linux-gnueabihf-g++ CC=arm-linux-gnueabihf-gcc
-
-RUN arm-linux-gnueabihf-strip --strip-unneeded libyuv.so*
-
-RUN cp libyuv.so* ${SYSROOT}/usr/lib/ &&\
-    cp -a include/. ${SYSROOT}/usr/include &&\
-    cd ${SYSROOT}/usr/lib/ &&\
-    ln -s libyuv.so.1 libyuv.so &&\
-    ln -s libyuv.so.1 libyuv.so.1.0
-
-COPY ./app /opt/app/
+# Copy the library to application folder
+ARG BUILDDIR=/opt/build/libyuv
 WORKDIR /opt/app
+COPY ./app /opt/app/
+RUN mkdir -p lib include && \
+  cp ${BUILDDIR}/libyuv.so* lib/ && \
+  cp -a ${BUILDDIR}/include/. include && \
+  cd lib/ && \
+  ln -s libyuv.so.1 libyuv.so && \
+  ln -s libyuv.so.1 libyuv.so.1.0
 
-# Creating package
+# Building the ACAP application
 RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh
