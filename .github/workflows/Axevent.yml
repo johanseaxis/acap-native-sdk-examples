@@ -2,7 +2,7 @@ name: Build Axevent Applications
 on:
   push:
      paths:
-      - 'axevent/send_event**'
+      - 'axevent/**'
       - '.github/workflows/Axevent.yml'
 jobs:
   build:
