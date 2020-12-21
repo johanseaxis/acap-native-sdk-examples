@@ -22,6 +22,9 @@ jobs:
     #Build Video scene subscriber application
     - name: Build Video scene subscriber application
       run: |
+        export DOCKER_CONFIG="$WORKSPACE/.docker"
+        mkdir -p "$DOCKER_CONFIG"
+        echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
         export VERSION=3.2
         cd video-scene-subscriber
         docker build --build-arg VERSION=${VERSION} --tag video-scene-subscriber:1.0 .
