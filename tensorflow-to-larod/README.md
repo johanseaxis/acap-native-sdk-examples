@@ -56,9 +56,7 @@ tensorflow_to_larod
 │   │   ├── train.py
 │   │   └── utils.py
 │   └── yuv
-│       ├── 0001-Create-a-shared-library.patch
-│       ├── build.sh
-│       └── Dockerfile
+│       └── 0001-Create-a-shared-library.patch
 ├── README.md
 └── run_env.sh
 ```
@@ -76,7 +74,7 @@ tensorflow_to_larod
 - **env/training/model.py** - Defines the Tensorflow model used in this example.
 - **env/training/train.py** - Defines the model training procedure of this example.
 - **env/training/utils.py** - Contains a datagenerator which specifies how data is loaded to the training process.
-- **env/yuv/** - Folder containing files for building libyuv.
+- **env/yuv/** - Folder containing patch for building libyuv.
 - **run_env.sh** - Runs the environment in which this example is run.
 
 
