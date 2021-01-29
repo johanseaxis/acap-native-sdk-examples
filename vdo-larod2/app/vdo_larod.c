@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2020, Axis Communications AB, Lund, Sweden
+ * Copyright (C) 2018-2021, Axis Communications AB, Lund, Sweden
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ void sigintHandler(int sig) {
     syslog(LOG_INFO, "Interrupted, starting graceful termination of app. Another "
            "interrupt signal will cause a forced exit.");
 
-    // Tell the main thread to stop running inferences asap.
+    // Tell the main thread to stop running jobs asap.
     stopRunning = true;
 }
 
@@ -214,17 +214,8 @@ static bool setupLarod(const larodChip larodChip, const int larodModelFd,
         goto end;
     }
 
-    // Set chip if user has specified non-default action.
-    if (larodChip != 0) {
-        if (!larodSetChip(conn, larodChip, &error)) {
-            syslog(LOG_ERR, "%s: Could not select chip %d: %s", __func__, larodChip,
-                   error->msg);
-            goto error;
-        }
-    }
-
-    loadedModel = larodLoadModel(conn, larodModelFd, LAROD_ACCESS_PRIVATE,
-                                 "Vdo Example App Model", &error);
+    loadedModel = larodLoadModel(conn, larodModelFd, larodChip, LAROD_ACCESS_PRIVATE,
+                                 "Vdo Example App Model", NULL, &error);
     if (!loadedModel) {
         syslog(LOG_ERR, "%s: Unable to load model: %s", __func__, error->msg);
         goto error;
@@ -401,7 +392,7 @@ int main(int argc, char** argv) {
     size_t numInputs = 0;
     larodTensor** outputTensors = NULL;
     size_t numOutputs = 0;
-    larodInferenceRequest* infReq = NULL;
+    larodJobRequest* jobReq = NULL;
     void* larodInputAddr = MAP_FAILED;
     void* larodOutputAddr = MAP_FAILED;
     int larodModelFd = -1;
@@ -456,7 +447,7 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    syslog(LOG_INFO, "Creating temporary files and memmaps for inference input and "
+    syslog(LOG_INFO, "Creating temporary files and memmaps for job input and "
            "output tensors");
 
     if (!createAndMapTmpFile(CONV_INP_FILE_PATTERN,
@@ -503,10 +494,10 @@ int main(int argc, char** argv) {
     }
 
     // App supports only one input/output tensor.
-    infReq = larodCreateInferenceRequest(model, inputTensors, 1, outputTensors,
-                                         1, &error);
-    if (!infReq) {
-        syslog(LOG_ERR, "Failed creating inference request: %s", error->msg);
+    jobReq = larodCreateJobRequest(model, inputTensors, 1, outputTensors,
+                                         1, NULL, &error);
+    if (!jobReq) {
+        syslog(LOG_ERR, "Failed creating job request: %s", error->msg);
         goto end;
     }
 
@@ -552,7 +543,7 @@ int main(int argc, char** argv) {
         syslog(LOG_INFO, "Converted image in %u ms", elapsedMs);
 
         // Since larodOutputAddr points to the beginning of the fd we should
-        // rewind the file position before each inference.
+        // rewind the file position before each job.
         if (lseek(larodOutputFd, 0, SEEK_SET) == -1) {
             syslog(LOG_ERR, "Unable to rewind output file position: %s",
                    strerror(errno));
@@ -561,8 +552,8 @@ int main(int argc, char** argv) {
         }
 
         gettimeofday(&startTs, NULL);
-        if (!larodRunInference(conn, infReq, &error)) {
-            syslog(LOG_ERR, "Unable to run inference on model %s: %s (%d)",
+        if (!larodRunJob(conn, jobReq, &error)) {
+            syslog(LOG_ERR, "Unable to run job on model %s: %s (%d)",
                    args.modelFile, error->msg, error->code);
             goto end;
         }
@@ -570,7 +561,7 @@ int main(int argc, char** argv) {
 
         elapsedMs = (unsigned int) (((endTs.tv_sec - startTs.tv_sec) * 1000) +
                                     ((endTs.tv_usec - startTs.tv_usec) / 1000));
-        syslog(LOG_INFO, "Ran inference for %u ms", elapsedMs);
+        syslog(LOG_INFO, "Ran job for %u ms", elapsedMs);
 
         // Compute the most likely index.
         uint8_t maxProb = 0;
@@ -634,7 +625,7 @@ end:
         close(larodOutputFd);
     }
 
-    larodDestroyInferenceRequest(&infReq);
+    larodDestroyJobRequest(&jobReq);
     larodDestroyTensors(&inputTensors, numInputs);
     larodDestroyTensors(&outputTensors, numOutputs);
     larodClearError(&error);
