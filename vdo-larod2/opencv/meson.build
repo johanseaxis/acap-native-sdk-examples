@@ -1,4 +1,4 @@
-opencv_ex_src = ['argparse.c', 'main.cc', 'misc.cc']
+opencv_ex_src = ['argparse.c', 'main.cc', 'misc.cc', 'opencvutils.cc']
 
 opencv_dep = dependency('opencv', required : true)
 

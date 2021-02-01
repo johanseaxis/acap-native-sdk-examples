@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -24,13 +25,11 @@ Timer::Timer(std::string_view msg) : msg(msg) {
     start = std::chrono::steady_clock::now();
 }
 
-Timer::~Timer()
-{
+Timer::~Timer() {
     printDuration();
 }
 
-void Timer::printDuration() const
-{
+void Timer::printDuration() const {
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> duration = end - start;
     auto ns =
@@ -50,8 +49,7 @@ void Timer::printDuration() const
         size_t hours = min / 60;
         min %= 60;
         sec = sec - 60 * 60 * hours - 60 * min;
-        cout << msg << ": " << hours << " h " << min << " m " << sec
-             << " s\n";
+        cout << msg << ": " << hours << " h " << min << " m " << sec << " s\n";
     }
 }
 
@@ -88,22 +86,51 @@ FdBuffer::FdBuffer(size_t sz) : size(sz) {
         throw runtime_error("Could not truncate file for fd buffer");
     }
 
+    mapBuffer();
+}
+
+FdBuffer::FdBuffer(FdBuffer&& other) noexcept {
+    fd = other.fd;
+    size = other.size;
+    data = other.data;
+    filePath = other.filePath;
+
+    other.fd = -1;
+    other.size = 0;
+    other.data = nullptr;
+}
+
+FdBuffer::FdBuffer(FdBuffer const& other) {
+    fd = dup(other.fd);
+    if (fd < 0) {
+        throw runtime_error("Could not open file for fd buffer");
+    }
+
+    size = other.size;
+    filePath = other.filePath;
+
+    logInfo("mmaping for duplicate fd= %d", fd);
+    mapBuffer();
+}
+
+FdBuffer::~FdBuffer() {
+    if (fd >= 0 && close(fd)) {
+        logWarning("Failed to close fd");
+    }
+    if (data && msync(data, size, MS_SYNC)) {
+        logWarning("Failed to sync mmap");
+    }
+    if (data && munmap(data, size)) {
+        logWarning("Failed to unmap mmap");
+    }
+}
+
+void FdBuffer::mapBuffer() {
     data = static_cast<uint8_t*>(
         mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
     if (data == MAP_FAILED) {
         close(fd);
-        throw runtime_error("Could not mmap file for fd buffer");
-    }
-}
-
-FdBuffer::~FdBuffer() {
-    if (close(fd)) {
-        logWarning("Failed to close fd");
-    }
-    if (msync(data, size, MS_SYNC)) {
-        logWarning("Failed to sync mmap");
-    }
-    if (munmap(data, size)) {
-        logWarning("Failed to unmap mmap");
+        throw runtime_error("Could not mmap file for fd buffer: " +
+                            string(strerror(errno)));
     }
 }

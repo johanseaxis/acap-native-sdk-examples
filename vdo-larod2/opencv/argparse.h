@@ -20,7 +20,6 @@ typedef struct args_t {
     larodChip chip;
     bool hasModelParams;
     bool debug;
-    bool runInference;
     size_t width;
     size_t height;
 } args_t;

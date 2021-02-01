@@ -8,11 +8,11 @@ a video stream from opencv.
 
 - [x] Display a video stream using opencv.
 - [x] Configure video stream to be in YUV-format.
-- [ ] Implement YUYV convertion in larod.
-- [ ] Run preprocessing YUYV -> RGB + crop-scale.
-- [ ] Run inference.
-- [ ] Create a cv::Mat of the final RGB-image and display it with opencv.
-- [ ] Do any postprocessing depending on the NN model.
+- [x] Implement YUYV convertion in larod.
+- [x] Run preprocessing YUYV -> RGB + crop-scale.
+- [x] Run inference.
+- [x] Create a cv::Mat of the final RGB-image and display it with opencv.
+- [x] Do any postprocessing depending on the NN model.
 
 ## Video formats
 

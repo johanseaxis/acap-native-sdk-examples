@@ -6,16 +6,16 @@
 
 // Prints the time since construction at time of destruction.
 class Timer {
-  public:
+public:
     Timer();
     Timer(std::string_view msg);
     ~Timer();
 
     void printDuration() const;
 
-  private:
-      std::chrono::steady_clock::time_point start;
-      std::string_view msg;
+private:
+    std::chrono::steady_clock::time_point start;
+    std::string_view msg;
 };
 
 #ifdef DEBUG
@@ -42,5 +42,9 @@ struct FdBuffer {
     std::string filePath;
 
     FdBuffer(size_t sz);
+    FdBuffer(FdBuffer&&) noexcept;
+    FdBuffer(FdBuffer const&);
     ~FdBuffer();
+
+    void mapBuffer();
 };

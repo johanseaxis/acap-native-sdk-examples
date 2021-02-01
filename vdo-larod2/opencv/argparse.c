@@ -45,10 +45,9 @@ static int parseNonNegInt(char* arg, unsigned long long* i,
 
 const struct argp_option opts[] = {
     {"debug", 'd', NULL, 0, "Enable debug output.", 0},
-    {"disable-inference", 'n', NULL, 0, "Disable inference.", 0},
     {"model-file", 'g', "FILE", 0, "Load model file.", 0},
-    {"width", 'x', "WIDTH", 0, "Video stream width. (320 by default)", 0},
-    {"height", 'y', "HEIGHT", 0, "Video stream height. (180 by default)", 0},
+    {"width", 'x', "WIDTH", 0, "Video stream width.", 0},
+    {"height", 'y', "HEIGHT", 0, "Video stream height.", 0},
     {"help", 'h', NULL, 0, "Print this help text and exit.", 0},
     {"usage", KEY_USAGE, NULL, 0, "Print short usage message and exit.", 0},
     {"version", 'v', NULL, 0, "Print version information and exit.", 0},
@@ -80,9 +79,6 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
     switch (key) {
     case 'd':
         args->debug = true;
-        break;
-    case 'n':
-        args->runInference = false;
         break;
     case 'g':
         args->modelFile = arg;
@@ -154,9 +150,8 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
 #else
         args->debug = false;
 #endif
-        args->runInference = true;
-        args->width = 320;
-        args->height = 180;
+        args->width = 1280;
+        args->height = 720;
         break;
     case ARGP_KEY_END:
         if (state->argc == 1) {
