@@ -201,7 +201,7 @@ error:
     return false;
 }
 
-static bool setupLarod(const larodChip larodChip, const int larodModelFd,
+static bool setupLarod(const larodChip chip, const int larodModelFd,
                        larodConnection** larodConn, larodModel** model) {
     larodError* error = NULL;
     larodConnection* conn = NULL;
@@ -214,7 +214,21 @@ static bool setupLarod(const larodChip larodChip, const int larodModelFd,
         goto end;
     }
 
-    loadedModel = larodLoadModel(conn, larodModelFd, larodChip, LAROD_ACCESS_PRIVATE,
+    // List available chip id:s
+    larodChip* chipIds = NULL;
+    size_t numChipIds = 0;
+    syslog(LOG_INFO, "Available chip ids:");
+    if (larodListChips(conn, &chipIds, &numChipIds, &error)) {
+        for (size_t i = 0; i < numChipIds; ++i) {
+            syslog(LOG_INFO, "%d: %s", chipIds[i], larodGetChipName(chipIds[i]));;
+        }
+        free(chipIds);
+    } else {
+        syslog(LOG_ERR, "%s: Failed to list available chip id: %s", __func__, error->msg);
+        larodClearError(&error);
+    }
+
+    loadedModel = larodLoadModel(conn, larodModelFd, chip, LAROD_ACCESS_PRIVATE,
                                  "Vdo Example App Model", NULL, &error);
     if (!loadedModel) {
         syslog(LOG_ERR, "%s: Unable to load model: %s", __func__, error->msg);
@@ -389,6 +403,9 @@ int main(int argc, char** argv) {
     ImgProvider_t* provider = NULL;
     larodError* error = NULL;
     larodConnection* conn = NULL;
+    larodMap* ppMap = NULL;
+    larodModel* ppModel = NULL;
+    larodModel* model = NULL;
     larodTensor** ppInputTensors = NULL;
     size_t ppNumInputs = 0;
     larodTensor** ppOutputTensors = NULL;
@@ -442,11 +459,10 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "%s: Could not create image provider", __func__);
         goto end;
     }
-    goto end;
 
     // Create preprocessing maps
     syslog(LOG_INFO, "Create preprocessing maps");
-    larodMap* ppMap = larodCreateMap(&error);
+    ppMap = larodCreateMap(&error);
     if (!ppMap) {
         syslog(LOG_ERR, "Could not create preprocessing larodMap %s", error->msg);
         goto end;
@@ -455,15 +471,15 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
         goto end;
     }
-    if (larodMapSetIntArr2(ppMap, "image.input.size", streamWidth, streamHeight, &error)) {
+    if (!larodMapSetIntArr2(ppMap, "image.input.size", streamWidth, streamHeight, &error)) {
         syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
         goto end;
     }
-    if (larodMapSetStr(ppMap, "image.output.format", "rgb-interleaved", &error)) {
+    if (!larodMapSetStr(ppMap, "image.output.format", "rgb-interleaved", &error)) {
         syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
         goto end;
     }
-    if (larodMapSetIntArr2(ppMap, "image.output.size", args.width, args.height, &error)) {
+    if (!larodMapSetIntArr2(ppMap, "image.output.size", args.width, args.height, &error)) {
         syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
         goto end;
     }
@@ -479,15 +495,14 @@ int main(int argc, char** argv) {
 
     syslog(LOG_INFO, "Setting up larod connection with chip %d and model %s", args.chip,
            args.modelFile);
-    larodModel* model = NULL;
     if (!setupLarod(args.chip, larodModelFd, &conn, &model)) {
         goto end;
     }
 
-    larodModel *ppModel = larodLoadModel(conn, -1, LAROD_CHIP_LIBYUV,
-        LAROD_ACCESS_PRIVATE, "", ppMap, &error);
+    larodChip ppChip = LAROD_CHIP_LIBYUV;
+    ppModel = larodLoadModel(conn, -1, ppChip, LAROD_ACCESS_PRIVATE, "", ppMap, &error);
     if (!ppModel) {
-        syslog(LOG_ERR, "Unable to load preprocessing model: %s", error->msg);
+        syslog(LOG_ERR, "Unable to load preprocessing model with chip %d: %s", ppChip, error->msg);
         goto end;
     }
 
@@ -719,6 +734,7 @@ int main(int argc, char** argv) {
     ret = true;
 
 end:
+    syslog(LOG_INFO, "Terminating vdo_larod");
     if (provider) {
         destroyImgProvider(provider);
     }
@@ -753,6 +769,7 @@ end:
         close(larodOutputFd);
     }
 
+    larodDestroyJobRequest(&ppJobReq);
     larodDestroyJobRequest(&jobReq);
     larodDestroyTensors(&inputTensors, numInputs);
     larodDestroyTensors(&outputTensors, numOutputs);
