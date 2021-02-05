@@ -70,6 +70,8 @@
 #include "vdo-frame.h"
 #include "vdo-types.h"
 
+#define LAROD_PREPROCESSING TRUE
+
 /**
  * brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
  * forces an immediate exit without clean up if invoked at least twice.
@@ -419,6 +421,7 @@ int main(int argc, char** argv) {
     void* ppInputAddr = MAP_FAILED;
     void* larodInputAddr = MAP_FAILED;
     void* larodOutputAddr = MAP_FAILED;
+    size_t outputBufferSize = 0;
     int larodModelFd = -1;
     int ppInputFd = -1;
     int larodInputFd = -1;
@@ -433,7 +436,11 @@ int main(int argc, char** argv) {
     // Open the syslog to report messages for "vdo_larod"
     openlog("vdo_larod", LOG_PID|LOG_CONS, LOG_USER);
 
-    syslog(LOG_INFO, "Starting ...");
+#if LAROD_PREPROCESSING
+    syslog(LOG_INFO, "Starting %s with larod preprocessing", argv[0]);
+#else
+    syslog(LOG_INFO, "Starting %s without larod preprocessing", argv[0]);
+#endif
 
     // Register an interrupt handler which tries to exit cleanly if invoked once
     // but exits immediately if further invoked.
@@ -503,7 +510,7 @@ int main(int argc, char** argv) {
     ppModel = larodLoadModel(conn, -1, ppChip, LAROD_ACCESS_PRIVATE, "", ppMap, &error);
     if (!ppModel) {
         syslog(LOG_ERR, "Unable to load preprocessing model with chip %d: %s", ppChip, error->msg);
-        goto end;
+       goto end;
     }
 
     // Create input/output tensors
@@ -565,11 +572,7 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "Could not get pitches of tensor: %s", error->msg);
         goto end;
     }
-    size_t outputBufferSize = outputPitches->pitches[0];
-    if (args.outputBytes != (int64_t)outputBufferSize) {
-        syslog(LOG_ERR, "Expected model output size %d", outputBufferSize);
-        goto end;
-    }
+    outputBufferSize = outputPitches->pitches[0];
 
     // Allocate memory for input/output buffers
     syslog(LOG_INFO, "Allocate memory for input/output buffers");
@@ -582,7 +585,7 @@ int main(int argc, char** argv) {
                              &larodInputAddr, &larodInputFd)) {
         goto end;
     }
-    if (!createAndMapTmpFile(CONV_OUT_FILE_PATTERN, args.outputBytes,
+    if (!createAndMapTmpFile(CONV_OUT_FILE_PATTERN, outputBufferSize,
                              &larodOutputAddr, &larodOutputFd)) {
         goto end;
     }
@@ -609,16 +612,16 @@ int main(int argc, char** argv) {
     // Create job requests
     syslog(LOG_INFO, "Create job requests");
     ppReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs,
-     ppOutputTensors, ppNumOutputs, ppMap, &error);
+    ppOutputTensors, ppNumOutputs, NULL, &error);
     if (!ppReq) {
         syslog(LOG_ERR, "Failed creating pp job request: %s", error->msg);
         goto end;
     }
     // App supports only one input/output tensor.
-    infReq = larodCreateJobRequest(model, inputTensors, 1,
-        outputTensors, 1, NULL, &error);
+    infReq = larodCreateJobRequest(model, inputTensors, 1, outputTensors,
+                                         1, NULL, &error);
     if (!infReq) {
-        syslog(LOG_ERR, "Failed creating job request: %s", error->msg);
+        syslog(LOG_ERR, "Failed creating inference request: %s", error->msg);
         goto end;
     }
 
@@ -650,20 +653,20 @@ int main(int argc, char** argv) {
 
         // Covert image data from NV12 format to interleaved uint8_t RGB format
         gettimeofday(&startTs, NULL);
-#if FALSE
+#if LAROD_PREPROCESSING
+        memcpy(ppInputAddr, nv12Data, yuyvBufferSize);
+        if (!larodRunJob(conn, ppReq, &error)) {
+            syslog(LOG_ERR, "Unable to run job on model pp: %s (%d)",
+                   error->msg, error->code);
+            goto end;
+        }
+#else
         if (!convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight,
                                         (uint8_t*) larodInputAddr, args.width,
                                         args.height)) {
             syslog(LOG_ERR, "%s: Failed img scale/convert in "
                    "convertCropScaleU8yuvToRGB() (continue anyway)",
                    __func__);
-        }
-#else
-        memcpy(ppInputAddr, nv12Data, yuyvBufferSize);
-        if (!larodRunJob(conn, ppReq, &error)) {
-            syslog(LOG_ERR, "Unable to run job on model %s: %s (%d)",
-                   "preprocess", error->msg, error->code);
-            goto end;
         }
 #endif
         gettimeofday(&endTs, NULL);
@@ -697,7 +700,7 @@ int main(int argc, char** argv) {
         uint8_t maxProb = 0;
         size_t maxIdx = 0;
         uint8_t* outputPtr = (uint8_t*) larodOutputAddr;
-        for (size_t j = 0; j < args.outputBytes; j++) {
+        for (size_t j = 0; j < outputBufferSize; j++) {
             if (outputPtr[j] > maxProb) {
                 maxProb = outputPtr[j];
                 maxIdx = j;
@@ -757,7 +760,7 @@ end:
         close(larodInputFd);
     }
     if (larodOutputAddr != MAP_FAILED) {
-        munmap(larodOutputAddr, args.outputBytes);
+        munmap(larodOutputAddr, outputBufferSize);
     }
     if (larodOutputFd >= 0) {
         close(larodOutputFd);

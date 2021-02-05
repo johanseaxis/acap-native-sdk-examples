@@ -49,14 +49,13 @@ const struct argp_option opts[] = {
 const struct argp argp = {
     opts,
     parseOpt,
-    "MODEL WIDTH HEIGHT OUTPUT_SIZE",
+    "MODEL WIDTH HEIGHT",
     "This is an example app which loads an image classification MODEL to "
     "larod and then uses vdo to fetch frames of size WIDTH x HEIGHT in a yuv "
     "format which are converted to an interleaved rgb format and then sent to "
-    "larod for inference on MODEL. OUTPUT_SIZE denotes the size in bytes of "
-    "the tensor output by MODEL.\n\nExample call:\n"
+    "larod for inference on MODEL. \n\nExample call:\n"
     "larod-vdo-example-app /tmp/mobilenet_v2_1.0_224_quant.larod 224 224 "
-    "1001 -c 2\nwhere 2 here refers to the tflite cpu backend. The numbers for "
+    "-c 2\nwhere 2 here refers to the tflite cpu backend. The numbers for "
     "each type of chip can be found at the top of the file larod.h.",
     NULL,
     NULL,
@@ -118,13 +117,6 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
                 argp_failure(state, EXIT_FAILURE, ret, "invalid height");
             }
             args->height = (unsigned int) height;
-        } else if (state->arg_num == 3) {
-            unsigned long long outputBytes;
-            int ret = parsePosInt(arg, &outputBytes, SIZE_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid output size");
-            }
-            args->outputBytes = (size_t) outputBytes;
         } else {
             argp_error(state, "Too many arguments given");
         }
@@ -132,14 +124,13 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
     case ARGP_KEY_INIT:
         args->width = 0;
         args->height = 0;
-        args->outputBytes = 0;
         args->numFrames = 100;
         args->chip = 0;
         args->modelFile = NULL;
         args->labelsFile = NULL;
         break;
     case ARGP_KEY_END:
-        if (state->arg_num != 4) {
+        if (state->arg_num != 3) {
             argp_error(state, "Invalid number of arguments given");
         }
         break;
