@@ -414,8 +414,8 @@ int main(int argc, char** argv) {
     size_t numInputs = 0;
     larodTensor** outputTensors = NULL;
     size_t numOutputs = 0;
-    larodJobRequest* ppJobReq = NULL;
-    larodJobRequest* jobReq = NULL;
+    larodJobRequest* ppReq = NULL;
+    larodJobRequest* infReq = NULL;
     void* ppInputAddr = MAP_FAILED;
     void* larodInputAddr = MAP_FAILED;
     void* larodOutputAddr = MAP_FAILED;
@@ -549,18 +549,15 @@ int main(int argc, char** argv) {
         goto end;
     }
     size_t yuyvBufferSize = ppInputPitches->pitches[0];
-    if (streamWidth * streamHeight * 2 != (int64_t)yuyvBufferSize) {
-        syslog(LOG_ERR, "Expected video input size %d", yuyvBufferSize);
-        goto end;
-    }
     const larodTensorPitches* ppOutputPitches = larodGetTensorPitches(ppOutputTensors[0], &error);
     if (!ppOutputPitches) {
         syslog(LOG_ERR, "Could not get pitches of tensor: %s", error->msg);
         goto end;
     }
     size_t rgbBufferSize = ppOutputPitches->pitches[0];
-    if (args.width * args.height * CHANNELS != (int64_t)rgbBufferSize) {
-        syslog(LOG_ERR, "Expected video output size %d", rgbBufferSize);
+    size_t expectedSize = args.width * args.height * CHANNELS;
+    if (expectedSize != rgbBufferSize) {
+        syslog(LOG_ERR, "Expected video output size %d, actual %d", expectedSize, rgbBufferSize);
         goto end;
     }
     const larodTensorPitches* outputPitches = larodGetTensorPitches(outputTensors[0], &error);
@@ -611,16 +608,16 @@ int main(int argc, char** argv) {
 
     // Create job requests
     syslog(LOG_INFO, "Create job requests");
-    ppJobReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs,
+    ppReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs,
      ppOutputTensors, ppNumOutputs, ppMap, &error);
-    if (!ppJobReq) {
+    if (!ppReq) {
         syslog(LOG_ERR, "Failed creating pp job request: %s", error->msg);
         goto end;
     }
     // App supports only one input/output tensor.
-    jobReq = larodCreateJobRequest(model, inputTensors, 1,
+    infReq = larodCreateJobRequest(model, inputTensors, 1,
         outputTensors, 1, NULL, &error);
-    if (!jobReq) {
+    if (!infReq) {
         syslog(LOG_ERR, "Failed creating job request: %s", error->msg);
         goto end;
     }
@@ -652,9 +649,8 @@ int main(int argc, char** argv) {
         uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
 
         // Covert image data from NV12 format to interleaved uint8_t RGB format
-        syslog(LOG_INFO, "Covert image data from NV12 format to interleaved uint8_t RGB format");
         gettimeofday(&startTs, NULL);
-#if TRUE
+#if FALSE
         if (!convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight,
                                         (uint8_t*) larodInputAddr, args.width,
                                         args.height)) {
@@ -664,7 +660,7 @@ int main(int argc, char** argv) {
         }
 #else
         memcpy(ppInputAddr, nv12Data, yuyvBufferSize);
-        if (!larodRunJob(conn, ppJobReq, &error)) {
+        if (!larodRunJob(conn, ppReq, &error)) {
             syslog(LOG_ERR, "Unable to run job on model %s: %s (%d)",
                    "preprocess", error->msg, error->code);
             goto end;
@@ -685,10 +681,9 @@ int main(int argc, char** argv) {
             goto end;
         }
 
-        syslog(LOG_INFO, "Run inference");
         gettimeofday(&startTs, NULL);
-        if (!larodRunJob(conn, jobReq, &error)) {
-            syslog(LOG_ERR, "Unable to run job on model %s: %s (%d)",
+        if (!larodRunJob(conn, infReq, &error)) {
+            syslog(LOG_ERR, "Unable to run inference on model %s: %s (%d)",
                    args.modelFile, error->msg, error->code);
             goto end;
         }
@@ -696,7 +691,7 @@ int main(int argc, char** argv) {
 
         elapsedMs = (unsigned int) (((endTs.tv_sec - startTs.tv_sec) * 1000) +
                                     ((endTs.tv_usec - startTs.tv_usec) / 1000));
-        syslog(LOG_INFO, "Ran job for %u ms", elapsedMs);
+        syslog(LOG_INFO, "Ran inference for %u ms", elapsedMs);
 
         // Compute the most likely index.
         uint8_t maxProb = 0;
@@ -734,7 +729,6 @@ int main(int argc, char** argv) {
     ret = true;
 
 end:
-    syslog(LOG_INFO, "Terminating vdo_larod");
     if (provider) {
         destroyImgProvider(provider);
     }
@@ -769,8 +763,8 @@ end:
         close(larodOutputFd);
     }
 
-    larodDestroyJobRequest(&ppJobReq);
-    larodDestroyJobRequest(&jobReq);
+    larodDestroyJobRequest(&ppReq);
+    larodDestroyJobRequest(&infReq);
     larodDestroyTensors(&inputTensors, numInputs);
     larodDestroyTensors(&outputTensors, numOutputs);
     larodClearError(&error);
@@ -779,6 +773,6 @@ end:
         freeLabels(labels, labelFileData);
     }
 
-    syslog(LOG_INFO, "Exit vdo_larod");
+    syslog(LOG_INFO, "Exit %s", argv[0]);
     return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }
