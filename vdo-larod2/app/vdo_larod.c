@@ -22,17 +22,14 @@
  * format which are converted to interleaved rgb format and then sent to
  * larod for inference on MODEL.
  *
- * The application expects four arguments on the command line in the following
- * order: MODEL WIDTH HEIGHT OUTPUT_SIZE.
+ * The application expects three arguments on the command line in the following
+ * order: MODEL WIDTH HEIGHT
  *
  * First argument, MODEL, is a string describing path to the model.
  *
  * Second argument, WIDTH, is an integer for width size.
  *
  * Third argument, HEIGHT, is an integer for height size.
- *
- * Fourth argument, OUTPUT_SIZE, denotes the size in bytes of
- * the tensor output by model.
  *
  * The application has two optional arguments on the command line in the following
  * order: CHIP NUM_FRAMES.
@@ -48,8 +45,7 @@
  * Then you could run the application with Google TPU with command:
  *     ./usr/local/packages/vdo_larod/vdo_larod \
  *     /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant_edgetpu.larod \
- *     224 224 1001 -c 4 \
- *     -l /usr/local/packages/vdo_larod/label/imagenet_labels.txt
+ *     224 224 -c 4 -l /usr/local/packages/vdo_larod/label/imagenet_labels.txt
  */
 
 #include <errno.h>
@@ -64,13 +60,10 @@
 #include <unistd.h>
 
 #include "argparse.h"
-#include "imgconverter.h"
 #include "imgprovider.h"
 #include "larod.h"
 #include "vdo-frame.h"
 #include "vdo-types.h"
-
-#define LAROD_PREPROCESSING TRUE
 
 /**
  * brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
@@ -406,6 +399,7 @@ int main(int argc, char** argv) {
     larodError* error = NULL;
     larodConnection* conn = NULL;
     larodMap* ppMap = NULL;
+    larodMap* cropMap = NULL;
     larodModel* ppModel = NULL;
     larodModel* model = NULL;
     larodTensor** ppInputTensors = NULL;
@@ -435,12 +429,7 @@ int main(int argc, char** argv) {
 
     // Open the syslog to report messages for "vdo_larod"
     openlog("vdo_larod", LOG_PID|LOG_CONS, LOG_USER);
-
-#if LAROD_PREPROCESSING
     syslog(LOG_INFO, "Starting %s with larod preprocessing", argv[0]);
-#else
-    syslog(LOG_INFO, "Starting %s without larod preprocessing", argv[0]);
-#endif
 
     // Register an interrupt handler which tries to exit cleanly if invoked once
     // but exits immediately if further invoked.
@@ -467,6 +456,24 @@ int main(int argc, char** argv) {
         goto end;
     }
 
+    // Calculate crop image
+    // 1. The crop area shall fill the input image either horizontally or
+    //    vertically.
+    // 2. The crop area shall have the same aspect ratio as the output image.
+    syslog(LOG_INFO, "Calculate crop image");
+    float destWHratio = (float) args.width / (float) args.height;
+    float cropW = (float) streamWidth;
+    float cropH = cropW / destWHratio;
+    if (cropH > (float) streamHeight) {
+        cropH = (float) streamHeight;
+        cropW = cropH * destWHratio;
+    }
+    unsigned int clipW = (unsigned int)cropW;
+    unsigned int clipH = (unsigned int)cropH;
+    unsigned int clipX = (streamWidth - clipW) / 2;
+    unsigned int clipY = (streamHeight - clipH) / 2;
+    syslog(LOG_INFO, "Crop VDO image X=%d Y=%d (%d x %d)", clipX, clipY, clipW, clipH);
+
     // Create preprocessing maps
     syslog(LOG_INFO, "Create preprocessing maps");
     ppMap = larodCreateMap(&error);
@@ -487,6 +494,15 @@ int main(int argc, char** argv) {
         goto end;
     }
     if (!larodMapSetIntArr2(ppMap, "image.output.size", args.width, args.height, &error)) {
+        syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
+        goto end;
+    }
+    cropMap = larodCreateMap(&error);
+    if (!cropMap) {
+        syslog(LOG_ERR, "Could not create preprocessing crop larodMap %s", error->msg);
+        goto end;
+    }
+    if (!larodMapSetIntArr4(cropMap, "image.input.crop", clipX, clipY, clipW, clipH, &error)) {
         syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
         goto end;
     }
@@ -612,11 +628,12 @@ int main(int argc, char** argv) {
     // Create job requests
     syslog(LOG_INFO, "Create job requests");
     ppReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs,
-    ppOutputTensors, ppNumOutputs, NULL, &error);
+        ppOutputTensors, ppNumOutputs, cropMap, &error);
     if (!ppReq) {
         syslog(LOG_ERR, "Failed creating pp job request: %s", error->msg);
         goto end;
     }
+
     // App supports only one input/output tensor.
     infReq = larodCreateJobRequest(model, inputTensors, 1, outputTensors,
                                          1, NULL, &error);
@@ -653,22 +670,12 @@ int main(int argc, char** argv) {
 
         // Covert image data from NV12 format to interleaved uint8_t RGB format
         gettimeofday(&startTs, NULL);
-#if LAROD_PREPROCESSING
         memcpy(ppInputAddr, nv12Data, yuyvBufferSize);
         if (!larodRunJob(conn, ppReq, &error)) {
             syslog(LOG_ERR, "Unable to run job on model pp: %s (%d)",
                    error->msg, error->code);
             goto end;
         }
-#else
-        if (!convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight,
-                                        (uint8_t*) larodInputAddr, args.width,
-                                        args.height)) {
-            syslog(LOG_ERR, "%s: Failed img scale/convert in "
-                   "convertCropScaleU8yuvToRGB() (continue anyway)",
-                   __func__);
-        }
-#endif
         gettimeofday(&endTs, NULL);
 
         elapsedMs = (unsigned int) (((endTs.tv_sec - startTs.tv_sec) * 1000) +
@@ -739,6 +746,7 @@ end:
     // release the privately loaded model when the session is disconnected in
     // larodDisconnect().
     larodDestroyMap(&ppMap);
+    larodDestroyMap(&cropMap);
     larodDestroyModel(&ppModel);
     larodDestroyModel(&model);
     if (conn) {
