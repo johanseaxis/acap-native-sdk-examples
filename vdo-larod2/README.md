@@ -10,7 +10,7 @@ It is achieved by using the containerized Axis API and toolchain images.
 Together with this README file you should be able to find a directory called app. That directory contains the "vdo_larod" application source code, which can easily be compiled and run with the help of the tools and step by step below.
 
 ## Detailed outline of example application
-This application opens a client to vdo and starts fetching frames (in a new thread) in the yuv format. It tries to match twice the WIDTH and HEIGHT that is required by the neural network. The thread fetching frames is written so that it always tries to provide a frame as new as possible even if not all previous frames have been processed by larod. The implementation of the vdo specific parts of the app can be found in file "imgprovider.c".
+This application opens a client to vdo and starts fetching frames (in a new thread) in the yuv format. It tries to find the smallest VDO stream resolution that fits the WIDTH and HEIGHT required by the neural network. The thread fetching frames is written so that it always tries to provide a frame as new as possible even if not all previous frames have been processed by larod. The implementation of the vdo specific parts of the app can be found in file "imgprovider.c".
 
 The image preprocessing is then started by larod preprocessing. The code will perform the following three steps:
 1. Copy the full size NV12 image delivered by vdo to a tensor buffer.
@@ -49,7 +49,7 @@ vdo-larod
 * **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
-* ARTPEC-7 based device.
+* ARTPEC-7 based device with edge TPU.
 * This application was not written to optimize performance.
 * MobileNet is good for classification, but it requires that the object you want to classify should cover almost all the frame.
 
@@ -155,7 +155,7 @@ Browse to the following page (replace <axis_device_ip> with the IP number of you
 http://<axis_device_ip>/#settings/apps
 ```
 
-*Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
+*Go to your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
 the newly built **vdo_larod_cpu_1_0_0_armv7hf.eap** or **vdo_larod_edgetpu_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
 Application vdo_larod is now available as an application on the device,
@@ -259,7 +259,7 @@ vdo_larod[3440]: Top result:  566  freight car with score 26.80%
 ```
 
 ##### Conclusion
-- This is an example of test data, which is dependant on selected device and chip.
+- This is an example of test data, which is dependent on selected device and chip.
 - Street view has been used for testing.
 - Running inference is much faster on chip Google TPU than CPU with TensorFlow Lite.
 - Converting images takes almost the same time on both chips.

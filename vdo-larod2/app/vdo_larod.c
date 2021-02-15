@@ -630,7 +630,7 @@ int main(int argc, char** argv) {
     ppReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs,
         ppOutputTensors, ppNumOutputs, cropMap, &error);
     if (!ppReq) {
-        syslog(LOG_ERR, "Failed creating pp job request: %s", error->msg);
+        syslog(LOG_ERR, "Failed creating preprocessing job request: %s", error->msg);
         goto end;
     }
 
