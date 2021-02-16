@@ -20,7 +20,8 @@ building-opencv
 │   └── package.conf - A file specifying execution-related options for the ACAP
 ├── build.sh - A convenience script for building the ACAP
 ├── Dockerfile - Specification of the container used to build the ACAP
-└── README.md
+├── README.md
+└── sources.list - Text file specifying repositories for armhf packages
 ```
 
 ## Instructions
