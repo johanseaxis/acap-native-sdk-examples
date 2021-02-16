@@ -22,12 +22,16 @@ Below is the list of examples available in the repository.
   * The example code is written in C which illustrates how to draw plain boxes and text as overlays in a stream.
 * [axparameter](./axparameter/)
   * The example code is written in C which shows how to handle application parameters from the device.
-* [Larod](./larod/)
+* [larod](./larod/)
   * The example code is written in C which connects to [larod](./FAQs.md#WhatisLarod?) and loads a model, runs inference on it and then finally deletes the loaded model from [larod](./FAQs.md#WhatisLarod?).
 * [licensekey](./licensekey/)
   * The example code is written in C which illustrates how to check the licensekey status.
 * [subscribe-to-object-detection](./subscribe-to-object-detection/)
   * The example code is written in C and exemplifies how to subscribe to video object detection, filter detections based on calibration data and points out ways to optimize object detection.
+* [tensorflow-to-larod](./tensorflow-to-larod/)
+  * This example covers model conversion, model quantization, image formats and custom models in
+greater depth than the [larod](./larod)
+and [vdo-larod](./vdo-larod) examples.
 * [vdostream](./vdostream/)
   * The example code is written in C which starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 * [vdo-larod](./vdo-larod/)
