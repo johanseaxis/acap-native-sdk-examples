@@ -63,7 +63,7 @@ to keep the armhf files separated from the non-armhf files. These files are then
 the `/opt/axis/acapsdk/sysroots/cortexa9hf-neon-poky-linux-gnueabi/` folder as this is used as the root for the application's Makefile. 
 
 #### Makefile
-The [Makefile](app/Makefile) in the `app` directory specifies how the application is built. Notable in the Makefile is that the 
+The [Makefile](app/Makefile) in the `app` directory specifies how the application is compiled and packaged. Notable in the Makefile is that the 
 OpenCV libraries our application needs are bundled with the application. These are copied to a path, `lib/`, relative to the applications 
 root through the `libscopy` target and then located using rpath.
 
