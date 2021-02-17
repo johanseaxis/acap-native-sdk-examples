@@ -41,7 +41,6 @@ jobs:
          git checkout topic/development/recaptest      
          export ATF_PYTHON=python3     
          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
-         python --version
          
          chmod +x test_starter.sh
          ./test_starter.sh licensekey_handler
