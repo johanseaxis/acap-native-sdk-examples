@@ -5,7 +5,7 @@
 * Camera feature plug-ins that add value beyond the Axis product's core functionality
 
 # Prerequisites for ACAP development
-ACAP is Axis own open platform for applications that run on-board an Axis product. If you are new to ACAP, start with learning more about the platform, [prerequisites](https://www.axis.com/developer-community/acap-fundamentals), [compatible architectures](https://www.axis.com/developer-community/acap-sdk) and [SDK user manual](https://www.axis.com/products/online-manual/s00001#t10152931).
+ACAP is Axis own open platform for applications that run on-board an Axis product. If you are new to ACAP, start with learning more about the platform, [prerequisites](https://www.axis.com/developer-community/acap-fundamentals), [compatible architectures](https://www.axis.com/developer-community/acap-sdk) and [SDK user manual](https://www.axis.com/products/online-manual/s00004).
 
 ## Getting started with the repo
 This repository contains a set of application examples which aims to enrich the
@@ -32,19 +32,21 @@ Below is the list of examples available in the repository.
   * This example covers model conversion, model quantization, image formats and custom models in
 greater depth than the [larod](./larod)
 and [vdo-larod](./vdo-larod) examples.
+* [using-opencv](./using-opencv/)
+  * This example covers how to build, bundle and use OpenCV with ACAP3.
 * [vdostream](./vdostream/)
   * The example code is written in C which starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 * [vdo-larod](./vdo-larod/)
   * The example code is written in C and loads an image classification model to [larod](./FAQs.md#WhatisLarod?) and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv format which are converted to interleaved rgb format and then sent to larod for inference on MODEL.
 
 
-### DockerHub Images
-There are two types of Docker images here: the toolchain (SDK), and the API. These images can be used as the basis for custom built images for running your applications. The images needed are specified in the docker-compose files. All images are public and free to use for anyone.
-* [Toolchain](https://hub.docker.com/repository/docker/axisecp/acap-toolchain) -  An Ubuntu-based toolchain bundle with all tools for building and packaging an ACAP 3 application included.
-* [API](https://hub.docker.com/repository/docker/axisecp/acap-api) - An Ubuntu-based API bundle with all API components (header and library files) included.
+### DockerHub Image
+The ACAP SDK image can be used as a basis for custom built images to run your application or as a developer environment inside the container. The image is public and free to use for anyone.
 
- # Frequently asked questions
-Please visit [FAQs page](FAQs.md)  for frequently asked questions.
+* [ACAP SDK](https://hub.docker.com/repository/docker/axisecp/acap-sdk) This image is based on Ubuntu and contains the environment needed for building an AXIS Camera Application Platform (ACAP) application. This includes all tools for building and packaging an ACAP 3 application as well as API components (header and library files) needed for accessing different parts of the camera firmware.
+
+# Frequently asked questions
+Please visit [FAQs page](FAQs.md) for frequently asked questions.
 
 # License
 [Apache 2.0](LICENSE)
