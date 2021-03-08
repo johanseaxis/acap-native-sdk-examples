@@ -132,6 +132,7 @@ char class_name[90][20] = {
   "toothbrush"
 };
 
+
 /// Set by signal handler if an interrupt signal sent to process.
 /// Indicates that app should stop asap and exit gracefully.
 volatile sig_atomic_t stopRunning = false;
@@ -532,23 +533,21 @@ int main(int argc, char** argv) {
         else {
             syslog(LOG_INFO,"There are %d objects", (int) numberofdetections[0]);
             for (int i = 0; i < numberofdetections[0]; i++){
-                syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
-                       i+1, class_name[(int) classes[i]], scores[i], locations[4*i],locations[4*i+1],locations[4*i+2],locations[4*i+3]);
+
+                float top = locations[4*i];
+                float left = locations[4*i+1];
+                float bottom = locations[4*i+2];
+                float right = locations[4*i+3];
+                unsigned int dw = (right - left) * args.width;
+                unsigned int dh = (bottom - top) * args.height;
+                unsigned int cropX = left * args.width; 
+                unsigned int cropY = top * args.height;
+
+                syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%d,%d,%d,%d]",
+                       i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
+                
                 } 
         } 
-
-        /*
-        if (numberofdetections[0] == 0) {
-            syslog(LOG_INFO,"Object Number %d", numberofdetections[0]);
-        }
-        else {
-            for (int i = 0; i < numberofdetections[0]; i++){
-                syslog(LOG_INFO, "Object %d: Classes: %d - Scores: %.2f%% - Locations [top, left, bottom, right]: [%d,%d,%d,%d]",
-                       i, classes[i], (float) scores[i] / 2.55f, locations[i],locations[i],locations[i],locations[i]);
-                }
-        }
-        */
-        
 
         // Release frame reference to provider.
         returnFrame(provider, buf);
