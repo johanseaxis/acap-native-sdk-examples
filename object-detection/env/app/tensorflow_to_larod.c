@@ -138,6 +138,32 @@ char class_name[90][20] = {
 volatile sig_atomic_t stopRunning = false;
 
 /**
+ * print out the rgb value of the detected object.
+ *
+ * param srcImg Point to the input tensor of RGB Image.
+ * param sw Pixel width of the input image.
+ * param sh Pixel height of the input image.
+ * param dw Pixel width of the detected object.
+ * param dh Pixel height of the detected object.
+ * param cropX column of the detected object's top left corner.
+ * param cropY row of the detected object's top left corner.
+ */
+void printRGB( uint8_t *srcImg, unsigned int sw, unsigned int sh,
+              unsigned int dw, unsigned int dh,
+              unsigned int cropX, unsigned int cropY )
+{   
+    unsigned int row;
+    unsigned int col;
+    for( row = cropY; row < cropY + dh; ++row ){
+        for ( col = cropX; col < cropX + dw; ++col){
+            syslog(LOG_INFO, "(%d,%d),(%d,%d),%d,%d,%d", row, cropY + dh, col, cropX + dw, 
+                   srcImg[3*(sw*row + col)],srcImg[3*(sw*row + col)+1],srcImg[3*(sw*row + col)+2]);
+        }   
+    }
+}
+
+
+/**
  * brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
  * forces an immediate exit without clean up if invoked at least twice.
  *
@@ -526,6 +552,8 @@ int main(int argc, char** argv) {
         float* classes = (float*) larodOutput2Addr;
         float* scores = (float*) larodOutput3Addr;
         float* numberofdetections = (float*) larodOutput4Addr;
+        // Threshold of the size of detected objects
+        unsigned int THRESHOLD = 50;
 
         if ((int) numberofdetections[0] == 0) {
            syslog(LOG_INFO,"No object is detected");
@@ -545,9 +573,13 @@ int main(int argc, char** argv) {
 
                 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%d,%d,%d,%d]",
                        i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
-                
+			if(dw <= THRESHOLD && dh <= THRESHOLD){
+			    cropRGB((uint8_t*)larodInputAddr, args.width, args.height, dw, dh, cropX, cropY);
+			}
                 } 
         } 
+
+                
 
         // Release frame reference to provider.
         returnFrame(provider, buf);
