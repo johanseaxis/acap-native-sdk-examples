@@ -148,18 +148,23 @@ volatile sig_atomic_t stopRunning = false;
  * param cropX column of the detected object's top left corner.
  * param cropY row of the detected object's top left corner.
  */
-void printRGB( uint8_t *srcImg, unsigned int sw, unsigned int sh,
+void printRGB( FILE *fptr, uint8_t *srcImg, unsigned int sw, unsigned int sh,
               unsigned int dw, unsigned int dh,
               unsigned int cropX, unsigned int cropY )
 {   
     unsigned int row;
     unsigned int col;
+    fptr = fopen("/tmp/object.txt", "w");
     for( row = cropY; row < cropY + dh; ++row ){
         for ( col = cropX; col < cropX + dw; ++col){
             syslog(LOG_INFO, "(%d,%d),(%d,%d),%d,%d,%d", row, cropY + dh, col, cropX + dw, 
                    srcImg[3*(sw*row + col)],srcImg[3*(sw*row + col)+1],srcImg[3*(sw*row + col)+2]);
+              
+            fprintf(fptr, "(%d,%d),(%d,%d),%d,%d,%d\n", row, cropY + dh, col, cropX + dw, 
+                   srcImg[3*(sw*row + col)],srcImg[3*(sw*row + col)+1],srcImg[3*(sw*row + col)+2]);
         }   
     }
+    fclose(fptr);
 }
 
 
@@ -477,6 +482,8 @@ int main(int argc, char** argv) {
         goto end;
     }
 
+    FILE *fptr;
+
     while (true) {
         struct timeval startTs, endTs;
         unsigned int elapsedMs = 0;
@@ -554,11 +561,12 @@ int main(int argc, char** argv) {
         float* numberofdetections = (float*) larodOutput4Addr;
         // Threshold of the size of detected objects
         unsigned int THRESHOLD = 50;
-
+        
         if ((int) numberofdetections[0] == 0) {
            syslog(LOG_INFO,"No object is detected");
         }
         else {
+            
             syslog(LOG_INFO,"There are %d objects", (int) numberofdetections[0]);
             for (int i = 0; i < numberofdetections[0]; i++){
 
@@ -573,13 +581,13 @@ int main(int argc, char** argv) {
 
                 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%d,%d,%d,%d]",
                        i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
-			if(dw <= THRESHOLD && dh <= THRESHOLD){
-			    printRGB((uint8_t*)larodInputAddr, args.width, args.height, dw, dh, cropX, cropY);
-			}
-                } 
-        } 
 
-                
+		if(dw <= THRESHOLD && dh <= THRESHOLD){
+		    printRGB(fptr, (uint8_t*)larodInputAddr, args.width, args.height, dw, dh, cropX, cropY);
+		}
+            }
+ 
+        }          
 
         // Release frame reference to provider.
         returnFrame(provider, buf);
