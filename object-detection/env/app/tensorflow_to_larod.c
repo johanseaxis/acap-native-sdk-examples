@@ -148,7 +148,8 @@ volatile sig_atomic_t stopRunning = false;
  * param cropX column of the detected object's top left corner.
  * param cropY row of the detected object's top left corner.
  */
-void printRGB( FILE *fptr, FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
+
+void printRGB( FILE *fptr,FILE *ppmimg,  FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
               unsigned int dw, unsigned int dh,
               unsigned int cropX, unsigned int cropY )
 {   
@@ -156,27 +157,32 @@ void printRGB( FILE *fptr, FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsig
     unsigned int col;
     fptr = fopen("/tmp/object.txt", "w");
     pgmimg = fopen("/tmp/pgmimg.pgm", "w");
+    ppmimg = fopen("/tmp/ppmimg.ppm", "w");
     // Writing Magic Number to the File 
-    fprintf(pgmimg, "P2\n");  
+    fprintf(pgmimg, "P2\n"); 
+    fprintf(ppmimg, "P3\n");  
     // Writing Width and Height 
-    fprintf(pgmimg, "%d %d\n", dw, dh);   
+    fprintf(pgmimg, "%d %d\n", dw, dh); 
+    fprintf(ppmimg, "%d %d\n", dw, dh);  
     // Writing the maximum gray value 
     fprintf(pgmimg, "255\n"); 
+    fprintf(ppmimg, "255\n"); 
 
     for( row = cropY; row < cropY + dh; ++row ){
         for ( col = cropX; col < cropX + dw; ++col){
-            syslog(LOG_INFO, "(%d,%d),(%d,%d),%d,%d,%d", row, cropY + dh, col, cropX + dw, 
-                   srcImg[3*(sw*row + col)],srcImg[3*(sw*row + col)+1],srcImg[3*(sw*row + col)+2]);
               
-            fprintf(fptr, "(%d,%d),(%d,%d),%d,%d,%d\n", row, cropY + dh, col, cropX + dw, 
+            fprintf(fptr, "(%d/%d),(%d/%d),%d,%d,%d\n", row, cropY + dh, col, cropX + dw, 
                    srcImg[3*(sw*row + col)],srcImg[3*(sw*row + col)+1],srcImg[3*(sw*row + col)+2]);
             int grey = (srcImg[3*(sw*row + col)] + srcImg[3*(sw*row + col)+1] + srcImg[3*(sw*row + col)+2])/3;
             fprintf(pgmimg, "%d ", grey);
+            fprintf(ppmimg, "%d %d %d ", srcImg[3*(sw*row + col)], srcImg[3*(sw*row + col)+1], srcImg[3*(sw*row + col)+2]);
         }
-        fprintf(pgmimg, "\n");    
+        fprintf(pgmimg, "\n");
+        fprintf(ppmimg, "\n");    
     }
     fclose(fptr);
     fclose(pgmimg);
+    fclose(ppmimg);
 }
 
 
@@ -496,6 +502,7 @@ int main(int argc, char** argv) {
 
     FILE *fptr;
     FILE *pgmimg;
+    FILE *ppmimg;
 
     while (true) {
         struct timeval startTs, endTs;
@@ -596,7 +603,7 @@ int main(int argc, char** argv) {
                        i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
 
 		if(dw <= THRESHOLD && dh <= THRESHOLD){
-		    printRGB(fptr, pgmimg, (uint8_t*)larodInputAddr, args.width, args.height, dw, dh, cropX, cropY);
+		    printRGB(fptr, pgmimg, ppmimg, (uint8_t*)larodInputAddr, args.width, args.height, dw, dh, cropX, cropY);
 		}
             }
  
