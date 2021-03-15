@@ -185,6 +185,42 @@ void printRGB( FILE *fptr,FILE *ppmimg,  FILE *pgmimg, uint8_t *srcImg, unsigned
     fclose(ppmimg);
 }
 
+void printRGB_big( FILE *fptr,FILE *ppmimg,  FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
+              unsigned int dw, unsigned int dh,
+              unsigned int cropX, unsigned int cropY )
+{   
+    unsigned int row;
+    unsigned int col;
+    fptr = fopen("/tmp/object_big.txt", "w");
+    pgmimg = fopen("/tmp/pgmimg_big.pgm", "w");
+    ppmimg = fopen("/tmp/ppmimg_big.ppm", "w");
+    // Writing Magic Number to the File 
+    fprintf(pgmimg, "P2\n"); 
+    fprintf(ppmimg, "P3\n");  
+    // Writing Width and Height 
+    fprintf(pgmimg, "%d %d\n", dw, dh); 
+    fprintf(ppmimg, "%d %d\n", dw, dh);  
+    // Writing the maximum gray value 
+    fprintf(pgmimg, "255\n"); 
+    fprintf(ppmimg, "255\n"); 
+
+    for( row = cropY; row < cropY + dh; ++row ){
+        for ( col = cropX; col < cropX + dw; ++col){
+              
+            fprintf(fptr, "(%d/%d),(%d/%d),%d,%d,%d\n", row, cropY + dh, col, cropX + dw, 
+                   srcImg[3*(sw*row + col)],srcImg[3*(sw*row + col)+1],srcImg[3*(sw*row + col)+2]);
+            int grey = (srcImg[3*(sw*row + col)] + srcImg[3*(sw*row + col)+1] + srcImg[3*(sw*row + col)+2])/3;
+            fprintf(pgmimg, "%d ", grey);
+            fprintf(ppmimg, "%d %d %d ", srcImg[3*(sw*row + col)], srcImg[3*(sw*row + col)+1], srcImg[3*(sw*row + col)+2]);
+        }
+        fprintf(pgmimg, "\n");
+        fprintf(ppmimg, "\n");    
+    }
+    fclose(fptr);
+    fclose(pgmimg);
+    fclose(ppmimg);
+}
+
 
 /**
  * brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
@@ -340,6 +376,7 @@ int main(int argc, char** argv) {
 
     // Name patterns for the temp file we will create.
     char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
+    char CONV_INP2_FILE_PATTERN[] = "/tmp/larod.in2.test-XXXXXX";
     char CONV_OUT1_FILE_PATTERN[] = "/tmp/larod.out1.test-XXXXXX";
     char CONV_OUT2_FILE_PATTERN[] = "/tmp/larod.out2.test-XXXXXX";
     char CONV_OUT3_FILE_PATTERN[] = "/tmp/larod.out3.test-XXXXXX";
@@ -355,12 +392,14 @@ int main(int argc, char** argv) {
     size_t numOutputs = 0;
     larodInferenceRequest* infReq = NULL;
     void* larodInputAddr = MAP_FAILED;
+    void* larodInput2Addr = MAP_FAILED;
     void* larodOutput1Addr = MAP_FAILED;
     void* larodOutput2Addr = MAP_FAILED;
     void* larodOutput3Addr = MAP_FAILED;
     void* larodOutput4Addr = MAP_FAILED;
     int larodModelFd = -1;
     int larodInputFd = -1;
+    int larodInput2Fd = -1;
     int larodOutput1Fd = -1;
     int larodOutput2Fd = -1;
     int larodOutput3Fd = -1;
@@ -418,6 +457,13 @@ int main(int argc, char** argv) {
     if (!createAndMapTmpFile(CONV_INP_FILE_PATTERN,
                              args.width * args.height * CHANNELS,
                              &larodInputAddr, &larodInputFd)) {
+        goto end;
+    }
+
+    // Allocate space for input tensor 2
+    if (!createAndMapTmpFile(CONV_INP2_FILE_PATTERN,
+                             streamWidth * streamHeight * CHANNELS,
+                             &larodInput2Addr, &larodInput2Fd)) {
         goto end;
     }
 
@@ -504,6 +550,10 @@ int main(int argc, char** argv) {
     FILE *pgmimg;
     FILE *ppmimg;
 
+    FILE *fptr_big;
+    FILE *pgmimg_big;
+    FILE *ppmimg_big;
+
     while (true) {
         struct timeval startTs, endTs;
         unsigned int elapsedMs = 0;
@@ -527,6 +577,15 @@ int main(int argc, char** argv) {
                      "convertCropScaleU8yuvToRGB() (continue anyway)",
                      __func__);
         }
+
+        if (!convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight,
+                                        (uint8_t*) larodInput2Addr,streamWidth,
+                                         streamHeight)) {
+            syslog(LOG_ERR, "%s: Failed img convert in "
+                     "convertCropScaleU8yuvToRGB() (continue anyway)",
+                     __func__);
+        }
+
         gettimeofday(&endTs, NULL);
 
         elapsedMs = (unsigned int) (((endTs.tv_sec - startTs.tv_sec) * 1000) +
@@ -579,8 +638,8 @@ int main(int argc, char** argv) {
         float* classes = (float*) larodOutput2Addr;
         float* scores = (float*) larodOutput3Addr;
         float* numberofdetections = (float*) larodOutput4Addr;
-        // Threshold of the size of detected objects
-        unsigned int THRESHOLD = 50;
+        // Threshold of the class of detected objects
+        int target_class = 2;
         
         if ((int) numberofdetections[0] == 0) {
            syslog(LOG_INFO,"No object is detected");
@@ -598,12 +657,20 @@ int main(int argc, char** argv) {
                 unsigned int dh = (bottom - top) * args.height;
                 unsigned int cropX = left * args.width; 
                 unsigned int cropY = top * args.height;
+                unsigned int dw_big = (right - left) * streamWidth;
+                unsigned int dh_big = (bottom - top) * streamHeight;
+                unsigned int cropX_big = left * streamWidth; 
+                unsigned int cropY_big = top * streamHeight;
+
 
                 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%d,%d,%d,%d]",
                        i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
 
-		if(dw <= THRESHOLD && dh <= THRESHOLD){
-		    printRGB(fptr, pgmimg, ppmimg, (uint8_t*)larodInputAddr, args.width, args.height, dw, dh, cropX, cropY);
+		if((int) classes[i] == target_class){
+		    printRGB(fptr, pgmimg, ppmimg, (uint8_t*)larodInputAddr, 
+                             args.width, args.height, dw, dh, cropX, cropY);
+                    printRGB_big(fptr_big, pgmimg_big, ppmimg_big, (uint8_t*)larodInput2Addr,
+                                 streamWidth, streamHeight, dw_big, dh_big, cropX_big, cropY_big);
 		}
             }
  
