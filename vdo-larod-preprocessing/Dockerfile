@@ -7,7 +7,7 @@ ARG https_proxy=$DOCKER_PROXY
 # Should be used for getting API and toolchain image
 # Currently, only armv7hf is supported
 ARG ARCH=armv7hf
-ARG VERSION=rel-fw-10.4-maint
+ARG VERSION=rel-fw-10.5-maint
 ARG UBUNTU_VERSION=20.04
 ARG REPO=docker-prod.se.axis.com/axisecp
 FROM ${REPO}/acap-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
