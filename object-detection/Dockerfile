@@ -22,11 +22,9 @@ RUN apt-get update && apt-get install docker-ce -y
 # Create skeleton
 RUN mkdir -p /env/app
 
-# Get dataset
-RUN apt-get install -y wget
-
 # Get pretrained models
-# WORKDIR /env
+RUN apt-get install -y wget
+WORKDIR /env
 ADD https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v1_coco_quant_postprocess_edgetpu.tflite /env/app/
 ADD https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite /env/app/
 
