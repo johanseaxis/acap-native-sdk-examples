@@ -661,8 +661,7 @@ int main(int argc, char** argv) {
                 unsigned int dh_big = (bottom - top) * streamHeight;
                 unsigned int cropX_big = left * streamWidth; 
                 unsigned int cropY_big = top * streamHeight;
-
-
+     
                 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%d,%d,%d,%d]",
                        i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
 
