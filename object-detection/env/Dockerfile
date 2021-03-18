@@ -35,5 +35,9 @@ RUN mkdir -p lib include && \
   ln -s libyuv.so.1 libyuv.so && \
   ln -s libyuv.so.1 libyuv.so.1.0
 
+# Get pretrained models
+RUN apt-get install -y wget
+ADD https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v1_coco_quant_postprocess_edgetpu.tflite converted_model_edgetpu.tflite
+
 # Building the ACAP application
 RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh
