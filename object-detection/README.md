@@ -6,46 +6,27 @@ This model is modified based on [tensorflow-to-larod](https://github.com/AxisCom
 
 ## Prerequisites
 - Axis camera equipped with an [Edge TPU](https://coral.ai/docs/edgetpu/faq/)
-- NVIDIA GPU and drivers [compatible with Tensorflow r2.3](https://www.tensorflow.org/install/source#gpu)
 - [Docker](https://docs.docker.com/get-docker/)
-- [NVIDIA container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian)
-
 
 ## Quickstart
 The following instructions can be executed to simply run the example.
 
-1. Build and run the example environment (add --no-gpu for the second step if needed):
-  
-```sh
-./build_env.sh
-./run_env.sh <a_name_for_your_env>
-```
-
-2. Copy the downloaded model [MobileNet SSD v1(2) (COCO)](https://coral.ai/models/) to the `app` directory:
-```sh
-cp path/to/ssd_mobilenet_v1_coco_quant_postprocess_edgetpu.tflite app/converted_model_edgetpu.tflite
-```
-
-3. Compile the ACAP:
+1. Compile the ACAP:
 ```sh
 ./build_acap.sh tensorflow_to_larod_acap:1.0
 ```
-
-4. Open a new terminal
-
-5. In the new terminal, copy the ACAP `.eap` file from the example environment:
+2. Find the ACAP `.eap` file 
 ```sh
-docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap tensorflow_to_larod.eap
+/env/build/tensorflow_to_larod_app_1_0_0_armv7hf.eap
 ```
-6. Install and start the ACAP on your camera through the GUI
+3. Install and start the ACAP on your camera through the GUI
 
-7. SSH to the camera
+4. SSH to the camera
 
-8. View its log to see the ACAP output:
+5. View its log to see the ACAP output:
 ```sh
 tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
 ```
-
 
 ## Output
 There are four outputs from MobileNet SSD v1(2) (COCO) model, and the Number of detections, CLasses, Scores, and Locations are shown as below. The location are in the form of [top, left, bottom, right]. 
