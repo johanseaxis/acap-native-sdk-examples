@@ -552,13 +552,7 @@ int main(int argc, char** argv) {
                      __func__);
         }
 
-        if (!convertCropScaleU8yuvToRGB(nv12Data_big, 1920, 1080,
-                                        (uint8_t*) larodInput2Addr,1920,
-                                         1080)) {
-            syslog(LOG_ERR, "%s: Failed bigger img convert in "
-                     "convertCropScaleU8yuvToRGB() (continue anyway)",
-                     __func__);
-        }
+        convertU8yuvToRGBlibYuv(1920, 1080, nv12Data_big, (uint8_t*) larodInput2Addr);
 
         gettimeofday(&endTs, NULL);
 
@@ -613,7 +607,6 @@ int main(int argc, char** argv) {
         float* scores = (float*) larodOutput3Addr;
         float* numberofdetections = (float*) larodOutput4Addr;
         // Threshold of the class of detected objects
-        int TARGET = 2;
         float MIN_SCORE = 0.5;
         
         if ((int) numberofdetections[0] == 0) {
@@ -634,10 +627,11 @@ int main(int argc, char** argv) {
                 unsigned int cropX_big = left * 1920; 
                 unsigned int cropY_big = top * 1080;
      
-                syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
+                if( scores[i] > MIN_SCORE ){
+
+                    syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
                        i+1, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
 
-                if((int) classes[i] == TARGET && scores[i] > MIN_SCORE ){
                     printRGB_big(pgmimg_big, ppmimg_big, (uint8_t*)larodInput2Addr,
                                         1920, 1080, dw_big, dh_big, cropX_big, cropY_big);
                 }
