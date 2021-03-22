@@ -650,7 +650,8 @@ int main(int argc, char** argv) {
         float* scores = (float*) larodOutput3Addr;
         float* numberofdetections = (float*) larodOutput4Addr;
         // Threshold of the class of detected objects
-        int target_class = 2;
+        int TARGET = 2;
+        float MIN_SCORE = 0.5;
         
         if ((int) numberofdetections[0] == 0) {
            syslog(LOG_INFO,"No object is detected");
@@ -676,7 +677,7 @@ int main(int argc, char** argv) {
                 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%d,%d,%d,%d]",
                        i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
 
-		if((int) classes[i] == target_class){
+		if((int) classes[i] == TARGET && scores[i] > MIN_SCORE ){
 		    printRGB(pgmimg, ppmimg, (uint8_t*)larodInputAddr, 
                              args.width, args.height, dw, dh, cropX, cropY);
                     printRGB_big(pgmimg_big, ppmimg_big, (uint8_t*)larodInput2Addr,
@@ -702,6 +703,9 @@ end:
     if (provider) {
         destroyImgProvider(provider);
     }
+        if (provider_big) {
+        destroyImgProvider(provider_big);
+    }
     // Only the model handle is released here. We count on larod service to
     // release the privately loaded model when the session is disconnected in
     // larodDisconnect().
@@ -717,6 +721,12 @@ end:
     }
     if (larodInputFd >= 0) {
         close(larodInputFd);
+    }
+     if (larodInput2Addr != MAP_FAILED) {
+        munmap(larodInput2Addr, 1920 * 1080 * CHANNELS);
+    }
+    if (larodInput2Fd >= 0) {
+        close(larodInput2Fd);
     }
     if (larodOutput1Addr != MAP_FAILED) {
         munmap(larodOutput1Addr, args.outputBytes);
