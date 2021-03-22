@@ -384,6 +384,7 @@ int main(int argc, char** argv) {
 
     bool ret = false;
     ImgProvider_t* provider = NULL;
+    ImgProvider_t* provider_big = NULL;
     larodError* error = NULL;
     larodConnection* conn = NULL;
     larodTensor** inputTensors = NULL;
@@ -435,6 +436,12 @@ int main(int argc, char** argv) {
         goto end;
     }
 
+    provider_big = createImgProvider(1920, 1080, 2, VDO_FORMAT_YUV);
+    if (!provider_big) {
+      syslog(LOG_ERR, "%s: Failed to create bigger ImgProvider", __func__);
+        goto end;
+    }
+
     larodModelFd = open(args.modelFile, O_RDONLY);
     if (larodModelFd < 0) {
         syslog(LOG_ERR, "Unable to open model file %s: %s", args.modelFile,
@@ -462,7 +469,7 @@ int main(int argc, char** argv) {
 
     // Allocate space for input tensor 2
     if (!createAndMapTmpFile(CONV_INP2_FILE_PATTERN,
-                             streamWidth * streamHeight * CHANNELS,
+                             1920 * 1080 * CHANNELS,
                              &larodInput2Addr, &larodInput2Fd)) {
         goto end;
     }
@@ -546,6 +553,10 @@ int main(int argc, char** argv) {
         goto end;
     }
 
+     if (!startFrameFetch(provider_big)) {
+        goto end;
+    }
+
     FILE *fptr;
     FILE *pgmimg;
     FILE *ppmimg;
@@ -564,8 +575,14 @@ int main(int argc, char** argv) {
             goto end;
         }
 
+        VdoBuffer* buf_big = getLastFrameBlocking(provider_big);
+        if (!buf_big) {
+            goto end;
+        }
+
         // Get data from latest frame.
         uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
+        uint8_t* nv12Data_big = (uint8_t*) vdo_buffer_get_data(buf_big);
 
         // Covert image data from NV12 format to interleaved uint8_t RGB format.
         gettimeofday(&startTs, NULL);
@@ -578,10 +595,10 @@ int main(int argc, char** argv) {
                      __func__);
         }
 
-        if (!convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight,
-                                        (uint8_t*) larodInput2Addr,streamWidth,
-                                         streamHeight)) {
-            syslog(LOG_ERR, "%s: Failed img convert in "
+        if (!convertCropScaleU8yuvToRGB(nv12Data_big, 1920, 1080,
+                                        (uint8_t*) larodInput2Addr,1920,
+                                         1080)) {
+            syslog(LOG_ERR, "%s: Failed bigger img convert in "
                      "convertCropScaleU8yuvToRGB() (continue anyway)",
                      __func__);
         }
@@ -657,10 +674,10 @@ int main(int argc, char** argv) {
                 unsigned int dh = (bottom - top) * args.height;
                 unsigned int cropX = left * args.width; 
                 unsigned int cropY = top * args.height;
-                unsigned int dw_big = (right - left) * streamWidth;
-                unsigned int dh_big = (bottom - top) * streamHeight;
-                unsigned int cropX_big = left * streamWidth; 
-                unsigned int cropY_big = top * streamHeight;
+                unsigned int dw_big = (right - left) * 1920;
+                unsigned int dh_big = (bottom - top) * 1080;
+                unsigned int cropX_big = left * 1920; 
+                unsigned int cropY_big = top * 1080;
      
                 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%d,%d,%d,%d]",
                        i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
@@ -669,7 +686,7 @@ int main(int argc, char** argv) {
 		    printRGB(fptr, pgmimg, ppmimg, (uint8_t*)larodInputAddr, 
                              args.width, args.height, dw, dh, cropX, cropY);
                     printRGB_big(fptr_big, pgmimg_big, ppmimg_big, (uint8_t*)larodInput2Addr,
-                                 streamWidth, streamHeight, dw_big, dh_big, cropX_big, cropY_big);
+                                 1920, 1080, dw_big, dh_big, cropX_big, cropY_big);
 		}
             }
  
@@ -677,6 +694,7 @@ int main(int argc, char** argv) {
 
         // Release frame reference to provider.
         returnFrame(provider, buf);
+        returnFrame(provider_big, buf_big);
     }
 
     syslog(LOG_INFO, "Stop streaming video from VDO");
