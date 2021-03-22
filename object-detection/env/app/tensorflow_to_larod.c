@@ -149,40 +149,6 @@ volatile sig_atomic_t stopRunning = false;
  * param cropY row of the detected object's top left corner.
  */
 
-void printRGB(FILE *ppmimg, FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
-              unsigned int dw, unsigned int dh,
-              unsigned int cropX, unsigned int cropY )
-{   
-    unsigned int row;
-    unsigned int col;
-
-    pgmimg = fopen("/tmp/pgmimg.pgm", "w");
-    ppmimg = fopen("/tmp/ppmimg.ppm", "w");
-    // Writing Magic Number to the File 
-    fprintf(pgmimg, "P2\n"); 
-    fprintf(ppmimg, "P3\n");  
-    // Writing Width and Height 
-    fprintf(pgmimg, "%d %d\n", dw, dh); 
-    fprintf(ppmimg, "%d %d\n", dw, dh);  
-    // Writing the maximum gray value 
-    fprintf(pgmimg, "255\n"); 
-    fprintf(ppmimg, "255\n"); 
-
-    for( row = cropY; row < cropY + dh; ++row ){
-        for ( col = cropX; col < cropX + dw; ++col){
-              
-            int grey = (srcImg[3*(sw*row + col)] + srcImg[3*(sw*row + col)+1] + srcImg[3*(sw*row + col)+2])/3;
-            fprintf(pgmimg, "%d ", grey);
-            fprintf(ppmimg, "%d %d %d ", srcImg[3*(sw*row + col)], srcImg[3*(sw*row + col)+1], srcImg[3*(sw*row + col)+2]);
-        }
-        fprintf(pgmimg, "\n");
-        fprintf(ppmimg, "\n");    
-    }
-
-    fclose(pgmimg);
-    fclose(ppmimg);
-}
-
 void printRGB_big(FILE *ppmimg, FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
               unsigned int dw, unsigned int dh,
               unsigned int cropX, unsigned int cropY )
@@ -549,12 +515,9 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-     if (!startFrameFetch(provider_big)) {
+    if (!startFrameFetch(provider_big)) {
         goto end;
     }
-
-    FILE *pgmimg;
-    FILE *ppmimg;
 
     FILE *pgmimg_big;
     FILE *ppmimg_big;
@@ -665,24 +628,19 @@ int main(int argc, char** argv) {
                 float left = locations[4*i+1];
                 float bottom = locations[4*i+2];
                 float right = locations[4*i+3];
-                unsigned int dw = (right - left) * args.width;
-                unsigned int dh = (bottom - top) * args.height;
-                unsigned int cropX = left * args.width; 
-                unsigned int cropY = top * args.height;
+
                 unsigned int dw_big = (right - left) * 1920;
                 unsigned int dh_big = (bottom - top) * 1080;
                 unsigned int cropX_big = left * 1920; 
                 unsigned int cropY_big = top * 1080;
      
-                syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%d,%d,%d,%d]",
-                       i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
+                syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
+                       i+1, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
 
-		if((int) classes[i] == TARGET && scores[i] > MIN_SCORE ){
-		    printRGB(pgmimg, ppmimg, (uint8_t*)larodInputAddr, 
-                             args.width, args.height, dw, dh, cropX, cropY);
+                if((int) classes[i] == TARGET && scores[i] > MIN_SCORE ){
                     printRGB_big(pgmimg_big, ppmimg_big, (uint8_t*)larodInput2Addr,
-                                 1920, 1080, dw_big, dh_big, cropX_big, cropY_big);
-		}
+                                        1920, 1080, dw_big, dh_big, cropX_big, cropY_big);
+                }
             }
  
         }          
