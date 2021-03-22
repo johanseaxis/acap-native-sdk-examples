@@ -18,8 +18,8 @@
   * - tensorflow_to_larod -
   *
   * This application loads a larod model which takes an image as input and
-  * outputs two values corresponding to the probability of 1) persons in image
-  * and 2) cars in image.
+  * outputs values corresponding to the class, score and location of detected 
+  * objects in image.
   *
   * The application expects three arguments on the command line in the
   * following order: MODEL WIDTH HEIGHT
@@ -355,14 +355,14 @@ int main(int argc, char** argv) {
     size_t numOutputs = 0;
     larodInferenceRequest* infReq = NULL;
     void* larodInputAddr = MAP_FAILED;
-    void* larodInput2Addr = MAP_FAILED;
+    void* Input2Addr = MAP_FAILED;
     void* larodOutput1Addr = MAP_FAILED;
     void* larodOutput2Addr = MAP_FAILED;
     void* larodOutput3Addr = MAP_FAILED;
     void* larodOutput4Addr = MAP_FAILED;
     int larodModelFd = -1;
     int larodInputFd = -1;
-    int larodInput2Fd = -1;
+    int Input2Fd = -1;
     int larodOutput1Fd = -1;
     int larodOutput2Fd = -1;
     int larodOutput3Fd = -1;
@@ -432,7 +432,7 @@ int main(int argc, char** argv) {
     // Allocate space for input tensor 2
     if (!createAndMapTmpFile(CONV_INP2_FILE_PATTERN,
                              1920 * 1080 * CHANNELS,
-                             &larodInput2Addr, &larodInput2Fd)) {
+                             &Input2Addr, &Input2Fd)) {
         goto end;
     }
 
@@ -552,7 +552,7 @@ int main(int argc, char** argv) {
                      __func__);
         }
 
-        convertU8yuvToRGBlibYuv(1920, 1080, nv12Data_big, (uint8_t*) larodInput2Addr);
+        convertU8yuvToRGBlibYuv(1920, 1080, nv12Data_big, (uint8_t*) Input2Addr);
 
         gettimeofday(&endTs, NULL);
 
@@ -632,7 +632,7 @@ int main(int argc, char** argv) {
                     syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
                        i+1, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
 
-                    printRGB_big(pgmimg_big, ppmimg_big, (uint8_t*)larodInput2Addr,
+                    printRGB_big(pgmimg_big, ppmimg_big, (uint8_t*)Input2Addr,
                                         1920, 1080, dw_big, dh_big, cropX_big, cropY_big);
                 }
             }
@@ -674,11 +674,11 @@ end:
     if (larodInputFd >= 0) {
         close(larodInputFd);
     }
-     if (larodInput2Addr != MAP_FAILED) {
-        munmap(larodInput2Addr, 1920 * 1080 * CHANNELS);
+     if (Input2Addr != MAP_FAILED) {
+        munmap(Input2Addr, 1920 * 1080 * CHANNELS);
     }
-    if (larodInput2Fd >= 0) {
-        close(larodInput2Fd);
+    if (Input2Fd >= 0) {
+        close(Input2Fd);
     }
     if (larodOutput1Addr != MAP_FAILED) {
         munmap(larodOutput1Addr, args.outputBytes);
