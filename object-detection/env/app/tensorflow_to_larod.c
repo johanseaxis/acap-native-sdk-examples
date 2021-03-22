@@ -149,13 +149,13 @@ volatile sig_atomic_t stopRunning = false;
  * param cropY row of the detected object's top left corner.
  */
 
-void printRGB( FILE *fptr,FILE *ppmimg,  FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
+void printRGB(FILE *ppmimg, FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
               unsigned int dw, unsigned int dh,
               unsigned int cropX, unsigned int cropY )
 {   
     unsigned int row;
     unsigned int col;
-    fptr = fopen("/tmp/object.txt", "w");
+
     pgmimg = fopen("/tmp/pgmimg.pgm", "w");
     ppmimg = fopen("/tmp/ppmimg.ppm", "w");
     // Writing Magic Number to the File 
@@ -171,8 +171,6 @@ void printRGB( FILE *fptr,FILE *ppmimg,  FILE *pgmimg, uint8_t *srcImg, unsigned
     for( row = cropY; row < cropY + dh; ++row ){
         for ( col = cropX; col < cropX + dw; ++col){
               
-            fprintf(fptr, "(%d/%d),(%d/%d),%d,%d,%d\n", row, cropY + dh, col, cropX + dw, 
-                   srcImg[3*(sw*row + col)],srcImg[3*(sw*row + col)+1],srcImg[3*(sw*row + col)+2]);
             int grey = (srcImg[3*(sw*row + col)] + srcImg[3*(sw*row + col)+1] + srcImg[3*(sw*row + col)+2])/3;
             fprintf(pgmimg, "%d ", grey);
             fprintf(ppmimg, "%d %d %d ", srcImg[3*(sw*row + col)], srcImg[3*(sw*row + col)+1], srcImg[3*(sw*row + col)+2]);
@@ -180,18 +178,18 @@ void printRGB( FILE *fptr,FILE *ppmimg,  FILE *pgmimg, uint8_t *srcImg, unsigned
         fprintf(pgmimg, "\n");
         fprintf(ppmimg, "\n");    
     }
-    fclose(fptr);
+
     fclose(pgmimg);
     fclose(ppmimg);
 }
 
-void printRGB_big( FILE *fptr,FILE *ppmimg,  FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
+void printRGB_big(FILE *ppmimg, FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
               unsigned int dw, unsigned int dh,
               unsigned int cropX, unsigned int cropY )
 {   
     unsigned int row;
     unsigned int col;
-    fptr = fopen("/tmp/object_big.txt", "w");
+
     pgmimg = fopen("/tmp/pgmimg_big.pgm", "w");
     ppmimg = fopen("/tmp/ppmimg_big.ppm", "w");
     // Writing Magic Number to the File 
@@ -207,8 +205,6 @@ void printRGB_big( FILE *fptr,FILE *ppmimg,  FILE *pgmimg, uint8_t *srcImg, unsi
     for( row = cropY; row < cropY + dh; ++row ){
         for ( col = cropX; col < cropX + dw; ++col){
               
-            fprintf(fptr, "(%d/%d),(%d/%d),%d,%d,%d\n", row, cropY + dh, col, cropX + dw, 
-                   srcImg[3*(sw*row + col)],srcImg[3*(sw*row + col)+1],srcImg[3*(sw*row + col)+2]);
             int grey = (srcImg[3*(sw*row + col)] + srcImg[3*(sw*row + col)+1] + srcImg[3*(sw*row + col)+2])/3;
             fprintf(pgmimg, "%d ", grey);
             fprintf(ppmimg, "%d %d %d ", srcImg[3*(sw*row + col)], srcImg[3*(sw*row + col)+1], srcImg[3*(sw*row + col)+2]);
@@ -216,7 +212,7 @@ void printRGB_big( FILE *fptr,FILE *ppmimg,  FILE *pgmimg, uint8_t *srcImg, unsi
         fprintf(pgmimg, "\n");
         fprintf(ppmimg, "\n");    
     }
-    fclose(fptr);
+
     fclose(pgmimg);
     fclose(ppmimg);
 }
@@ -557,11 +553,9 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    FILE *fptr;
     FILE *pgmimg;
     FILE *ppmimg;
 
-    FILE *fptr_big;
     FILE *pgmimg_big;
     FILE *ppmimg_big;
 
@@ -683,9 +677,9 @@ int main(int argc, char** argv) {
                        i+1, class_name[(int) classes[i]], scores[i], cropX, cropY, dw, dh);
 
 		if((int) classes[i] == target_class){
-		    printRGB(fptr, pgmimg, ppmimg, (uint8_t*)larodInputAddr, 
+		    printRGB(pgmimg, ppmimg, (uint8_t*)larodInputAddr, 
                              args.width, args.height, dw, dh, cropX, cropY);
-                    printRGB_big(fptr_big, pgmimg_big, ppmimg_big, (uint8_t*)larodInput2Addr,
+                    printRGB_big(pgmimg_big, ppmimg_big, (uint8_t*)larodInput2Addr,
                                  1920, 1080, dw_big, dh_big, cropX_big, cropY_big);
 		}
             }
