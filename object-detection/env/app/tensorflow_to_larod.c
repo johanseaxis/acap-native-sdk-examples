@@ -139,53 +139,6 @@ char class_name[90][20] = {
 volatile sig_atomic_t stopRunning = false;
 
 /**
- * print out the rgb value of the detected object.
- *
- * param srcImg Point to the input tensor of RGB Image.
- * param sw Pixel width of the input image.
- * param sh Pixel height of the input image.
- * param dw Pixel width of the detected object.
- * param dh Pixel height of the detected object.
- * param cropX column of the detected object's top left corner.
- * param cropY row of the detected object's top left corner.
- */
-
-void printRGB_big(FILE *ppmimg, FILE *pgmimg, uint8_t *srcImg, unsigned int sw, unsigned int sh,
-              unsigned int dw, unsigned int dh,
-              unsigned int cropX, unsigned int cropY )
-{   
-    unsigned int row;
-    unsigned int col;
-
-    pgmimg = fopen("/tmp/pgmimg_big.pgm", "w");
-    ppmimg = fopen("/tmp/ppmimg_big.ppm", "w");
-    // Writing Magic Number to the File 
-    fprintf(pgmimg, "P2\n"); 
-    fprintf(ppmimg, "P3\n");  
-    // Writing Width and Height 
-    fprintf(pgmimg, "%d %d\n", dw, dh); 
-    fprintf(ppmimg, "%d %d\n", dw, dh);  
-    // Writing the maximum gray value 
-    fprintf(pgmimg, "255\n"); 
-    fprintf(ppmimg, "255\n"); 
-
-    for( row = cropY; row < cropY + dh; ++row ){
-        for ( col = cropX; col < cropX + dw; ++col){
-              
-            int grey = (srcImg[3*(sw*row + col)] + srcImg[3*(sw*row + col)+1] + srcImg[3*(sw*row + col)+2])/3;
-            fprintf(pgmimg, "%d ", grey);
-            fprintf(ppmimg, "%d %d %d ", srcImg[3*(sw*row + col)], srcImg[3*(sw*row + col)+1], srcImg[3*(sw*row + col)+2]);
-        }
-        fprintf(pgmimg, "\n");
-        fprintf(ppmimg, "\n");    
-    }
-
-    fclose(pgmimg);
-    fclose(ppmimg);
-}
-
-
-/**
  * brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
  * forces an immediate exit without clean up if invoked at least twice.
  *
@@ -520,9 +473,6 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    FILE *pgmimg_big;
-    FILE *ppmimg_big;
-
     while (true) {
         struct timeval startTs, endTs;
         unsigned int elapsedMs = 0;
@@ -608,7 +558,7 @@ int main(int argc, char** argv) {
         float* scores = (float*) larodOutput3Addr;
         float* numberofdetections = (float*) larodOutput4Addr;
         // Threshold of the class of detected objects
-        float MIN_SCORE = 0.5;
+        float MIN_SCORE = 0.1;
         
         if ((int) numberofdetections[0] == 0) {
            syslog(LOG_INFO,"No object is detected");
@@ -631,7 +581,7 @@ int main(int argc, char** argv) {
                 if( scores[i] > MIN_SCORE ){
 
                     syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
-                       i+1, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
+                       i, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
                     unsigned char* crop_buffer = crop_interleaved(Input2Addr, 1920, 1080, 3,
                                                                   crop_x, crop_y, crop_w, crop_h);
 
