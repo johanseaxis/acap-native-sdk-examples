@@ -44,6 +44,7 @@
 #include "argparse.h"
 #include "imgconverter.h"
 #include "imgprovider.h"
+#include "imgutils.h"
 #include "larod.h"
 #include "vdo-frame.h"
 #include "vdo-types.h"
@@ -622,18 +623,28 @@ int main(int argc, char** argv) {
                 float bottom = locations[4*i+2];
                 float right = locations[4*i+3];
 
-                unsigned int dw_big = (right - left) * 1920;
-                unsigned int dh_big = (bottom - top) * 1080;
-                unsigned int cropX_big = left * 1920; 
-                unsigned int cropY_big = top * 1080;
+                unsigned int crop_x = left * 1920; 
+                unsigned int crop_y = top * 1080;
+                unsigned int crop_w = (right - left) * 1920;
+                unsigned int crop_h = (bottom - top) * 1080;
      
                 if( scores[i] > MIN_SCORE ){
 
                     syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
                        i+1, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
+                    unsigned char* crop_buffer = crop_interleaved(Input2Addr, 1920, 1080, 3,
+                                                                  crop_x, crop_y, crop_w, crop_h);
 
-                    printRGB_big(pgmimg_big, ppmimg_big, (uint8_t*)Input2Addr,
-                                        1920, 1080, dw_big, dh_big, cropX_big, cropY_big);
+                    unsigned long jpeg_size = 0;
+                    unsigned char* jpeg_buffer = NULL;
+                    struct jpeg_compress_struct jpeg_conf;
+                    set_jpeg_configuration(crop_w, crop_h, 3, 80, &jpeg_conf);
+                    buffer_to_jpeg(crop_buffer, &jpeg_conf, &jpeg_size, &jpeg_buffer);
+                    char file_name[32];
+                    snprintf(file_name, sizeof(char) * 32, "/tmp/detection_%i.jpg", i);
+                    jpeg_to_file(file_name, jpeg_buffer, jpeg_size);
+                    free(crop_buffer);
+                    free(jpeg_buffer);
                 }
             }
  
