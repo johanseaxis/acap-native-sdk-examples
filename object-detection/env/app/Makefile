@@ -1,4 +1,4 @@
-PROG1	= tensorflow_to_larod
+PROG1	= object_detection
 OBJS1	= $(PROG1).c argparse.c imgconverter.c imgprovider.c imgutils.c
 PROGS	= $(PROG1)
 
