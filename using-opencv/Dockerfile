@@ -5,8 +5,9 @@ ARG http_proxy
 ARG https_proxy
 ARG ARCH=armv7hf
 ARG VERSION=3.2
+ARG SDK=acap-sdk
 
-FROM axisecp/acap-sdk:${VERSION}-${ARCH}-ubuntu20.04 as sdk
+FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
 # Add a sources.list file that contains the armhf repositories
 COPY sources.list /etc/apt

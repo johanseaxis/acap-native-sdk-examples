@@ -5,8 +5,9 @@ ARG ARCH=armv7hf
 ARG VERSION=3.2
 ARG UBUNTU_VERSION=20.04
 ARG REPO=axisecp
+ARG SDK=acap-sdk
 
-FROM ${REPO}/acap-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
+FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
 # Get the host protobuf code compiler with the same version as the target protobuf libraries
 # Currently this is v3.11.4

@@ -10,7 +10,9 @@ ARG ARCH=armv7hf
 ARG VERSION=rel-fw-10.4-maint
 ARG UBUNTU_VERSION=20.04
 ARG REPO=docker-prod.se.axis.com/axisecp
-FROM ${REPO}/acap-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
+ARG SDK=acap-sdk
+
+FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
 # Copy the library to application folder
 WORKDIR /opt/app

@@ -5,8 +5,9 @@ ARG ARCH=armv7hf
 ARG VERSION=3.2
 ARG UBUNTU_VERSION=20.04
 ARG REPO=axisecp
+ARG SDK=acap-sdk
 
-FROM ${REPO}/acap-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
+FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
 # Install the tools needed for building the protobuf-c dependency and C code generation from .proto file
 RUN apt-get update && apt-get install -y --no-install-recommends \
