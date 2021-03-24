@@ -292,7 +292,7 @@ int main(int argc, char** argv) {
 
     // Name patterns for the temp file we will create.
     char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
-    char CONV_INP2_FILE_PATTERN[] = "/tmp/larod.in2.test-XXXXXX";
+    char CROP_FILE_PATTERN[] = "/tmp/crop.test-XXXXXX";
     char CONV_OUT1_FILE_PATTERN[] = "/tmp/larod.out1.test-XXXXXX";
     char CONV_OUT2_FILE_PATTERN[] = "/tmp/larod.out2.test-XXXXXX";
     char CONV_OUT3_FILE_PATTERN[] = "/tmp/larod.out3.test-XXXXXX";
@@ -300,7 +300,7 @@ int main(int argc, char** argv) {
 
     bool ret = false;
     ImgProvider_t* provider = NULL;
-    ImgProvider_t* provider_big = NULL;
+    ImgProvider_t* provider_crop = NULL;
     larodError* error = NULL;
     larodConnection* conn = NULL;
     larodTensor** inputTensors = NULL;
@@ -309,14 +309,14 @@ int main(int argc, char** argv) {
     size_t numOutputs = 0;
     larodInferenceRequest* infReq = NULL;
     void* larodInputAddr = MAP_FAILED;
-    void* Input2Addr = MAP_FAILED;
+    void* cropAddr = MAP_FAILED;
     void* larodOutput1Addr = MAP_FAILED;
     void* larodOutput2Addr = MAP_FAILED;
     void* larodOutput3Addr = MAP_FAILED;
     void* larodOutput4Addr = MAP_FAILED;
     int larodModelFd = -1;
     int larodInputFd = -1;
-    int Input2Fd = -1;
+    int cropFd = -1;
     int larodOutput1Fd = -1;
     int larodOutput2Fd = -1;
     int larodOutput3Fd = -1;
@@ -352,9 +352,9 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    provider_big = createImgProvider(1920, 1080, 2, VDO_FORMAT_YUV);
-    if (!provider_big) {
-      syslog(LOG_ERR, "%s: Failed to create bigger ImgProvider", __func__);
+    provider_crop = createImgProvider(1920, 1080, 2, VDO_FORMAT_YUV);
+    if (!provider_crop) {
+      syslog(LOG_ERR, "%s: Failed to create crop ImgProvider", __func__);
         goto end;
     }
 
@@ -384,9 +384,9 @@ int main(int argc, char** argv) {
     }
 
     // Allocate space for input tensor 2
-    if (!createAndMapTmpFile(CONV_INP2_FILE_PATTERN,
+    if (!createAndMapTmpFile(CROP_FILE_PATTERN,
                              1920 * 1080 * CHANNELS,
-                             &Input2Addr, &Input2Fd)) {
+                             &cropAddr, &cropFd)) {
         goto end;
     }
 
@@ -469,7 +469,7 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    if (!startFrameFetch(provider_big)) {
+    if (!startFrameFetch(provider_crop)) {
         goto end;
     }
 
@@ -483,14 +483,14 @@ int main(int argc, char** argv) {
             goto end;
         }
 
-        VdoBuffer* buf_big = getLastFrameBlocking(provider_big);
-        if (!buf_big) {
+        VdoBuffer* buf_crop = getLastFrameBlocking(provider_crop);
+        if (!buf_crop) {
             goto end;
         }
 
         // Get data from latest frame.
         uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
-        uint8_t* nv12Data_big = (uint8_t*) vdo_buffer_get_data(buf_big);
+        uint8_t* nv12Data_crop = (uint8_t*) vdo_buffer_get_data(buf_crop);
 
         // Covert image data from NV12 format to interleaved uint8_t RGB format.
         gettimeofday(&startTs, NULL);
@@ -503,7 +503,7 @@ int main(int argc, char** argv) {
                      __func__);
         }
 
-        convertU8yuvToRGBlibYuv(1920, 1080, nv12Data_big, (uint8_t*) Input2Addr);
+        convertU8yuvToRGBlibYuv(1920, 1080, nv12Data_crop, (uint8_t*) cropAddr);
 
         gettimeofday(&endTs, NULL);
 
@@ -582,7 +582,7 @@ int main(int argc, char** argv) {
 
                     syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
                        i, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
-                    unsigned char* crop_buffer = crop_interleaved(Input2Addr, 1920, 1080, 3,
+                    unsigned char* crop_buffer = crop_interleaved(cropAddr, 1920, 1080, 3,
                                                                   crop_x, crop_y, crop_w, crop_h);
 
                     unsigned long jpeg_size = 0;
@@ -602,7 +602,7 @@ int main(int argc, char** argv) {
 
         // Release frame reference to provider.
         returnFrame(provider, buf);
-        returnFrame(provider_big, buf_big);
+        returnFrame(provider_crop, buf_crop);
     }
 
     syslog(LOG_INFO, "Stop streaming video from VDO");
@@ -616,8 +616,8 @@ end:
     if (provider) {
         destroyImgProvider(provider);
     }
-        if (provider_big) {
-        destroyImgProvider(provider_big);
+        if (provider_crop) {
+        destroyImgProvider(provider_crop);
     }
     // Only the model handle is released here. We count on larod service to
     // release the privately loaded model when the session is disconnected in
@@ -635,11 +635,11 @@ end:
     if (larodInputFd >= 0) {
         close(larodInputFd);
     }
-     if (Input2Addr != MAP_FAILED) {
-        munmap(Input2Addr, 1920 * 1080 * CHANNELS);
+     if (cropAddr != MAP_FAILED) {
+        munmap(cropAddr, 1920 * 1080 * CHANNELS);
     }
-    if (Input2Fd >= 0) {
-        close(Input2Fd);
+    if (cropFd >= 0) {
+        close(cropFd);
     }
     if (larodOutput1Addr != MAP_FAILED) {
         munmap(larodOutput1Addr, args.outputBytes);
