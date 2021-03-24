@@ -54,6 +54,20 @@ void set_jpeg_configuration(int width, int height, int channels, int quality,
  */
 void jpeg_to_file(char* file_name, unsigned char* buffer, unsigned long buffer_size);
 
+
+/**
+ * brief Crops a rectangular patch from an image buffer.
+ *       The image channels are expected to be interleaved.
+ *
+ * param image_buffer A buffer holding an uint8 image
+ * param image_w The input image's width in pixels
+ * param image_h The input image's height in pixels
+ * param channels The input image's number of channels
+ * param crop_x The leftmost pixel coordinate of the desired crop
+ * param crop_y The top pixel coordinate of the desired crop
+ * param crop_w The width of the desired crop in pixels
+ * param crop_h The height of the desired crop in pixels
+ */
 unsigned char* crop_interleaved(unsigned char* image_buffer, int image_w,
                                 int image_h, int channels,
                                 int crop_x, int crop_y,
