@@ -564,8 +564,7 @@ int main(int argc, char** argv) {
            syslog(LOG_INFO,"No object is detected");
         }
         else {
-            
-            syslog(LOG_INFO,"There are %d objects", (int) numberofdetections[0]);
+
             for (int i = 0; i < numberofdetections[0]; i++){
 
                 float top = locations[4*i];
@@ -578,7 +577,7 @@ int main(int argc, char** argv) {
                 unsigned int crop_w = (right - left) * 1920;
                 unsigned int crop_h = (bottom - top) * 1080;
      
-                if( scores[i] > MIN_SCORE ){
+                if( scores[i] >= MIN_SCORE ){
 
                     syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
                        i, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
