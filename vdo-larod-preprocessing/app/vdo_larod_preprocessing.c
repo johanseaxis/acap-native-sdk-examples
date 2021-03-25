@@ -32,10 +32,10 @@
 #define NUM_TOP_SCORES 3
 
 /**
- * brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
+ * @brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
  * forces an immediate exit without clean up if invoked at least twice.
  *
- * param sig What signal has been sent.
+ * @param sig What signal has been sent.
  */
 static void sigintHandler(int sig);
 
@@ -455,7 +455,7 @@ bool setupPreprocModel(larodConnection* const conn, const larodChip infChip,
     }
 
     if (!larodMapSetIntArr2(modelParams, "image.output.size",
-                            INFERENCE_INPUT_HEIGHT, INFERENCE_INPUT_WIDTH,
+                            INFERENCE_INPUT_WIDTH, INFERENCE_INPUT_HEIGHT,
                             &larodError)) {
         syslog(LOG_ERR, "Could not set preprocessing output size (%d): %s\n",
                 larodError->code, larodError->msg);
