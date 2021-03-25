@@ -50,10 +50,10 @@ provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
 
 #### Setting up the Crop Stream
 
-The original resolution 1920x1080 is used to crop a higher resolution image.
+The original resolution args.input_width x args.height is used to crop a higher resolution image.
 
 ```c
-provider_crop = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
+provider_crop = createImgProvider(args.input_width, args.height, 2, VDO_FORMAT_YUV);
 ```
 
 #### Setting up the larod interface
@@ -98,7 +98,7 @@ char CROP_FILE_PATTERN[] = "/tmp/crop.test-XXXXXX";
 void* cropAddr = MAP_FAILED;
 int cropFd = -1;
 
-createAndMapTmpFile(CROP_FILE_PATTERN, 1920 * 1080 * CHANNELS, &cropAddr, &cropFd);
+createAndMapTmpFile(CROP_FILE_PATTERN, args.input_width * args.height * CHANNELS, &cropAddr, &cropFd);
 ```
 
 The `larodCreateModelInputs` and `larodCreateModelOutputs` methods map the input and output tensors with the model.
@@ -147,7 +147,7 @@ In terms of the frame used to crop the detected objects, there is no need to sca
 VdoBuffer* buf_crop = getLastFrameBlocking(provider_crop);
 uint8_t* nv12Data_crop = (uint8_t*) vdo_buffer_get_data(buf_crop);
 
-convertU8yuvToRGBlibYuv(1920, 1080, nv12Data_crop, (uint8_t*) cropAddr);
+convertU8yuvToRGBlibYuv(args.input_width, args.height, nv12Data_crop, (uint8_t*) cropAddr);
 ```
 
 By using the `larodRunInference` method, the predictions from the MobileNet are saved into the specified addresses.
@@ -171,7 +171,7 @@ If the score is higher than a threshold `MIN_SCORE`, the results are outputted b
 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
 i, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
 
-unsigned char* crop_buffer = crop_interleaved(cropAddr, 1920, 1080, 3,
+unsigned char* crop_buffer = crop_interleaved(cropAddr, args.input_width, args.height, CHANNELS,
                                           crop_x, crop_y, crop_w, crop_h);
 
 buffer_to_jpeg(crop_buffer, &jpeg_conf, &jpeg_size, &jpeg_buffer);
@@ -203,7 +203,7 @@ With the algorithm started, we can view the output by either pressing "App log" 
 ```sh
 tail -f /var/volatile/log/info.log | grep object_detection
 ```
-There are four outputs from MobileNet SSD v1(2) (COCO) model. The Number of detections, CLasses, Scores, and Locations are shown as below. The four location numbers stand for [top, left, bottom, right]. 
+There are four outputs from MobileNet SSD v2 (COCO) model. The Number of detections, CLasses, Scores, and Locations are shown as below. The four location numbers stand for [top, left, bottom, right]. 
 
 ```sh
 [ INFO    ] object_detection[645]: There are 3 objects
@@ -212,7 +212,7 @@ There are four outputs from MobileNet SSD v1(2) (COCO) model. The Number of dete
 [ INFO    ] object_detection[645]: Object 3: Classes: car - Scores: 0.308594 - Locations: [0.109673,0.005128,0.162298,0.050947]
 ```
 
-The detected objects with a score higher than a threshold are saved into /tmp folder in .jpg form as we.
+The detected objects with a score higher than a threshold are saved into /tmp folder in .jpg form as well.
 
 ## License
 **[Apache License 2.0](../LICENSE)**

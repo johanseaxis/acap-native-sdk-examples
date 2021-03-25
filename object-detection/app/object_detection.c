@@ -352,7 +352,7 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    provider_crop = createImgProvider(1920, 1080, 2, VDO_FORMAT_YUV);
+    provider_crop = createImgProvider(args.input_width, args.input_height, 2, VDO_FORMAT_YUV);
     if (!provider_crop) {
       syslog(LOG_ERR, "%s: Failed to create crop ImgProvider", __func__);
         goto end;
@@ -385,7 +385,7 @@ int main(int argc, char** argv) {
 
     // Allocate space for input tensor 2
     if (!createAndMapTmpFile(CROP_FILE_PATTERN,
-                             1920 * 1080 * CHANNELS,
+                             args.input_width * args.input_height * CHANNELS,
                              &cropAddr, &cropFd)) {
         goto end;
     }
@@ -503,7 +503,7 @@ int main(int argc, char** argv) {
                      __func__);
         }
 
-        convertU8yuvToRGBlibYuv(1920, 1080, nv12Data_crop, (uint8_t*) cropAddr);
+        convertU8yuvToRGBlibYuv(args.input_width, args.input_height, nv12Data_crop, (uint8_t*) cropAddr);
 
         gettimeofday(&endTs, NULL);
 
@@ -557,8 +557,6 @@ int main(int argc, char** argv) {
         float* classes = (float*) larodOutput2Addr;
         float* scores = (float*) larodOutput3Addr;
         float* numberofdetections = (float*) larodOutput4Addr;
-        // Threshold of the class of detected objects
-        float MIN_SCORE = 0.1;
         
         if ((int) numberofdetections[0] == 0) {
            syslog(LOG_INFO,"No object is detected");
@@ -572,22 +570,21 @@ int main(int argc, char** argv) {
                 float bottom = locations[4*i+2];
                 float right = locations[4*i+3];
 
-                unsigned int crop_x = left * 1920; 
-                unsigned int crop_y = top * 1080;
-                unsigned int crop_w = (right - left) * 1920;
-                unsigned int crop_h = (bottom - top) * 1080;
+                unsigned int crop_x = left * args.input_width; 
+                unsigned int crop_y = top * args.input_height;
+                unsigned int crop_w = (right - left) * args.input_width;
+                unsigned int crop_h = (bottom - top) * args.input_height;
      
-                if( scores[i] >= MIN_SCORE ){
-
+                if (scores[i] >= args.threshold/100.0){
                     syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
                        i, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
-                    unsigned char* crop_buffer = crop_interleaved(cropAddr, 1920, 1080, 3,
+                    unsigned char* crop_buffer = crop_interleaved(cropAddr, args.input_width, args.input_height, CHANNELS,
                                                                   crop_x, crop_y, crop_w, crop_h);
 
                     unsigned long jpeg_size = 0;
                     unsigned char* jpeg_buffer = NULL;
                     struct jpeg_compress_struct jpeg_conf;
-                    set_jpeg_configuration(crop_w, crop_h, 3, 80, &jpeg_conf);
+                    set_jpeg_configuration(crop_w, crop_h, CHANNELS, args.outputBytes, &jpeg_conf);
                     buffer_to_jpeg(crop_buffer, &jpeg_conf, &jpeg_size, &jpeg_buffer);
                     char file_name[32];
                     snprintf(file_name, sizeof(char) * 32, "/tmp/detection_%i.jpg", i);
@@ -635,7 +632,7 @@ end:
         close(larodInputFd);
     }
      if (cropAddr != MAP_FAILED) {
-        munmap(cropAddr, 1920 * 1080 * CHANNELS);
+        munmap(cropAddr, args.input_width * args.input_height * CHANNELS);
     }
     if (cropFd >= 0) {
         close(cropFd);

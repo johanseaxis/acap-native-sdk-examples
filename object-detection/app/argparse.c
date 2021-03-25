@@ -41,15 +41,17 @@ const struct argp_option opts[] = {
 const struct argp argp = {
     opts,
     parseOpt,
-    "MODEL WIDTH HEIGHT OUTPUT_SIZE",
-    "This is an example app which loads an image classification MODEL to "
+    "MODEL WIDTH HEIGHT OUTPUT_SIZE INPUT_WIDTH INPUT_HEIGHT THRESHOLD",
+    "This is an example app which loads an object detection MODEL to "
     "larod and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv "
     "format which are converted to interleaved rgb format and then sent to "
-    "larod for inference on MODEL. OUTPUT_SIZE denotes the size in bytes of "
-    "the tensor output by MODEL.\n\nExample call:\n"
-    "/usr/local/packages/tensorflow_to_larod/model/converted_model.larod 256 "
-    "256 1 -c 4\nwhere 4 here refers to the Edge TPU backend. The numbers for "
-    "each type of chip can be found at the top of the file larod.h.",
+    "larod for inference on MODEL. INPUT_WIDTH x INPUT_HEIGHT is the original "
+    "resolution of frames from the camera. OUTPUT_SIZE denotes the size in "
+    "bytes of the tensor output by MODEL. THRESHOLD ranging from 1 to 100 is the "
+    "min scores required to show the detected objects and crop them.\n\nExample "
+    "call:\n/usr/local/packages/tensorflow_to_larod/model/converted_model.larod "
+    "300 300 80 -c 4 1920 1080 10\nwhere 4 here refers to the Edge TPU backend. "
+    "The numbers for each type of chip can be found at the top of the file larod.h.",
     NULL,
     NULL,
     NULL};
@@ -104,6 +106,27 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
                 argp_failure(state, EXIT_FAILURE, ret, "invalid output size");
             }
             args->outputBytes = (size_t) outputBytes;
+        } else if (state->arg_num == 4) {
+            unsigned long long input_width;
+            int ret = parsePosInt(arg, &input_width, UINT_MAX);
+            if (ret) {
+                argp_failure(state, EXIT_FAILURE, ret, "invalid input_width");
+            }
+            args->input_width = (unsigned int) input_width;
+        } else if (state->arg_num == 5) {
+            unsigned long long input_height;
+            int ret = parsePosInt(arg, &input_height, UINT_MAX);
+            if (ret) {
+                argp_failure(state, EXIT_FAILURE, ret, "invalid input_height");
+            }
+            args->input_height = (unsigned int) input_height;
+        } else if (state->arg_num == 6) {
+            unsigned long long threshold;
+            int ret = parsePosInt(arg, &threshold, UINT_MAX);
+            if (ret) {
+                argp_failure(state, EXIT_FAILURE, ret, "invalid threshold");
+            }
+            args->threshold = (unsigned int) threshold;
         } else {
             argp_error(state, "Too many arguments given");
         }
@@ -112,11 +135,14 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
         args->width = 0;
         args->height = 0;
         args->outputBytes = 0;
+        args->input_width = 0;
+        args->input_height = 0;
+        args->threshold = 0.0;
         args->chip = 0;
         args->modelFile = NULL;
         break;
     case ARGP_KEY_END:
-        if (state->arg_num != 4) {
+        if (state->arg_num != 7) {
             argp_error(state, "Invalid number of arguments given");
         }
         break;
