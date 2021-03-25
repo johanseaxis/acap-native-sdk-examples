@@ -41,11 +41,11 @@ const struct argp_option opts[] = {
 const struct argp argp = {
     opts,
     parseOpt,
-    "MODEL WIDTH HEIGHT OUTPUT_SIZE INPUT_WIDTH INPUT_HEIGHT THRESHOLD",
+    "MODEL WIDTH HEIGHT OUTPUT_SIZE RAW_WIDTH RAW_HEIGHT THRESHOLD",
     "This is an example app which loads an object detection MODEL to "
     "larod and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv "
     "format which are converted to interleaved rgb format and then sent to "
-    "larod for inference on MODEL. INPUT_WIDTH x INPUT_HEIGHT is the original "
+    "larod for inference on MODEL. RAW_WIDTH x RAW_HEIGHT is the original "
     "resolution of frames from the camera. OUTPUT_SIZE denotes the size in "
     "bytes of the tensor output by MODEL. THRESHOLD ranging from 1 to 100 is the "
     "min scores required to show the detected objects and crop them.\n\nExample "
@@ -107,19 +107,19 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
             }
             args->outputBytes = (size_t) outputBytes;
         } else if (state->arg_num == 4) {
-            unsigned long long input_width;
-            int ret = parsePosInt(arg, &input_width, UINT_MAX);
+            unsigned long long raw_width;
+            int ret = parsePosInt(arg, &raw_width, UINT_MAX);
             if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid input_width");
+                argp_failure(state, EXIT_FAILURE, ret, "invalid raw_width");
             }
-            args->input_width = (unsigned int) input_width;
+            args->raw_width = (unsigned int) raw_width;
         } else if (state->arg_num == 5) {
-            unsigned long long input_height;
-            int ret = parsePosInt(arg, &input_height, UINT_MAX);
+            unsigned long long raw_height;
+            int ret = parsePosInt(arg, &raw_height, UINT_MAX);
             if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid input_height");
+                argp_failure(state, EXIT_FAILURE, ret, "invalid raw_height");
             }
-            args->input_height = (unsigned int) input_height;
+            args->raw_height = (unsigned int) raw_height;
         } else if (state->arg_num == 6) {
             unsigned long long threshold;
             int ret = parsePosInt(arg, &threshold, UINT_MAX);
@@ -135,8 +135,8 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
         args->width = 0;
         args->height = 0;
         args->outputBytes = 0;
-        args->input_width = 0;
-        args->input_height = 0;
+        args->raw_width = 0;
+        args->raw_height = 0;
         args->threshold = 0.0;
         args->chip = 0;
         args->modelFile = NULL;

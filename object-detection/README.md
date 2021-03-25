@@ -50,10 +50,10 @@ provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
 
 #### Setting up the Crop Stream
 
-The original resolution args.input_width x args.height is used to crop a higher resolution image.
+The original resolution args.raw_width x args.raw_height is used to crop a higher resolution image.
 
 ```c
-provider_crop = createImgProvider(args.input_width, args.height, 2, VDO_FORMAT_YUV);
+provider_raw = createImgProvider(args.raw_width, args.raw_height, 2, VDO_FORMAT_YUV);
 ```
 
 #### Setting up the larod interface
@@ -98,7 +98,7 @@ char CROP_FILE_PATTERN[] = "/tmp/crop.test-XXXXXX";
 void* cropAddr = MAP_FAILED;
 int cropFd = -1;
 
-createAndMapTmpFile(CROP_FILE_PATTERN, args.input_width * args.height * CHANNELS, &cropAddr, &cropFd);
+createAndMapTmpFile(CROP_FILE_PATTERN, args.raw_width * args.raw_height * CHANNELS, &cropAddr, &cropFd);
 ```
 
 The `larodCreateModelInputs` and `larodCreateModelOutputs` methods map the input and output tensors with the model.
@@ -144,10 +144,10 @@ convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight, (uint8_t*) larod
 In terms of the frame used to crop the detected objects, there is no need to scale, so `convertU8yuvToRGBlibYuv` method is used.
 
 ```c
-VdoBuffer* buf_crop = getLastFrameBlocking(provider_crop);
-uint8_t* nv12Data_crop = (uint8_t*) vdo_buffer_get_data(buf_crop);
+VdoBuffer* buf_raw = getLastFrameBlocking(provider_raw);
+uint8_t* nv12Data_raw = (uint8_t*) vdo_buffer_get_data(buf_raw);
 
-convertU8yuvToRGBlibYuv(args.input_width, args.height, nv12Data_crop, (uint8_t*) cropAddr);
+convertU8yuvToRGBlibYuv(args.raw_width, args.raw_height, nv12Data_raw, (uint8_t*) cropAddr);
 ```
 
 By using the `larodRunInference` method, the predictions from the MobileNet are saved into the specified addresses.
@@ -171,7 +171,7 @@ If the score is higher than a threshold `MIN_SCORE`, the results are outputted b
 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
 i, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
 
-unsigned char* crop_buffer = crop_interleaved(cropAddr, args.input_width, args.height, CHANNELS,
+unsigned char* crop_buffer = crop_interleaved(cropAddr, args.raw_width, args.raw_height, CHANNELS,
                                           crop_x, crop_y, crop_w, crop_h);
 
 buffer_to_jpeg(crop_buffer, &jpeg_conf, &jpeg_size, &jpeg_buffer);
@@ -181,7 +181,7 @@ jpeg_to_file(file_name, jpeg_buffer, jpeg_size);
 
 ## Building the application
 
-Similar with [tensorflow-to-larod](https://github.com/AxisCommunications/acap3-examples-staging/tree/master/tensorflow-to-larod), a packaging file is needed to compile the ACAP. This is found in [app/package.conf](app/package.conf). For the scope of this tutorial, the `APPOPTS` and `OTHERFILES` keys are noteworthy. `APPOPTS` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes>`. The file(s) specified in `OTHERFILES` simply tell the compiler what files to copy to the ACAP, such as our .larod model file.
+Similar with [tensorflow-to-larod](https://github.com/AxisCommunications/acap3-examples-staging/tree/master/tensorflow-to-larod), a packaging file is needed to compile the ACAP. This is found in [app/package.conf](app/package.conf). For the scope of this tutorial, the `APPOPTS` and `OTHERFILES` keys are noteworthy. `APPOPTS` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes raw_video_resolution_width raw_video_resolution_height threshold>`. The file(s) specified in `OTHERFILES` simply tell the compiler what files to copy to the ACAP, such as our .larod model file.
 
 The ACAP is built to specification by the `Makefile` in [app/Makefile](app/Makefile). It is also this file which specifies the last step in the model conversion process, namely converting the `.tflite` to `.larod` by using the `convert_larod.py`-tool described earlier. With the [Makefile](app/Makefile) and [package.conf](app/package.conf) files set up, the ACAP can be built by running the build script in the example environment:
 

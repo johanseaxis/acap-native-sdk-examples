@@ -29,8 +29,8 @@ typedef struct args_t {
     char* modelFile;
     unsigned width;
     unsigned height;
-    unsigned input_width;
-    unsigned input_height;
+    unsigned raw_width;
+    unsigned raw_height;
     unsigned threshold;
     larodChip chip;
 } args_t;
