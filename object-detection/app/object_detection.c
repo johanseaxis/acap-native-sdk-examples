@@ -19,10 +19,10 @@
   *
   * This application loads a larod model which takes an image as input and
   * outputs values corresponding to the class, score and location of detected 
-  * objects in image.
+  * objects in the image.
   *
-  * The application expects three arguments on the command line in the
-  * following order: MODEL WIDTH HEIGHT RAW_WIDTH RAW_HEIGHT THRESHOLD
+  * The application expects six arguments on the command line in the
+  * following order: MODEL WIDTH HEIGHT RAW_WIDTH RAW_HEIGHT THRESHOLD.
   *
   * First argument, MODEL, is a string describing path to the model.
   *
@@ -34,7 +34,7 @@
   *
   * Fifth argument, RAW_HEIGHT is an integer for camera height resolution.
   *
-  * Sixth argument, THRESHOLD is a score ranging from 1 to 100 to select good detections.
+  * Sixth argument, THRESHOLD is an integer ranging from 0 to 100 to select good detections.
   *
   */
 
