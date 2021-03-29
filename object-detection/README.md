@@ -135,7 +135,8 @@ VdoBuffer* buf = getLastFrameBlocking(provider);
 uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
 ```
 
-Considering that CNN models usually handle with RGB images, while images from Axis cameras are in the form of NV12 YUV, the `convertCropScaleU8yuvToRGB` method from `imgconverter` is used to crop and scale the frames from Axis cameras into a 300x300 RGB image.
+Axis cameras output images on the NV12 YUV format. As this is not normally used as input format to deep learning models,
+conversion to e.g., RGB might be needed. This can be done using ```libyuv```. However, if performance is a primary objective, training the model to use the YUV format directly should be considered, as each frame conversion takes a few milliseconds.  To convert the NV12 stream to RGB, the `convertCropScaleU8yuvToRGB` from `imgconverter` is used, which in turn uses the `libyuv` library.
 
 ```c
 convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight, (uint8_t*) larodInputAddr, args.width, args.height);
@@ -206,10 +207,9 @@ tail -f /var/volatile/log/info.log | grep object_detection
 There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for [top, left, bottom, right]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers. 
 
 ```sh
-[ INFO    ] object_detection[645]: There are 3 objects
-[ INFO    ] object_detection[645]: Object 1: Classes: car - Scores: 0.769531 - Locations: [0.750146,0.086451,0.894765,0.299347]
-[ INFO    ] object_detection[645]: Object 2: Classes: car - Scores: 0.335938 - Locations: [0.005453,0.101417,0.045346,0.144171]
-[ INFO    ] object_detection[645]: Object 3: Classes: car - Scores: 0.308594 - Locations: [0.109673,0.005128,0.162298,0.050947]
+[ INFO    ] object_detection[645]: Object 1: Classes: 2 car - Scores: 0.769531 - Locations: [0.750146,0.086451,0.894765,0.299347]
+[ INFO    ] object_detection[645]: Object 2: Classes: 2 car - Scores: 0.335938 - Locations: [0.005453,0.101417,0.045346,0.144171]
+[ INFO    ] object_detection[645]: Object 3: Classes: 2 car - Scores: 0.308594 - Locations: [0.109673,0.005128,0.162298,0.050947]
 ```
 
 The detected objects with a score higher than a threshold are saved into /tmp folder in .jpg form as well.

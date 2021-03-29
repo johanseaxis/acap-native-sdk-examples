@@ -15,7 +15,8 @@ LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 CFLAGS += -Wall
 
 all:	$(PROGS) \
-		model/converted_model.larod
+		model/converted_model.larod \
+		label/labels.txt
 
 $(PROG1): $(OBJS1)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
@@ -25,6 +26,10 @@ model/converted_model.larod:
 	cp converted_model_edgetpu.tflite model/converted_model.tflite
 	larod-convert.py tflite model/converted_model.tflite
 	rm -f model/*.tflite
+
+label/labels.txt:
+	mkdir -p label
+	curl -L -o label/labels.txt https://github.com/google-coral/test_data/raw/master/coco_labels.txt
 
 clean:
 	rm -f $(PROGS) *.o *.eap lib/* include/* model/* label/*

@@ -21,21 +21,26 @@
   * outputs values corresponding to the class, score and location of detected 
   * objects in the image.
   *
-  * The application expects six arguments on the command line in the
-  * following order: MODEL WIDTH HEIGHT RAW_WIDTH RAW_HEIGHT THRESHOLD.
+  * The application expects eight arguments on the command line in the
+  * following order: MODEL WIDTH HEIGHT OUTPUTBYTES RAW_WIDTH RAW_HEIGHT
+  * THRESHOLD LABELSFILE.
   *
   * First argument, MODEL, is a string describing path to the model.
   *
   * Second argument, WIDTH, is an integer for the input width.
   *
-  * Third argument, HEIGHT, is an integer for input height.
+  * Third argument, HEIGHT, is an integer for the input height.
+  * 
+  * Forth argument, OUTPUTBYTES, is an integer for the output bytes.
   *
-  * Forth argument, RAW_WIDTH is an integer for camera width resolution.
+  * Fifth argument, RAW_WIDTH is an integer for camera width resolution.
   *
-  * Fifth argument, RAW_HEIGHT is an integer for camera height resolution.
+  * Sixth argument, RAW_HEIGHT is an integer for camera height resolution.
   *
-  * Sixth argument, THRESHOLD is an integer ranging from 0 to 100 to select good detections.
-  *
+  * Seventh argument, THRESHOLD is an integer ranging from 0 to 100 to select good detections.
+  * 
+  * Eighth argument, LABELSFILE, is a string describing path to the label txt.
+  * 
   */
 
 #include <errno.h>
@@ -43,6 +48,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <syslog.h>
@@ -56,100 +62,164 @@
 #include "vdo-frame.h"
 #include "vdo-types.h"
 
+/**
+ * @brief Free up resources held by an array of labels.
+ *
+ * @param labels An array of label string pointers.
+ * @param labelFileBuffer Heap buffer containing the actual string data.
+ */
+void freeLabels(char** labelsArray, char* labelFileBuffer) {
+    free(labelsArray);
+    free(labelFileBuffer);
+}
 
-char class_name[90][20] = {
-  "person",
-  "bicycle",   
-  "car",
-  "motorcycle",
-  "airplane",
-  "bus",
-  "train",
-  "truck",
-  "boat",
-  "traffic light",
-  "fire hydrant",
-  "stop sign",
-  "parking meter",
-  "bench",
-  "bird",
-  "cat",
-  "dog",
-  "horse",
-  "sheep",
-  "cow",
-  "elephant",
-  "bear",
-  "zebra",
-  "giraffe",
-  "backpack",
-  "umbrella",
-  "handbag",
-  "tie",
-  "suitcase",
-  "frisbee",
-  "skis",
-  "snowboard",
-  "sports ball",
-  "kite",
-  "baseball bat",
-  "baseball glove",
-  "skateboard",
-  "surfboard",
-  "tennis racket",
-  "bottle",
-  "wine glass",
-  "cup",
-  "fork",
-  "knife",
-  "spoon",
-  "bowl",
-  "banana",
-  "apple",
-  "sandwich",
-  "orange",
-  "broccoli",
-  "carrot",
-  "hot dog",
-  "pizza",
-  "donut",
-  "cake",
-  "chair",
-  "couch",
-  "potted plant",
-  "bed",
-  "dining table",
-  "toilet",
-  "tv",
-  "laptop",
-  "mouse",
-  "remote",
-  "keyboard",
-  "cell phone",
-  "microwave",
-  "oven",
-  "toaster",
-  "sink",
-  "refrigerator",
-  "book",
-  "clock",
-  "vase",
-  "scissors",
-  "teddy bear",
-  "hair drier",
-  "toothbrush"
-};
+/**
+ * @brief Reads a file of labels into an array.
+ *
+ * An array filled by this function should be freed using freeLabels.
+ *
+ * @param labelsPtr Pointer to a string array.
+ * @param labelFileBuffer Pointer to the labels file contents.
+ * @param labelsPath String containing the path to the labels file to be read.
+ * @param numLabelsPtr Pointer to number which will store number of labels read.
+ * @return False if any errors occur, otherwise true.
+ */
+static bool parseLabels(char*** labelsPtr, char** labelFileBuffer, char *labelsPath,
+                 size_t* numLabelsPtr) {
+    // We cut off every row at 60 characters.
+    const size_t LINE_MAX_LEN = 60;
+    bool ret = false;
+    char* labelsData = NULL;  // Buffer containing the label file contents.
+    char** labelArray = NULL; // Pointers to each line in the labels text.
 
+    struct stat fileStats = {0};
+    if (stat(labelsPath, &fileStats) < 0) {
+        syslog(LOG_ERR, "%s: Unable to get stats for label file %s: %s", __func__,
+               labelsPath, strerror(errno));
+        return false;
+    }
+
+    // Sanity checking on the file size - we use size_t to keep track of file
+    // size and to iterate over the contents. off_t is signed and 32-bit or
+    // 64-bit depending on architecture. We just check toward 10 MByte as we
+    // will not encounter larger label files and both off_t and size_t should be
+    // able to represent 10 megabytes on both 32-bit and 64-bit systems.
+    if (fileStats.st_size > (10 * 1024 * 1024)) {
+        syslog(LOG_ERR, "%s: failed sanity check on labels file size", __func__);
+        return false;
+    }
+
+    int labelsFd = open(labelsPath, O_RDONLY);
+    if (labelsFd < 0) {
+        syslog(LOG_ERR, "%s: Could not open labels file %s: %s", __func__, labelsPath,
+               strerror(errno));
+        return false;
+    }
+
+    size_t labelsFileSize = (size_t) fileStats.st_size;
+    // Allocate room for a terminating NULL char after the last line.
+    labelsData = malloc(labelsFileSize + 1);
+    if (labelsData == NULL) {
+        syslog(LOG_ERR, "%s: Failed allocating labels text buffer: %s", __func__,
+               strerror(errno));
+        goto end;
+    }
+
+    ssize_t numBytesRead = -1;
+    size_t totalBytesRead = 0;
+    char* fileReadPtr = labelsData;
+    while (totalBytesRead < labelsFileSize) {
+        numBytesRead =
+            read(labelsFd, fileReadPtr, labelsFileSize - totalBytesRead);
+
+        if (numBytesRead < 1) {
+            syslog(LOG_ERR, "%s: Failed reading from labels file: %s", __func__,
+                   strerror(errno));
+            goto end;
+        }
+        totalBytesRead += (size_t) numBytesRead;
+        fileReadPtr += numBytesRead;
+    }
+
+    // Now count number of lines in the file - check all bytes except the last
+    // one in the file.
+    size_t numLines = 0;
+    for (size_t i = 0; i < (labelsFileSize - 1); i++) {
+        if (labelsData[i] == '\n') {
+            numLines++;
+        }
+    }
+
+    // We assume that there is always a line at the end of the file, possibly
+    // terminated by newline char. Either way add this line as well to the
+    // counter.
+    numLines++;
+
+    labelArray = malloc(numLines * sizeof(char*));
+    if (!labelArray) {
+        syslog(LOG_ERR, "%s: Unable to allocate labels array: %s", __func__,
+               strerror(errno));
+        ret = false;
+        goto end;
+    }
+
+    size_t labelIdx = 0;
+    labelArray[labelIdx] = labelsData;
+    labelIdx++;
+    for (size_t i = 0; i < labelsFileSize; i++) {
+        if (labelsData[i] == '\n') {
+            // Register the string start in the list of labels.
+            labelArray[labelIdx] = labelsData + i + 1;
+            labelIdx++;
+            // Replace the newline char with string-ending NULL char.
+            labelsData[i] = '\0';
+        }
+    }
+
+    // If the very last byte in the labels file was a new-line we just
+    // replace that with a NULL-char. Refer previous for loop skipping looking
+    // for new-line at the end of file.
+    if (labelsData[labelsFileSize - 1] == '\n') {
+        labelsData[labelsFileSize - 1] = '\0';
+    }
+
+    // Make sure we always have a terminating NULL char after the label file
+    // contents.
+    labelsData[labelsFileSize] = '\0';
+
+    // Now go through the list of strings and cap if strings too long.
+    for (size_t i = 0; i < numLines; i++) {
+        size_t stringLen = strnlen(labelArray[i], LINE_MAX_LEN);
+        if (stringLen >= LINE_MAX_LEN) {
+            // Just insert capping NULL terminator to limit the string len.
+            *(labelArray[i] + LINE_MAX_LEN + 1) = '\0';
+        }
+    }
+
+    *labelsPtr = labelArray;
+    *numLabelsPtr = numLines;
+    *labelFileBuffer = labelsData;
+
+    ret = true;
+
+end:
+    if (!ret) {
+        freeLabels(labelArray, labelsData);
+    }
+    close(labelsFd);
+
+    return ret;
+}
 
 /// Set by signal handler if an interrupt signal sent to process.
 /// Indicates that app should stop asap and exit gracefully.
 volatile sig_atomic_t stopRunning = false;
 
 /**
- * brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
+ * @brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
  * forces an immediate exit without clean up if invoked at least twice.
  *
- * param sig What signal has been sent. Will always be SIGINT.
+ * @param sig What signal has been sent. Will always be SIGINT.
  */
 void sigintHandler(int sig) {
     // Force an exit if SIGINT has already been sent before.
@@ -167,15 +237,15 @@ void sigintHandler(int sig) {
 }
 
 /**
- * brief Creates a temporary fd and truncated to correct size and mapped.
+ * @brief Creates a temporary fd and truncated to correct size and mapped.
  *
  * This convenience function creates temp files to be used for input and output.
  *
- * param fileName Pattern for how the temp file will be named in file system.
- * param fileSize How much space needed to be allocated (truncated) in fd.
- * param mappedAddr Pointer to the address of the fd mapped for this process.
- * param Pointer to the generated fd.
- * return Positive errno style return code (zero means success).
+ * @param fileName Pattern for how the temp file will be named in file system.
+ * @param fileSize How much space needed to be allocated (truncated) in fd.
+ * @param mappedAddr Pointer to the address of the fd mapped for this process.
+ * @param Pointer to the generated fd.
+ * @return Positive errno style return code (zero means success).
  */
 bool createAndMapTmpFile(char* fileName, size_t fileSize, void** mappedAddr,
                          int* convFd) {
@@ -227,18 +297,18 @@ error:
 }
 
 /**
- * brief Sets up and configures a connection to larod, and loads a model.
+ * @brief Sets up and configures a connection to larod, and loads a model.
  *
  * Opens a connection to larod, which is tied to larodConn. After opening a
  * larod connection the chip specified by larodChip is set for the
  * connection. Then the model file specified by larodModelFd is loaded to the
  * chip, and a corresponding larodModel object is tied to model.
  *
- * param larodChip Speficier for which larod chip to use.
- * param larodModelFd Fd for a model file to load.
- * param larodConn Pointer to a larod connection to be opened.
- * param model Pointer to a larodModel to be obtained.
- * return false if error has occurred, otherwise true.
+ * @param larodChip Speficier for which larod chip to use.
+ * @param larodModelFd Fd for a model file to load.
+ * @param larodConn Pointer to a larod connection to be opened.
+ * @param model Pointer to a larodModel to be obtained.
+ * @return false if error has occurred, otherwise true.
  */
 bool setupLarod(const larodChip larodChip, const int larodModelFd,
                 larodConnection** larodConn, larodModel** model) {
@@ -291,7 +361,7 @@ end:
 
 //void get_tensor_information()
 /**
- * brief Main function that starts a stream with different options.
+ * @brief Main function that starts a stream with different options.
  */
 int main(int argc, char** argv) {
     // Hardcode to use three image "color" channels (eg. RGB).
@@ -328,6 +398,11 @@ int main(int argc, char** argv) {
     int larodOutput2Fd = -1;
     int larodOutput3Fd = -1;
     int larodOutput4Fd = -1;
+    char** labels = NULL; // This is the array of label strings. The label
+                          // entries points into the large labelFileData buffer.
+    size_t numLabels = 0; // Number of entries in the labels array.
+    char* labelFileData =
+        NULL; // Buffer holding the complete collection of label strings.
     args_t args;
 
     // Open the syslog to report messages for "object_detection"
@@ -470,6 +545,14 @@ int main(int argc, char** argv) {
         goto end;
     }
 
+    if (args.labelsFile) {
+        if (!parseLabels(&labels, &labelFileData, args.labelsFile,
+                         &numLabels)) {
+            syslog(LOG_ERR, "Failed creating parsing labels file");
+            goto end;
+        }
+    }
+
     syslog(LOG_INFO, "Found %x input tensors and %x output tensors", numInputs, numOutputs);
     syslog(LOG_INFO, "Start fetching video frames from VDO");
     if (!startFrameFetch(provider)) {
@@ -584,7 +667,8 @@ int main(int argc, char** argv) {
      
                 if (scores[i] >= args.threshold/100.0){
                     syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
-                       i, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
+                       i, labels[(int) classes[i]], scores[i], top, left, bottom, right);
+                       
                     unsigned char* crop_buffer = crop_interleaved(cropAddr, args.raw_width, args.raw_height, CHANNELS,
                                                                   crop_x, crop_y, crop_w, crop_h);
 
@@ -680,6 +764,10 @@ end:
     larodDestroyTensors(&inputTensors, numInputs);
     larodDestroyTensors(&outputTensors, numOutputs);
     larodClearError(&error);
+
+    if (labels) {
+        freeLabels(labels, labelFileData);
+    }
 
     // Close application logging to syslog
     closelog();

@@ -41,17 +41,19 @@ const struct argp_option opts[] = {
 const struct argp argp = {
     opts,
     parseOpt,
-    "MODEL WIDTH HEIGHT OUTPUT_SIZE RAW_WIDTH RAW_HEIGHT THRESHOLD",
+    "MODEL WIDTH HEIGHT OUTPUTBYTES RAW_WIDTH RAW_HEIGHT THRESHOLD LABELSFILE",
     "This is an example app which loads an object detection MODEL to "
     "larod and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv "
     "format which are converted to interleaved rgb format and then sent to "
     "larod for inference on MODEL. RAW_WIDTH x RAW_HEIGHT is the original "
-    "resolution of frames from the camera. OUTPUT_SIZE denotes the size in "
+    "resolution of frames from the camera. OUTPUTBYTES denotes the size in "
     "bytes of the tensor output by MODEL. THRESHOLD ranging from 1 to 100 is the "
-    "min scores required to show the detected objects and crop them.\n\nExample "
-    "call:\n/usr/local/packages/object_detection/model/converted_model.larod "
-    "300 300 20 1920 1080 10 -c 4 \nwhere 4 here refers to the Edge TPU backend. "
-    "The numbers for each type of chip can be found at the top of the file larod.h.",
+    "min score required to show the detected objects and crop them. LABELSFILE "
+    "is the path of a txt where labes names are saved. \n\nExample call: "
+    "\n/usr/local/packages/object_detection/model/converted_model.larod 300 "
+    "300 20 1920 1080 10 /usr/local/packages/object_detection/label/labels.txt "
+    "-c 4 \nwhere 4 here refers to the Edge TPU backend. The numbers for "
+    "each type of chip can be found at the top of the file larod.h.",
     NULL,
     NULL,
     NULL};
@@ -127,6 +129,8 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
                 argp_failure(state, EXIT_FAILURE, ret, "invalid threshold");
             }
             args->threshold = (unsigned int) threshold;
+        } else if (state->arg_num == 7) {
+            args->labelsFile = arg;
         } else {
             argp_error(state, "Too many arguments given");
         }
@@ -140,9 +144,10 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
         args->threshold = 0.0;
         args->chip = 0;
         args->modelFile = NULL;
+        args->labelsFile = NULL;
         break;
     case ARGP_KEY_END:
-        if (state->arg_num != 7) {
+        if (state->arg_num != 8) {
             argp_error(state, "Invalid number of arguments given");
         }
         break;
