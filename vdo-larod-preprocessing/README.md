@@ -122,12 +122,11 @@ The working dir now also contains a build folder with the following content:
 ```bash
 vdo_larod_preprocessing
 ├── build
-│   ├── label
-|   │   └── imagenet_labels.txt
 │   ├── model
+|   │   ├── imagenet_labels.txt
 |   │   ├── mobilenet_v2_1.9_224_quant_edgetpu.larod
 |   │   └── mobilenet_v2_1.9_224_quant.larod
-│   ├── imagenet-labels.conf
+│   ├── imagenet-labels.h
 │   ├── larod-vdo-utils.c
 │   ├── larod-vod-utils.h
 │   ├── LICENSE
@@ -142,8 +141,8 @@ vdo_larod_preprocessing
 │   └── vdo_larod_preprocessing.c
 ```
 
-Explanation of some files in build folder:
-* **build/label/imagenet_labels.txt** - Label file for MobileNet V2 (ImageNet).
+Explanation of some files in the build folder:
+* **build/model/imagenet_labels.txt** - Label file for MobileNet V2 (ImageNet).
 * **build/model/mobilenet_v2_1.9_224_quant_edgetpu.larod** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
 * **build/model/mobilenet_v2_1.9_224_quant.larod** - Model file for MobileNet V2 (ImageNet), used for CPU with TensorFlow Lite.
 * **build/vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap** - Application package .eap file,
@@ -192,37 +191,33 @@ Depending on selected chip, different output is received. The label file is used
 ```
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
-vdo_larod[4840]: Starting /usr/local/packages/vdo_larod/vdo_larod with larod preprocessing
-vdo_larod[4840]: Creating VDO image provider and creating stream 320 x 240
-vdo_larod[4840]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
-vdo_larod[4840]: Dump of vdo stream settings map =====
-vdo_larod[4840]: Calculate crop image
-vdo_larod[4840]: Create larod models
-vdo_larod[4840]: Create preprocessing maps
-vdo_larod[4840]: Crop VDO image X=40 Y=0 (240 x 240)
-vdo_larod[4840]: Setting up larod connection with chip 2 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant.larod
-vdo_larod[4840]: Available chip ids:
-vdo_larod[4840]: 2: CPU with TensorFlow Lite
-vdo_larod[4840]: 4: Google TPU
-vdo_larod[4840]: 11: CPU with libyuv
-vdo_larod[4840]: Allocate memory for input/output buffers
-vdo_larod[4840]: Create input/output tensors
-vdo_larod[4840]: Determine tensor buffer sizes
-vdo_larod[4840]: Connect tensors to file descriptors
-vdo_larod[4840]: Create job requests
-vdo_larod[4840]: Start fetching video frames from VDO
-vdo_larod[4840]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.in.test-XXXXXX and size 150528
-vdo_larod[4840]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.out.test-XXXXXX and size 1001
-vdo_larod[4840]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.pp.test-XXXXXX and size 115200
-vdo_larod[4840]: Converted image in 5 ms
-vdo_larod[4840]: Ran inference for 369 ms
-vdo_larod[4840]: Top result:  566  freight car with score 58.40%
-vdo_larod[4840]: Converted image in 4 ms
-vdo_larod[4840]: Ran inference for 348 ms
-vdo_larod[4840]: Top result:  566  freight car with score 58.40%
-vdo_larod[4840]: Converted image in 4 ms
-vdo_larod[4840]: Ran inference for 330 ms
-vdo_larod[4840]: Top result:  566  freight car with score 59.20%
+vdo_larod_preprocessing[0]: starting vdo_larod_preprocessing
+vdo_larod_preprocessing[20004]: Connecting to larod
+vdo_larod_preprocessing[20004]: Setting up inference model
+vdo_larod_preprocessing[20004]: Setting up preprocessing model
+vdo_larod_preprocessing[20004]: Setting up and starting VDO stream
+vdo_larod_preprocessing[20004]: Starting to run larod jobs
+vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.81
+vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.53
+vdo_larod_preprocessing[20004]: 3. idx 97 labeled "toucan" with score 0.51
+vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.80
+vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.54
+vdo_larod_preprocessing[20004]: 3. idx 943 labeled "butternut squash" with score 0.49
+vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.82
+vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.54
+vdo_larod_preprocessing[20004]: 3. idx 943 labeled "butternut squash" with score 0.50
+vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.81
+vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.53
+vdo_larod_preprocessing[20004]: 3. idx 97 labeled "toucan" with score 0.51
+vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.80
+vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.53
+vdo_larod_preprocessing[20004]: 3. idx 97 labeled "toucan" with score 0.50
+vdo_larod_preprocessing[20004]: Exit /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
 ```
 
 ## Output Alternative Chip 4 - Google TPU
@@ -230,37 +225,33 @@ vdo_larod[4840]: Top result:  566  freight car with score 59.20%
 ```
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
-vdo_larod[3440]: Starting /usr/local/packages/vdo_larod/vdo_larod with larod preprocessing
-vdo_larod[3440]: Creating VDO image provider and creating stream 320 x 240
-vdo_larod[3440]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
-vdo_larod[3440]: Dump of vdo stream settings map =====
-vdo_larod[3440]: Calculate crop image
-vdo_larod[3440]: Create larod models
-vdo_larod[3440]: Create preprocessing maps
-vdo_larod[3440]: Crop VDO image X=40 Y=0 (240 x 240)
-vdo_larod[3440]: Setting up larod connection with chip 4 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant_edgetpu.larod
-vdo_larod[3440]: Available chip ids:
-vdo_larod[3440]: 11: CPU with libyuv
-vdo_larod[3440]: 2: CPU with TensorFlow Lite
-vdo_larod[3440]: 4: Google TPU
-vdo_larod[3440]: Allocate memory for input/output buffers
-vdo_larod[3440]: Connect tensors to file descriptors
-vdo_larod[3440]: Create input/output tensors
-vdo_larod[3440]: Create job requests
-vdo_larod[3440]: Determine tensor buffer sizes
-vdo_larod[3440]: Start fetching video frames from VDO
-vdo_larod[3440]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.in.test-XXXXXX and size 150528
-vdo_larod[3440]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.out.test-XXXXXX and size 1001
-vdo_larod[3440]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.pp.test-XXXXXX and size 115200
-vdo_larod[3440]: Converted image in 5 ms
-vdo_larod[3440]: Ran inference for 11 ms
-vdo_larod[3440]: Top result:  566  freight car with score 32.40%
-vdo_larod[3440]: Converted image in 10 ms
-vdo_larod[3440]: Ran inference for 5 ms
-vdo_larod[3440]: Top result:  566  freight car with score 31.60%
-vdo_larod[3440]: Converted image in 4 ms
-vdo_larod[3440]: Ran inference for 5 ms
-vdo_larod[3440]: Top result:  566  freight car with score 26.80%
+vdo_larod_preprocessing[0]: starting vdo_larod_preprocessing
+vdo_larod_preprocessing[17701]: Connecting to larod
+vdo_larod_preprocessing[17701]: Setting up inference model
+vdo_larod_preprocessing[17701]: Setting up preprocessing model
+vdo_larod_preprocessing[17701]: Setting up and starting VDO stream
+vdo_larod_preprocessing[17701]: Starting to run larod jobs
+vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
+vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
+vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
+vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
+vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
+vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
+vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
+vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
+vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
+vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
+vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
+vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
+vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
+vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
+vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
+vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
+vdo_larod_preprocessing[17701]: Exit /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
 ```
 
 ## A note on performance
