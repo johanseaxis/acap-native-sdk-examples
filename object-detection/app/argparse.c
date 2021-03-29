@@ -49,8 +49,8 @@ const struct argp argp = {
     "resolution of frames from the camera. OUTPUT_SIZE denotes the size in "
     "bytes of the tensor output by MODEL. THRESHOLD ranging from 1 to 100 is the "
     "min scores required to show the detected objects and crop them.\n\nExample "
-    "call:\n/usr/local/packages/tensorflow_to_larod/model/converted_model.larod "
-    "300 300 80 -c 4 1920 1080 10\nwhere 4 here refers to the Edge TPU backend. "
+    "call:\n/usr/local/packages/object_detection/model/converted_model.larod "
+    "300 300 20 1920 1080 10 -c 4 \nwhere 4 here refers to the Edge TPU backend. "
     "The numbers for each type of chip can be found at the top of the file larod.h.",
     NULL,
     NULL,

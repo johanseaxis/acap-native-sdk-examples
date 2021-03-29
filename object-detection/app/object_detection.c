@@ -390,7 +390,7 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    // Allocate space for input tensor 2
+    // Allocate space to save a hige quality frame for crop
     if (!createAndMapTmpFile(CROP_FILE_PATTERN,
                              args.raw_width * args.raw_height * CHANNELS,
                              &cropAddr, &cropFd)) {
@@ -398,7 +398,7 @@ int main(int argc, char** argv) {
     }
 
     // Allocate space for output tensor 1 (Locations)
-    if (!createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, args.outputBytes,
+    if (!createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, 4 * args.outputBytes,
                              &larodOutput1Addr, &larodOutput1Fd)) {
         goto end;
     }
@@ -490,14 +490,14 @@ int main(int argc, char** argv) {
             goto end;
         }
 
-        VdoBuffer* buf_raw = getLastFrameBlocking(provider_raw);
-        if (!buf_raw) {
+        VdoBuffer* buf_hq = getLastFrameBlocking(provider_raw);
+        if (!buf_hq) {
             goto end;
         }
 
         // Get data from latest frame.
         uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
-        uint8_t* nv12Data_raw = (uint8_t*) vdo_buffer_get_data(buf_raw);
+        uint8_t* nv12Data_hq = (uint8_t*) vdo_buffer_get_data(buf_hq);
 
         // Covert image data from NV12 format to interleaved uint8_t RGB format.
         gettimeofday(&startTs, NULL);
@@ -510,7 +510,7 @@ int main(int argc, char** argv) {
                      __func__);
         }
 
-        convertU8yuvToRGBlibYuv(args.raw_width, args.raw_height, nv12Data_raw, (uint8_t*) cropAddr);
+        convertU8yuvToRGBlibYuv(args.raw_width, args.raw_height, nv12Data_hq, (uint8_t*) cropAddr);
 
         gettimeofday(&endTs, NULL);
 
@@ -605,7 +605,7 @@ int main(int argc, char** argv) {
 
         // Release frame reference to provider.
         returnFrame(provider, buf);
-        returnFrame(provider_raw, buf_raw);
+        returnFrame(provider_raw, buf_hq);
     }
 
     syslog(LOG_INFO, "Stop streaming video from VDO");

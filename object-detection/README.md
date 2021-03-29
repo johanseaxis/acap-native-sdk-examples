@@ -2,7 +2,7 @@
 
 # Object Detection Example
 ## Overview
-This example focuses on the application of object detection on an Axis camera equipped with an Edge TPU. A pretrained Edge TPU model [MobileNet SSD v2 (COCO)] is used to detect the location of 90 types of different objects. The detected objects are saved in /tmp folder for further usage. 
+This example focuses on the application of object detection on an Axis camera equipped with an Edge TPU. A pretrained Edge TPU model [MobileNet SSD v2 (COCO)] is used to detect the location of 90 types of different objects. The model is downloaded through the dockerfile from the google-coral repository. The detected objects are saved in /tmp folder for further usage. 
 
 ## Prerequisites
 - Axis camera equipped with an [Edge TPU](https://coral.ai/docs/edgetpu/faq/)
@@ -17,7 +17,7 @@ The following instructions can be executed to simply run the example.
 ```
 2. Find the ACAP `.eap` file 
 ```sh
-/build/object_detection_app_1_0_0_armv7hf.eap
+build/object_detection_app_1_0_0_armv7hf.eap
 ```
 3. Install and start the ACAP on your camera through the GUI
 
@@ -42,7 +42,7 @@ unsigned int streamHeight = 0;
 chooseStreamResolution(args.width, args.height, &streamWidth, &streamHeight);
 ```
 
-Then the [createImgProvider](app/imgprovider.c#L95) method is used to return an ImgProvider with the selected [output format](https://www.axis.com/techsup/developer_doc/acap3/3.1/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246).
+Then the [createImgProvider](app/imgprovider.c#L95) method is used to return an ImgProvider with the selected [output format](https://www.axis.com/techsup/developer_doc/acap3/3.2/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246).
 
 ```c
 provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
@@ -58,7 +58,7 @@ provider_raw = createImgProvider(args.raw_width, args.raw_height, 2, VDO_FORMAT_
 
 #### Setting up the larod interface
 
-Then similar with [tensorflow-to-larod](https://github.com/AxisCommunications/acap3-examples-staging/tree/master/tensorflow-to-larod), the [larod](https://www.axis.com/techsup/developer_doc/acap3/3.1/api/larod/html/larod_8h.html) interface needs to be set up. The [setupLarod](app/object_detection.c#L236) method is used to create a conncection to larod and select the hardware to use the model. 
+Then similar with [tensorflow-to-larod](https://github.com/AxisCommunications/acap3-examples-staging/tree/master/tensorflow-to-larod), the [larod](https://www.axis.com/techsup/developer_doc/acap3/3.2/api/larod/html/larod_8h.html) interface needs to be set up. The [setupLarod](app/object_detection.c#L236) method is used to create a conncection to larod and select the hardware to use the model. 
 
 ```c
 int larodModelFd = -1;
@@ -86,7 +86,7 @@ int larodOutput3Fd = -1;
 int larodOutput4Fd = -1;
 
 createAndMapTmpFile(CONV_INP_FILE_PATTERN,  args.width * args.height * CHANNELS, &larodInputAddr, &larodInputFd);
-createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, args.outputBytes, &larodOutput1Addr, &larodOutput1Fd);
+createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, 4 * args.outputBytes, &larodOutput1Addr, &larodOutput1Fd);
 createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, args.outputBytes, &larodOutput2Addr, &larodOutput2Fd);
 createAndMapTmpFile(CONV_OUT3_FILE_PATTERN, args.outputBytes, &larodOutput3Addr, &larodOutput3Fd);
 createAndMapTmpFile(CONV_OUT4_FILE_PATTERN, args.outputBytes, &larodOutput4Addr, &larodOutput4Fd);
@@ -110,7 +110,7 @@ inputTensors = larodCreateModelInputs(model, &numInputs, &error);
 outputTensors = larodCreateModelOutputs(model, &numOutputs, &error);
 ```
 
-The `larodSetTensorFd` method then map each tensor to the corresponding file descriptor to allow IO.
+The `larodSetTensorFd` method then maps each tensor to the corresponding file descriptor to allow IO.
 
 ```c
 larodSetTensorFd(inputTensors[0], larodInputFd, &error);
@@ -120,15 +120,15 @@ larodSetTensorFd(outputTensors[2], larodOutput3Fd, &error);
 larodSetTensorFd(outputTensors[3], larodOutput4Fd, &error);
 ```
 
-Finally, the the `larodCreateInferenceRequest` method create an inference request to use the model.
+Finally, the `larodCreateInferenceRequest` method creates an inference request to use the model.
 
 ```c
 infReq = larodCreateInferenceRequest(model, inputTensors, numInputs, outputTensors,numOutputs, &error);
 ```
 
-#### Feaching a frame and performing inference
+#### Fetching a frame and performing inference
 
-By using the `getLastFrameBlocking` method, a  buffer containing the latest image is retrived from the `ImgProvider` created earlier. Then `vdo_buffer_get_data` method is used to extract NV12 data from the buffer.
+By using the `getLastFrameBlocking` method, a  buffer containing the latest image is retrieved from the `ImgProvider` created earlier. Then `vdo_buffer_get_data` method is used to extract NV12 data from the buffer.
 
 ```c
 VdoBuffer* buf = getLastFrameBlocking(provider);
@@ -144,10 +144,10 @@ convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight, (uint8_t*) larod
 In terms of the frame used to crop the detected objects, there is no need to scale, so `convertU8yuvToRGBlibYuv` method is used.
 
 ```c
-VdoBuffer* buf_raw = getLastFrameBlocking(provider_raw);
-uint8_t* nv12Data_raw = (uint8_t*) vdo_buffer_get_data(buf_raw);
+VdoBuffer* buf_hq = getLastFrameBlocking(provider_raw);
+uint8_t* nv12Data_hq = (uint8_t*) vdo_buffer_get_data(buf_hq);
 
-convertU8yuvToRGBlibYuv(args.raw_width, args.raw_height, nv12Data_raw, (uint8_t*) cropAddr);
+convertU8yuvToRGBlibYuv(args.raw_width, args.raw_height, nv12Data_hq, (uint8_t*) cropAddr);
 ```
 
 By using the `larodRunInference` method, the predictions from the MobileNet are saved into the specified addresses.
@@ -165,7 +165,7 @@ float* scores = (float*) larodOutput3Addr;
 float* numberofdetections = (float*) larodOutput4Addr;
 ```
 
-If the score is higher than a threshold `MIN_SCORE`, the results are outputted by the `syslog` function, and the object is cropped and saved into jpg form by `crop_interleaved`, `set_jpeg_configuration`, `buffer_to_jpeg`, `jpeg_to_file` methods. 
+If the score is higher than a threshold `args.threshold/100.0`, the results are outputted by the `syslog` function, and the object is cropped and saved into jpg form by `crop_interleaved`, `set_jpeg_configuration`, `buffer_to_jpeg`, `jpeg_to_file` methods. 
 
 ```c
 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
@@ -183,7 +183,7 @@ jpeg_to_file(file_name, jpeg_buffer, jpeg_size);
 
 Similar with [tensorflow-to-larod](https://github.com/AxisCommunications/acap3-examples-staging/tree/master/tensorflow-to-larod), a packaging file is needed to compile the ACAP. This is found in [app/package.conf](app/package.conf). For the scope of this tutorial, the `APPOPTS` and `OTHERFILES` keys are noteworthy. `APPOPTS` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes raw_video_resolution_width raw_video_resolution_height threshold>`. The file(s) specified in `OTHERFILES` simply tell the compiler what files to copy to the ACAP, such as our .larod model file.
 
-The ACAP is built to specification by the `Makefile` in [app/Makefile](app/Makefile). It is also this file which specifies the last step in the model conversion process, namely converting the `.tflite` to `.larod` by using the `convert_larod.py`-tool described earlier. With the [Makefile](app/Makefile) and [package.conf](app/package.conf) files set up, the ACAP can be built by running the build script in the example environment:
+The ACAP is built to specification by the `Makefile` in [app/Makefile](app/Makefile). It is also this file which specifies the last step in the model conversion process, namely converting the `.tflite` to `.larod` by using the `larod-convert.py`-tool described earlier. With the [Makefile](app/Makefile) and [package.conf](app/package.conf) files set up, the ACAP can be built by running the build script in the example environment:
 
 ```sh
 ./build_acap.sh object_detection_acap:1.0
@@ -195,7 +195,7 @@ After running this script, the `build` directory should have been populated. Ins
 
 To install an ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI. Then go to your camera -> Settings -> Apps -> Add -> Browse to `object_detection.eap` and press Install.
 
-## Runing the application
+## Running the application
 
 In the Apps view of the camera, press the icon for your ACAP. A window will pop up which allows you to start the application. Press the Start icon to run the algorithm.
 
@@ -203,7 +203,7 @@ With the algorithm started, we can view the output by either pressing "App log" 
 ```sh
 tail -f /var/volatile/log/info.log | grep object_detection
 ```
-There are four outputs from MobileNet SSD v2 (COCO) model. The Number of detections, CLasses, Scores, and Locations are shown as below. The four location numbers stand for [top, left, bottom, right]. 
+There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for [top, left, bottom, right]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers. 
 
 ```sh
 [ INFO    ] object_detection[645]: There are 3 objects
