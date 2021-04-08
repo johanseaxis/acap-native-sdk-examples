@@ -90,14 +90,14 @@ Different devices support different chips and models.
 
 Select one of the chip alternatives, CPU or Google TPU, to build an application for that chip:
 
-## Alternative Chip 2 - CPU with TensorFlow Lite
+## CPU with TensorFlow Lite
 Standing in your working directory run the following command, to copy configuration for CPU with TensorFlow Lite:
 
 ```
 cp app/package.conf.cpu app/package.conf
 ```
 
-## Alternative Chip 4 - Google TPU
+## Google TPU
 Standing in your working directory run the following command, to copy configuration for Google TPU:
 
 ```
