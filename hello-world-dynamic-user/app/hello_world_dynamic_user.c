@@ -17,7 +17,7 @@
 /**
  * - hello_world_dynamic_user -
  *
- * This application writes hello_world to the syslog.
+ * This application writes "Hello World!" to the syslog.
  *
  */
 
