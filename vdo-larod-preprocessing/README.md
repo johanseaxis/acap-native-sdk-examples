@@ -169,7 +169,7 @@ using the friendly name "vdo_larod_proprocessing_cpu" or "vdo_larod_preprocessin
 Application log can be found directly at:
 
 ```
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=vdo_larod
+http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=vdo_larod_preprocessing
 ```
 
 or by clicking on the "**App log**" link in the device GUI or by extracting the logs using following commands
@@ -189,7 +189,7 @@ Depending on selected chip, different output is received. The label file is used
 ## Output Alternative Chip 2 - CPU with TensorFlow Lite
 
 ```
------ Contents of SYSTEM_LOG for 'vdo_larod' -----
+----- Contents of SYSTEM_LOG for 'vdo_larod_preprocessing' -----
 
 vdo_larod_preprocessing[0]: starting vdo_larod_preprocessing
 vdo_larod_preprocessing[20004]: Connecting to larod
@@ -223,7 +223,7 @@ vdo_larod_preprocessing[20004]: Exit /usr/local/packages/vdo_larod_preprocessing
 ## Output Alternative Chip 4 - Google TPU
 
 ```
------ Contents of SYSTEM_LOG for 'vdo_larod' -----
+----- Contents of SYSTEM_LOG for 'vdo_larod_preprocessing' -----
 
 vdo_larod_preprocessing[0]: starting vdo_larod_preprocessing
 vdo_larod_preprocessing[17701]: Connecting to larod
