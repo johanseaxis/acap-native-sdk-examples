@@ -27,7 +27,7 @@ jobs:
         docker cp $(docker create hello_world_dynamic_user:1.0 .):/opt/app ./build
         cd ..
         mkdir -p acap3/examples/hello-world-dynamic-user/build
-        cp hello_world_dynamic_user/build/hello_world_dynamic_user_1_0_0_armv7hf.eap acap3/examples/hello-world-dynamic-user/build/hello_world_dynamic_user_1_0_0_armv7hf.eap
+        cp hello-world-dynamic-user/build/Hello_world_dynamic_user_example_1_0_0_armv7hf.eap acap3/examples/hello-world-dynamic-user/build/Hello_world_dynamic_user_example_1_0_0_armv7hf.eap
         ls acap3/examples/hello-world-dynamic-user/build
     
     - name: Run functional tests

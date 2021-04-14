@@ -22,7 +22,7 @@
     },
     "acapPackageConf": {
         "setup": {
-            "friendlyName": "hello_world_dynamic_user",
+            "friendlyName": "Hello world dynamic user example",
             "appName": "hello_world_dynamic_user",
             "appId": "112",
             "vendor": "Axis Communications",
