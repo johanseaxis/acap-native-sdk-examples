@@ -58,9 +58,9 @@ docker build --tag <APP_IMAGE> .
 
 <APP_IMAGE> is the name to tag the image with, e.g., send-event:1.0
 
-Default architecture is *armv7hf*, to build for another architecture e.g.
-*aarch64* it's possible to change the variable in the Dockerfile or to set
-it in the docker build command via build argument:
+Default architecture is *armv7hf*. To build for *aarch64* it's possible to
+change the variable in the Dockerfile or to set it in the docker build command
+via build argument:
 ```bash
 docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
