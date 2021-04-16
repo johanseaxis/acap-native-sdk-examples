@@ -32,6 +32,7 @@ video-scene-subscriber
 Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device:
 
 #### Build the application
+Standing in your working directory run the following commands:
 
 > [!IMPORTANT]
 > *Depending on the network you are connected to.
@@ -39,20 +40,26 @@ The file that needs those settings is: *~/.docker/config.json.*
 For reference please see: https://docs.docker.com/network/proxy/ and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
-Standing in your working directory run the following commands.
-First build the docker container image and compile the ACAP:
-```
+```bash
 docker build --tag <APP_IMAGE> .
 ```
 
-<APP_IMAGE> is the name to tag the image with, e.g., `vss_example`.
+<APP_IMAGE> is the name to tag the image with, e.g., vss_example:1.0
 
-Then copy the result from the container image to a local directory build:
-```
-docker cp $(docker create  <APP_IMAGE>):/opt/app/ build
+Default architecture is **armv7hf**. To build for **aarch64** it's possible to
+update the *ARCH* variable in the Dockerfile or to set it in the docker build
+command via build argument:
+```bash
+docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
 
-The working directory now contains a build folder with the following files:
+Copy the result from the container image to a local directory build:
+
+```bash
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+```
+
+The working dir now contains a build folder with the following files:
 
 ```bash
 video-scene-subscriber

@@ -50,6 +50,13 @@ docker build --tag <APP_IMAGE> .
 
 <APP_IMAGE> is the name to tag the image with, e.g., boundingboxexample:1.0
 
+Default architecture is **aarch64**. To build for **armv7hf** it's possible to
+update the *ARCH* variable in the Dockerfile or to set it in the docker build
+command via build argument:
+```bash
+docker build --build-arg ARCH=armv7hf --tag <APP_IMAGE> .
+```
+
 Copy the result from the container image to a local directory build:
 
 ```bash
