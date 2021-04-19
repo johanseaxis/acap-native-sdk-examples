@@ -1,6 +1,3 @@
-# Specify the architecture at build time: armv7hf
-# Should be used for getting API and toolchain image
-# Currently, only armv7hf is supported
 ARG ARCH=armv7hf
 ARG VERSION=3.2
 ARG UBUNTU_VERSION=20.04

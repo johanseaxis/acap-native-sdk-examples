@@ -22,6 +22,9 @@ jobs:
     # Build VDO larod application to run on CPU
     - name: Build VDO larod application to run on CPU
       run: |  
+        export DOCKER_CONFIG="$WORKSPACE/.docker"
+        mkdir -p "$DOCKER_CONFIG"
+        echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
         cd vdo-larod
         cp app/package.conf.cpu app/package.conf
         docker build --tag vdo_larod_cpu:1.0 .
@@ -35,6 +38,9 @@ jobs:
     # Build VDO larod application to run on TPU
     - name: Build VDO larod application to run on TPU
       run: |     
+        export DOCKER_CONFIG="$WORKSPACE/.docker"
+        mkdir -p "$DOCKER_CONFIG"
+        echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
         cd vdo-larod
         rm -rf build/
         cp app/package.conf.edgetpu app/package.conf

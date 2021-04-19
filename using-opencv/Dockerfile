@@ -1,6 +1,3 @@
-# Specify the architecture at build time: armv7hf
-# Should be used for getting API and toolchain images
-# Currently, only armv7hf is supported
 ARG http_proxy
 ARG https_proxy
 ARG ARCH=armv7hf

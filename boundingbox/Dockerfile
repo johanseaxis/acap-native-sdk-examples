@@ -1,6 +1,3 @@
-# Specify the architecture at build time: aarch64
-# Should be used for getting API and toolchain images
-# Currently, only aarch64 is supported
 ARG ARCH=aarch64
 ARG VERSION=3.2
 ARG UBUNTU_VERSION=20.04

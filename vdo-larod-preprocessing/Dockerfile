@@ -3,9 +3,6 @@ ARG DOCKER_PROXY
 ARG http_proxy=$DOCKER_PROXY
 ARG https_proxy=$DOCKER_PROXY
 
-# Specify the architecture at build time: armv7hf
-# Should be used for getting API and toolchain image
-# Currently, only armv7hf is supported
 ARG ARCH=armv7hf
 ARG VERSION=rel-fw-10.5-maint
 ARG UBUNTU_VERSION=20.04
