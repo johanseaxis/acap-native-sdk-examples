@@ -47,8 +47,8 @@ jobs:
          python --version
          
          chmod +x test_starter.sh
-         ./test_starter.sh subscribe_to_object_detection
-         ls recap/output
+     #./test_starter.sh subscribe_to_object_detection
+    
    
     # Save functional test report as artifact
     - uses: actions/upload-artifact@master
