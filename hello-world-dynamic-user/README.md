@@ -1,9 +1,11 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A hello-world ACAP3 application using manifest
-This README file explains how to build a simple Hello World ACAP3 application. It is achieved by using the containerized Axis API and toolchain images.
+This README file explains how to build a simple Hello World manifest ACAP3 application. It is achieved by using the containerized Axis API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "hello-world-dynamic-user" application source code which can easily be compiled and run with the help of the tools and step by step below.
+
+This example shows how to build an ACAP3 using a manifest, and how to create a dynamically generated user using manifests. Dynamically generated users is a functionality that's only available by using manifests.
 
 ## Getting started
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
@@ -13,7 +15,8 @@ hello-world-dynamic-user
 ├── app
 │   ├── hello_world_dynamic_user.c
 │   ├── LICENSE
-│   └── Makefile
+│   ├── Makefile
+│   └── manifest.json
 ├── Dockerfile
 └── README.md
 ```
@@ -55,7 +58,8 @@ hello-world-dynamic-user
 ├── app
 │   ├── hello_world_dynamic_user.c
 │   ├── LICENSE
-│   └── Makefile
+│   ├── Makefile
+│   └── manifest.json
 ├── build
 │   ├── hello_world_dynamic_user*
 │   ├── Hello_world_dynamic_user_example_1_0_0_armv7hf.eap
@@ -63,6 +67,7 @@ hello-world-dynamic-user
 │   ├── hello_world_dynamic_user.c
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   └── param.conf
