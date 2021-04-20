@@ -1,0 +1,50 @@
+name: Build hello-world-dynamic-user Applications
+on:
+  push:
+     paths:
+      - 'hello-world-dynamic-user/**'
+      - '.github/workflows/hello-world-dynamic-user.yml'
+jobs:
+  build:
+
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+      #- uses: actions/checkout@master
+      # this will enable shellCheck to be performed
+      # on every push to the repo.
+    #- name: Run ShellCheck
+      #uses: ludeeus/action-shellcheck@master
+      # If shellCheck complains about unnecessery things, ignore it.
+      #env:
+        #SHELLCHECK_OPTS: -e SC2153 -e SC2148
+    
+    #Build hello-world-dynamic-user application
+    - name: Build hello-world-dynamic-user application
+      run: |
+        cd hello-world-dynamic-user
+        docker build --tag hello_world_dynamic_user:1.0 .
+        docker cp $(docker create hello_world_dynamic_user:1.0 .):/opt/app ./build
+        cd ..
+        mkdir -p acap3/examples/hello-world-dynamic-user/build
+        cp hello-world-dynamic-user/build/Hello_world_dynamic_user_example_1_0_0_armv7hf.eap acap3/examples/hello-world-dynamic-user/build/Hello_world_dynamic_user_example_1_0_0_armv7hf.eap
+        ls acap3/examples/hello-world-dynamic-user/build
+    
+    - name: Run functional tests
+      run: |
+         export WORKSPACE=$(pwd)
+         echo $WORKSPACE
+         git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
+         cd recap   
+         export ATF_PYTHON=python3     
+         ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
+         python --version 
+         chmod +x test_starter.sh
+         ./test_starter.sh hello_world_dynamic_user
+         ls recap/output
+         
+    # Save functional test report as artifact
+    - uses: actions/upload-artifact@master
+      with:
+        name: Test report 
+        path: recap/recap/output/report.xml 
