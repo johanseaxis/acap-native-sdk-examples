@@ -1,38 +1,12 @@
 {
-    "schemaVersion": "1.2",
-    "resources": {
-        "dbus": {
-            "requiredMethods": [
-                "com.axis.Service1.Interface.Method1",
-                "com.axis.Service1.Interface.Method2"
-            ],
-            "conditionalMethods": [
-                "com.axis.Service2.Interface.Method1",
-                "com.axis.Service2.Interface.Method2"
-            ]
-        },
-        "linux": {
-            "user": {
-                "groups": [
-                    "video",
-                    "tty"
-                ]
-            }
-        }
-    },
+    "schemaVersion": "1.1",
     "acapPackageConf": {
         "setup": {
-            "friendlyName": "Hello world dynamic user example",
             "appName": "hello_world_dynamic_user",
-            "appId": "112",
-            "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
-            "vendorUrl": "https://www.axis.com",
             "runMode": "never",
+            "vendor": "Axis Communications",
             "version": "1.0.0"
-        },
-        "copyProtection": {
-            "method": "none"
         }
     }
 }
