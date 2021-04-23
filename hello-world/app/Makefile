@@ -1,4 +1,4 @@
-PROG1	= hello_world_manifest
+PROG1	= hello_world
 OBJS1	= $(PROG1).c
 
 PROGS	= $(PROG1)
