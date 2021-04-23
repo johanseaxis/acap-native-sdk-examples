@@ -15,7 +15,7 @@
  */
 
 /**
- * - hello_world_dynamic_user -
+ * - hello_world_manifest -
  *
  * This application writes "Hello World!" to the syslog.
  *
@@ -28,15 +28,15 @@
 /**
  * brief Main function.
  *
- * This main function writes "hello_world_dynamic_user" to the syslog.
+ * This main function writes "hello_world_manifest" to the syslog.
  *
  * param argc Number of arguments.
  * param argv Arguments vector.
  */
 int main(int argc, char **argv)
 {
-  /* Open the syslog to report messages for "hello_world_dynamic_user" */
-  openlog("hello_world_dynamic_user", LOG_PID | LOG_CONS, LOG_USER);
+  /* Open the syslog to report messages for "hello_world_manifest" */
+  openlog("hello_world_manifest", LOG_PID | LOG_CONS, LOG_USER);
 
   /* Choose between { LOG_INFO, LOG_CRIT, LOG_WARN, LOG_ERR }*/
   syslog(LOG_INFO, "Hello World!");

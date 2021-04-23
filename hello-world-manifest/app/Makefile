@@ -1,4 +1,4 @@
-PROG1	= hello_world_dynamic_user
+PROG1	= hello_world_manifest
 OBJS1	= $(PROG1).c
 
 PROGS	= $(PROG1)

@@ -1,0 +1,15 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "hello_world_manifest",
+            "runMode": "never",
+            "vendor": "Axis Communications",
+            "version": "1.0.0",
+            "user": {
+                "username": "sdk",
+                "group": "sdk"
+            }
+        }
+    }
+}
