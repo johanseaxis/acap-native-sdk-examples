@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2020, Axis Communications AB, Lund, Sweden
+ * Copyright (C) 2021, Axis Communications AB, Lund, Sweden
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,8 @@
 static std::atomic<bool> should_run{true};
 
 // Structure to hold application user data
-struct app_data_t {
+struct app_data_t
+{
     // Queue with scene data
     std::queue<Scene> scene_queue;
     // Mutex to guard the scene queue
@@ -95,7 +96,7 @@ void on_message_arrived(char *scene_data, void *user_data)
     free(scene_data);
 
     // Cast the user data to access queue
-    app_data_t *app_data = (app_data_t*)user_data;
+    app_data_t *app_data = (app_data_t *)user_data;
 
     // Put the scene data with objects or events in queue for further processing
     if (scene.objects_size() > 0 || scene.events_size() > 0)
@@ -121,7 +122,8 @@ static void process_scene(const Scene scene, app_data_t *app_data)
            scene.objects_size(), scene.events_size());
 
     // Iterate over all objects in scene data
-    for (int i = 0; i < scene.objects_size(); i++) {
+    for (int i = 0; i < scene.objects_size(); i++)
+    {
         const Object &object = scene.objects(i);
 
         // Check if object is new or already in active set
@@ -138,7 +140,8 @@ static void process_scene(const Scene scene, app_data_t *app_data)
             float vy = object.velocity().vy();
             float object_speed = std::sqrt(vx * vx + vy * vy);
             // Check speed limit and increase statistic if speeding object
-            if (object_speed > app_data->speed_limit) {
+            if (object_speed > app_data->speed_limit)
+            {
                 if (app_data->objects_speeding_set.find(object.id()) == app_data->objects_speeding_set.end())
                 {
                     app_data->objects_speeding_set.insert(object.id());
@@ -148,13 +151,15 @@ static void process_scene(const Scene scene, app_data_t *app_data)
         }
 
         // Check if "large" object if bounding box is enabled and present in scene data
-        if (object.has_bounding_box()) {
-            const BoundingBox& bbox = object.bounding_box();
+        if (object.has_bounding_box())
+        {
+            const BoundingBox &bbox = object.bounding_box();
             float width = bbox.right() - bbox.left();
             float height = bbox.top() - bbox.bottom();
             float area = width * height;
             // Check area limit and increase statistic if large object
-            if (area > app_data->speed_limit) {
+            if (area > app_data->speed_limit)
+            {
                 if (app_data->objects_large_set.find(object.id()) == app_data->objects_large_set.end())
                 {
                     app_data->objects_large_set.insert(object.id());

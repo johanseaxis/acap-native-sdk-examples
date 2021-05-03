@@ -1,5 +1,5 @@
 """
- * Copyright (C) 2020 Axis Communications AB, Lund, Sweden
+ * Copyright (C) 2021 Axis Communications AB, Lund, Sweden
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,13 @@ precision, which allows usage on INT8 compatible devices.
 
 # Some code adapted from https://www.tensorflow.org/lite/performance/post_training_quantization
 
+
 import argparse
 import glob
 import numpy as np
 import os
 import tensorflow as tf
-
 from PIL import Image
-
 parser = argparse.ArgumentParser(description='Converts a SavedModel to \
                                               .tflite with INT8 quantization.')
 parser.add_argument('-i', '--input', type=str, required=True,

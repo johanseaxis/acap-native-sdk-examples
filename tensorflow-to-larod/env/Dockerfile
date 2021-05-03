@@ -34,4 +34,4 @@ RUN mkdir -p lib include && \
   ln -s libyuv.so.1 libyuv.so.1.0
 
 # Building the ACAP application
-RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh
+RUN . /opt/axis/acapsdk/environment-setup* && acap-build . -a 'model/converted_model.larod'

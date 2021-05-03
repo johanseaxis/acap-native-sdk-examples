@@ -1,7 +1,7 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A video scene subscriber based ACAP3 application on an edge device
-This README file explains how to build an ACAP3 that uses the video scene subscriber API. It is achieved by using the containerized Axis API and toolchain images.
+This README file explains how to build an ACAP3 that uses the video scene subscriber API. It is achieved by using the containerized API and toolchain images.
 
 Together with this README file you should be able to find a directory called app, that directory contains the "video_scene_subscriber_client" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -15,13 +15,15 @@ video-scene-subscriber
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── video_scene_subscriber_client.cpp
+│   ├── manifest.json
+│   └── video_scene_sub_client.cpp
 ├── Dockerfile
 └── README.md
 ```
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
-* **app/video_scene_subscriber_client.cpp** - Application to subscribe to metadata from the video scene provider service.
+* **app/manifest.json** - Defines the application and its configuration.
+* **app/video_scene_sub_client.cpp** - Application to subscribe to metadata from the video scene provider service.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
 
@@ -66,23 +68,25 @@ video-scene-subscriber
 ├── build
 │   ├── generated
 │   ├── lib
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
-│   ├── video_scene_subscriber_client*
+│   ├── video_scene_sub_client*
+|   ├── video_scene_sub_client.cpp
 │   ├── video_scene_subscriber_client_1_0_0_armv7hf.eap
 │   ├── video_scene_subscriber_client_1_0_0_LICENSE.txt
-|   ├── video_scene_subscriber_client.cpp
 ```
 * **generated** - Folder containing the [protobuf](https://developers.google.com/protocol-buffers/docs/cpptutorial) generated C++ code.
 * **lib** - Folder containing the libraries to be bundled in this ACAP .eap file. These are copied from the API container image.
+* **manifest.json** - Defines the application and its configuration.
 * **package.conf** - Defines the application and its configuration.
 * **package.conf.orig** - Defines the application and its configuration, original file.
 * **param.conf** - File containing application parameters.
-* **video_scene_subscriber_client** - Application executable binary file.
+* **video_scene_sub_client** - Application executable binary file.
+* **video_scene_sub_client.cpp** - Application to subscribe to metadata from the video scene provider service.
 * **video_scene_subscriber_client_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 * **video_scene_subscriber_client_1_0_0_armv7hf.eap** - Application package .eap file.
-* **video_scene_subscriber_client.cpp** - Application to subscribe to metadata from the video scene provider service.
 
 #### Install your application
 Installing your application on an Axis video device is as simple as:
@@ -99,7 +103,7 @@ the newly built **video_scene_subscriber_client_1_0_0_armv7hf.eap** > Click **In
 #### The expected output
 The statistics computed from the video scene subscriber metadata is printed to the application log which is found directly at:
 ```
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=video_scene_subscriber_client
+http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=video_scene_sub_client
 ```
 
 or by clicking on the "**App log**" link in the device GUI.

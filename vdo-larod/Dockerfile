@@ -31,5 +31,15 @@ RUN mkdir -p lib include && \
   ln -s libyuv.so.1 libyuv.so && \
   ln -s libyuv.so.1 libyuv.so.1.0
 
+ARG CHIP=CPU
 # Building the ACAP application
-RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh
+RUN if [ "$CHIP" = CPU ]; then \
+  . /opt/axis/acapsdk/environment-setup* && acap-build . \
+  -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant.larod'; \
+  elif [ "$CHIP" = EDGETPU ]; then \
+  . /opt/axis/acapsdk/environment-setup* && acap-build . \
+  -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.larod'; \
+  else \
+  echo 'Error:' $CHIP 'is not a valid value for the CHIP variable'; \
+  exit 1; \
+  fi

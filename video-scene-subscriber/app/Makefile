@@ -1,4 +1,4 @@
-PROG1	= video_scene_subscriber_client
+PROG1	= video_scene_sub_client
 OBJS1	= $(PROG1).cpp generated/scene.pb.cc
 PROGS	= $(PROG1)
 
