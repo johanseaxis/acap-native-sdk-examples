@@ -33,4 +33,4 @@ RUN mkdir -p /opt/app/lib &&\
 
 # Building the ACAP application
 WORKDIR /opt/app
-RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh
+RUN . /opt/axis/acapsdk/environment-setup* && acap-build .

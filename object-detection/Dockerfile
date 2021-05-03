@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y cmake
 RUN git clone --branch 2.0.6 https://github.com/libjpeg-turbo/libjpeg-turbo.git
 WORKDIR /opt/build/libjpeg-turbo/build
 RUN CFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
-    CC=arm-linux-gnueabihf-gcc cmake -G"Unix Makefiles" ..
+  CC=arm-linux-gnueabihf-gcc cmake -G"Unix Makefiles" ..
 RUN make
 WORKDIR /opt/app
 RUN mkdir -p lib include
@@ -54,4 +54,4 @@ RUN mkdir -p lib include && \
 ADD https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite converted_model_edgetpu.tflite
 
 # Building the ACAP application
-RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh
+RUN . /opt/axis/acapsdk/environment-setup* && acap-build .  -a 'label/labels.txt' -a 'model/converted_model.larod'

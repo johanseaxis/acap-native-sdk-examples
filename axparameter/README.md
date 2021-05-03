@@ -1,7 +1,7 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A parameter handler based ACAP3 application on an edge device
-This README file explains how to build an ACAP3 application that uses the axparameter API. It is achieved by using the containerized Axis API and toolchain images.
+This README file explains how to build an ACAP3 application that uses the axparameter API. It is achieved by using the containerized API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the application source code which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -19,7 +19,7 @@ axparameter
 │   ├── axparameter.c
 │   ├── LICENSE
 │   ├── Makefile
-|   └── param.conf
+│   └── manifest.json
 ├── Dockerfile
 └── README.md
 ```
@@ -27,7 +27,7 @@ axparameter
 * **app/axparameter.c** - Application to defines parameters in C.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
-* **app/param.conf** - File containing additional application parameters.
+* **app/manifest.json** - Defines the application and its configuration. This includes additional parameters.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
 
@@ -73,7 +73,7 @@ axparameter
 │   ├── axparameter.c
 │   ├── LICENSE
 │   ├── Makefile
-|   └── param.conf
+│   └── manifest.json
 ├── build
 │   ├── axparameter*
 │   ├── axparameter_1_0_0_armv7hf.eap
@@ -81,6 +81,7 @@ axparameter
 │   ├── axparameter.c
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   └── param.conf
@@ -91,8 +92,10 @@ axparameter
 * **build/axparameter*** - Application executable binary file.
 * **build/axparameter_1_0_0_armv7hf.eap** - Application package .eap file.
 * **build/axparameter_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+* **build/manifest.json** - Defines the application and its configuration. This includes additional parameters.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
+* **build/param.conf** - File containing additional application parameters.
 
 #### Install your application
 Installing your application on an Axis video device is as simple as:
@@ -115,7 +118,7 @@ http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=axparameter
 
 or by clicking on the "**App log**" link in the device GUI.
 
-The log contains a list of available parameters, both visible and hidden, which have been defined in **app/axparameter.c** and **app/param.conf**.
+The log contains a list of available parameters, both visible and hidden, which have been defined in **app/axparameter.c** and **app/manifest.json**.
 
 ```
 ----- Contents of SYSTEM_LOG for 'axparameter' -----

@@ -1,0 +1,32 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "axparameter",
+            "appName": "axparameter",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        },
+        "configuration": {
+            "paramConfig": [
+                {
+                    "name": "StaticParam1",
+                    "default": "oldvalue",
+                    "type": "string"
+                },
+                {
+                    "name": "HiddenParam1",
+                    "default": "secret",
+                    "type": "hidden:string"
+                }
+            ]
+        }
+    }
+}

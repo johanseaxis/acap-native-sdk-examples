@@ -1,7 +1,7 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A video object detection subscriber based ACAP3 application on an edge device
-This README file explains how to build an ACAP3 that uses the video object detection subscriber API. It is achieved by using the containerized Axis API and toolchain images.
+This README file explains how to build an ACAP3 that uses the video object detection subscriber API. It is achieved by using the containerized API and toolchain images.
 
 Together with this README file you should be able to find a directory called app. That directory contains the "subscribe_to_object_detection" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -18,13 +18,15 @@ subscribe-to-object-detection
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
-│   └── subscribe_to_object_detection.c
+│   ├── manifest.json
+│   └── sub_to_object_detection.c
 ├── Dockerfile
 └── README.md
 ```
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
-* **app/subscribe_to_object_detection.c** - Application to subscribe to metadata from the video-object-detection service.
+* **app/manifest.json** - Defines the application and its configuration.
+* **app/sub_to_object_detection.c** - Application to subscribe to metadata from the video-object-detection service.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
 
@@ -65,22 +67,24 @@ subscribe-to-object-detection
 │   ├── lib
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
-│   ├── subscribe_to_object_detection*
+│   ├── sub_to_object_detection*
+│   ├── sub_to_object_detection.c
 │   ├── subscribe_to_object_detection_1_0_0_armv7hf.eap
 │   ├── subscribe_to_object_detection_1_0_0_LICENSE.txt
-│   ├── subscribe_to_object_detection.c
 │   └── video-object-detection.proto
 ```
 * **generated** - Folder containing the [protobuf-c](https://github.com/protobuf-c/protobuf-c) generated C code.
 * **include** - Folder containing include files for libprotobuf-c.
 * **lib** - Folder containing compiled library files for libprotobuf-c.
+* **manifest.json** - Defines the application and its configuration.
 * **package.conf** - Defines the application and its configuration.
 * **package.conf.orig** - Defines the application and its configuration, original file.
 * **param.conf** - File containing application parameters.
-* **subscribe_to_object_detection** - Application executable binary file.
+* **sub_to_object_detection** - Application executable binary file.
 * **subscribe_to_object_detection_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 * **subscribe_to_object_detection_1_0_0_armv7hf.eap** - Application package .eap file.
 * **video-object-detection.proto** - The [protocol buffer](https://developers.google.com/protocol-buffers/docs/proto3) file describing the data format.
@@ -100,7 +104,7 @@ the newly built **subscribe_to_object_detection_1_0_0_armv7hf.eap** > Click **In
 #### The expected output
 The video object detection (VOD) metadata is printed to the application log which is found directly at:
 ```
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=subscribe_to_object_detection
+http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=sub_to_object_detection
 ```
 
 or by clicking on the "**App log**" link in the device GUI or by extracting the logs using following commands
@@ -110,33 +114,33 @@ in the terminal.
 
 ```bash
 ssh root@<axis_device_ip>
-tail -f /var/info.log | grep subscribe_to_object_detection
+tail -f /var/info.log | grep sub_to_object_detection
 ```
 ```bash
------ Contents of SYSTEM_LOG for 'subscribe_to_object_detection' -----
+----- Contents of SYSTEM_LOG for 'sub_to_object_detection' -----
 
-[ INFO ] subscribe_to_object_detection[1234]: The following object classes are available:
-[ INFO ] subscribe_to_object_detection[1234]: class[0] = Vehicle, nbr_calibrations: 3
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 1.00  -->  precision: 83.00, recall: 60.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 2.00  -->  precision: 85.00, recall: 59.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 16.00 -->  precision: 93.00, recall: 52.00
-[ INFO ] subscribe_to_object_detection[1234]: class[1] = Human, nbr_calibrations: 3
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 2.00  -->  precision: 70.00, recall: 60.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 3.00  -->  precision: 71.00, recall: 60.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 23.00 -->  precision: 88.00, recall: 47.00
-[ INFO ] subscribe_to_object_detection[1234]: class [2] = Bike, nbr_calibrations: 3
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 2.00  -->  precision: 84.00, recall: 57.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 2.00  -->  precision: 84.00, recall: 57.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 22.00 -->  precision: 95.00, recall: 49.00
-[ INFO ] subscribe_to_object_detection[1234]: Threshold value set for each object class:
-[ INFO ] subscribe_to_object_detection[1234]: class[0] = Vehicle, threshold=16
-[ INFO ] subscribe_to_object_detection[1234]: class[1] = Human, threshold=23
-[ INFO ] subscribe_to_object_detection[1234]: class[2] = Bike, threshold=22
-[ INFO ] subscribe_to_object_detection[1234]: [#0] id = 0. class[0] = Vehicle. score = 45 >= 16. bbox[l,r,t,b]=[-0.236458, 0.227083, -0.179630, -0.529630].
-[ INFO ] subscribe_to_object_detection[1234]: [timestamp 19567993362000]: 1/4 OK detections!
-[ INFO ] subscribe_to_object_detection[1234]: [#0] id = 0. class[0] = Vehicle. score = 43 >= 16. bbox[l,r,t,b]=[-0.236458, 0.227083, -0.179630, -0.529630].
-[ INFO ] subscribe_to_object_detection[1234]: [#1] id = 1. class[2] = Bike. score = 22 >= 22. bbox[l,r,t,b]=[-0.833333, -0.775000, -0.481481, -0.585185].
-[ INFO ] subscribe_to_object_detection[1234]: [timestamp 19568360035000]: 2/4 OK detections!
+[ INFO ] sub_to_object_detection[1234]: The following object classes are available:
+[ INFO ] sub_to_object_detection[1234]: class[0] = Vehicle, nbr_calibrations: 3
+[ INFO ] sub_to_object_detection[1234]:   threshold: 1.00  -->  precision: 83.00, recall: 60.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 2.00  -->  precision: 85.00, recall: 59.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 16.00 -->  precision: 93.00, recall: 52.00
+[ INFO ] sub_to_object_detection[1234]: class[1] = Human, nbr_calibrations: 3
+[ INFO ] sub_to_object_detection[1234]:   threshold: 2.00  -->  precision: 70.00, recall: 60.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 3.00  -->  precision: 71.00, recall: 60.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 23.00 -->  precision: 88.00, recall: 47.00
+[ INFO ] sub_to_object_detection[1234]: class [2] = Bike, nbr_calibrations: 3
+[ INFO ] sub_to_object_detection[1234]:   threshold: 2.00  -->  precision: 84.00, recall: 57.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 2.00  -->  precision: 84.00, recall: 57.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 22.00 -->  precision: 95.00, recall: 49.00
+[ INFO ] sub_to_object_detection[1234]: Threshold value set for each object class:
+[ INFO ] sub_to_object_detection[1234]: class[0] = Vehicle, threshold=16
+[ INFO ] sub_to_object_detection[1234]: class[1] = Human, threshold=23
+[ INFO ] sub_to_object_detection[1234]: class[2] = Bike, threshold=22
+[ INFO ] sub_to_object_detection[1234]: [#0] id = 0. class[0] = Vehicle. score = 45 >= 16. bbox[l,r,t,b]=[-0.236458, 0.227083, -0.179630, -0.529630].
+[ INFO ] sub_to_object_detection[1234]: [timestamp 19567993362000]: 1/4 OK detections!
+[ INFO ] sub_to_object_detection[1234]: [#0] id = 0. class[0] = Vehicle. score = 43 >= 16. bbox[l,r,t,b]=[-0.236458, 0.227083, -0.179630, -0.529630].
+[ INFO ] sub_to_object_detection[1234]: [#1] id = 1. class[2] = Bike. score = 22 >= 22. bbox[l,r,t,b]=[-0.833333, -0.775000, -0.481481, -0.585185].
+[ INFO ] sub_to_object_detection[1234]: [timestamp 19568360035000]: 2/4 OK detections!
 ...
 ```
 
@@ -145,9 +149,9 @@ When the application starts, for each object available to detect on your device,
 The video object detection subscriber API looks for objects a number of times per second and in each run a number of objects may have been detected. If any of the detected objects have a score above or equal to the object threshold they are printed to syslog, followed by a resume with a timestamp and how many objects of the total detected that were above or equal to threshold. A closer look at a detection print:
 
 ```bash
-[ INFO ] subscribe_to_object_detection[1234]: [#0] id = 0. class[0] = Vehicle. score = 43 >= 16. bbox[l,r,t,b]=[-0.236458, 0.227083, -0.179630, -0.529630].
-[ INFO ] subscribe_to_object_detection[1234]: [#1] id = 1. class[2] = Bike. score = 22 >= 22. bbox[l,r,t,b]=[-0.833333, -0.775000, -0.481481, -0.585185].
-[ INFO ] subscribe_to_object_detection[1234]: [timestamp 19568360035000]: 2/4 OK detections!
+[ INFO ] sub_to_object_detection[1234]: [#0] id = 0. class[0] = Vehicle. score = 43 >= 16. bbox[l,r,t,b]=[-0.236458, 0.227083, -0.179630, -0.529630].
+[ INFO ] sub_to_object_detection[1234]: [#1] id = 1. class[2] = Bike. score = 22 >= 22. bbox[l,r,t,b]=[-0.833333, -0.775000, -0.481481, -0.585185].
+[ INFO ] sub_to_object_detection[1234]: [timestamp 19568360035000]: 2/4 OK detections!
 ...
 ```
 
@@ -173,19 +177,19 @@ The chosen threshold for each object in the example is based on the highest valu
 A calibration API is available on devices with VOD since firmware 9.80. The example prints all calibrations made for each object class and what a certain threshold for an object means in terms of trade-off between precision and recall.
 
 ```bash
-[ INFO ] subscribe_to_object_detection[1234]: The following object classes are available:
-[ INFO ] subscribe_to_object_detection[1234]: class[0] = Vehicle, nbr_calibrations: 3
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 1.00  -->  precision: 83.00, recall: 60.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 2.00  -->  precision: 85.00, recall: 59.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 16.00 -->  precision: 93.00, recall: 52.00
-[ INFO ] subscribe_to_object_detection[1234]: class[1] = Human, nbr_calibrations: 3
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 2.00  -->  precision: 70.00, recall: 60.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 3.00  -->  precision: 71.00, recall: 60.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 23.00 -->  precision: 88.00, recall: 47.00
-[ INFO ] subscribe_to_object_detection[1234]: class[2] = Bike, nbr_calibrations: 3
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 2.00  -->  precision: 84.00, recall: 57.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 2.00  -->  precision: 84.00, recall: 57.00
-[ INFO ] subscribe_to_object_detection[1234]:   threshold: 22.00 -->  precision: 95.00, recall: 49.00
+[ INFO ] sub_to_object_detection[1234]: The following object classes are available:
+[ INFO ] sub_to_object_detection[1234]: class[0] = Vehicle, nbr_calibrations: 3
+[ INFO ] sub_to_object_detection[1234]:   threshold: 1.00  -->  precision: 83.00, recall: 60.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 2.00  -->  precision: 85.00, recall: 59.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 16.00 -->  precision: 93.00, recall: 52.00
+[ INFO ] sub_to_object_detection[1234]: class[1] = Human, nbr_calibrations: 3
+[ INFO ] sub_to_object_detection[1234]:   threshold: 2.00  -->  precision: 70.00, recall: 60.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 3.00  -->  precision: 71.00, recall: 60.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 23.00 -->  precision: 88.00, recall: 47.00
+[ INFO ] sub_to_object_detection[1234]: class[2] = Bike, nbr_calibrations: 3
+[ INFO ] sub_to_object_detection[1234]:   threshold: 2.00  -->  precision: 84.00, recall: 57.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 2.00  -->  precision: 84.00, recall: 57.00
+[ INFO ] sub_to_object_detection[1234]:   threshold: 22.00 -->  precision: 95.00, recall: 49.00
 ...
 ```
 

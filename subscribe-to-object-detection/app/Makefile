@@ -1,4 +1,4 @@
-PROG1	= subscribe_to_object_detection
+PROG1	= sub_to_object_detection
 OBJS1	= $(PROG1).c generated/video-object-detection.pb-c.c
 PROGS	= $(PROG1)
 
