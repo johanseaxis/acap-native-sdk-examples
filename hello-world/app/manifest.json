@@ -3,13 +3,14 @@
     "acapPackageConf": {
         "setup": {
             "appName": "hello_world",
-            "runMode": "never",
             "vendor": "Axis Communications",
-            "version": "1.0.0",
+            "embeddedSdkVersion": "3.0",
             "user": {
                 "username": "sdk",
                 "group": "sdk"
-            }
+            },
+            "runMode": "never",
+            "version": "1.0.0"
         }
     }
 }
