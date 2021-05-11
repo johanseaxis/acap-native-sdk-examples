@@ -40,7 +40,7 @@ jobs:
          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
          python --version 
          chmod +x test_starter.sh
-         ./test_starter.sh hello_world
+         ./test_starter.sh hello_world_dynamic_user
          ls recap/output
          
     # Save functional test report as artifact
