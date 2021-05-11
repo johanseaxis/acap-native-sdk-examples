@@ -1,9 +1,9 @@
-name: Build hello-world-dynamic-user Applications
+name: Build hello-world Applications
 on:
   push:
      paths:
-      - 'hello-world-dynamic-user/**'
-      - '.github/workflows/hello-world-dynamic-user.yml'
+      - 'hello-world/**'
+      - '.github/workflows/hello-world.yml'
 jobs:
   build:
 
@@ -15,20 +15,20 @@ jobs:
       # on every push to the repo.
     #- name: Run ShellCheck
       #uses: ludeeus/action-shellcheck@master
-      # If shellCheck complains about unnecessery things, ignore it.
+      # If shellCheck complains about unnecessary things, ignore it.
       #env:
         #SHELLCHECK_OPTS: -e SC2153 -e SC2148
     
-    #Build hello-world-dynamic-user application
-    - name: Build hello-world-dynamic-user application
+    #Build hello-world application
+    - name: Build hello-world application
       run: |
-        cd hello-world-dynamic-user
-        docker build --tag hello_world_dynamic_user:1.0 .
-        docker cp $(docker create hello_world_dynamic_user:1.0 .):/opt/app ./build
+        cd hello-world
+        docker build --tag hello_world:1.0 .
+        docker cp $(docker create hello_world:1.0 .):/opt/app ./build
         cd ..
-        mkdir -p acap3/examples/hello-world-dynamic-user/build
-        cp hello-world-dynamic-user/build/Hello_world_dynamic_user_example_1_0_0_armv7hf.eap acap3/examples/hello-world-dynamic-user/build/Hello_world_dynamic_user_example_1_0_0_armv7hf.eap
-        ls acap3/examples/hello-world-dynamic-user/build
+        mkdir -p acap3/examples/hello-world/build
+        cp hello-world/build/hello_world_1_0_0_armv7hf.eap acap3/examples/hello-world/build/hello_world_1_0_0_armv7hf.eap
+        ls acap3/examples/hello-world/build
     
     - name: Run functional tests
       run: |
@@ -40,7 +40,7 @@ jobs:
          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
          python --version 
          chmod +x test_starter.sh
-         ./test_starter.sh hello_world_dynamic_user
+         ./test_starter.sh hello_world
          ls recap/output
          
     # Save functional test report as artifact
