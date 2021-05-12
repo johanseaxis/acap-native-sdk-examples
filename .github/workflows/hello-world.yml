@@ -41,8 +41,7 @@ jobs:
          python --version 
          chmod +x test_starter.sh
          ./test_starter.sh hello_world
-         ls recap/output
-         
+         ls recap/output      
     # Save functional test report as artifact
     - uses: actions/upload-artifact@master
       with:
