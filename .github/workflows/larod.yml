@@ -33,7 +33,6 @@ jobs:
         mkdir -p acap3/examples/larod/build
         cp larod/build/larod-simple-app_1_0_0_armv7hf.eap acap3/examples/larod/build/larod-simple-app_1_0_0_armv7hf.eap
         
-        
     #Run functional tests  
     - name: Run functional tests
       run: |
