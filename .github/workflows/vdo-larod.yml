@@ -34,7 +34,7 @@ jobs:
         mkdir -p acap3/examples/vdo-larod/build_cpu/
         ls
         cp vdo-larod/build/vdo_larod_cpu_1_0_0_armv7hf.eap acap3/examples/vdo-larod/build_cpu/vdo_larod_cpu_1_0_0_armv7hf.eap
-        ls acap3/examples/vdo-larod
+        ls acap3/examples/vdo-larod/build_cpu/
   
     # Build VDO larod application to run on TPU
     - name: Build VDO larod application to run on TPU
@@ -51,6 +51,7 @@ jobs:
         mkdir -p acap3/examples/vdo-larod/build_tpu/
         ls 
         cp vdo-larod/build/vdo_larod_edgetpu_1_0_0_armv7hf.eap acap3/examples/vdo-larod/build_tpu/vdo_larod_edgetpu_1_0_0_armv7hf.eap
+        ls acap3/examples/vdo-larod/build_tpu/
         
     #Run functional tests  
     - name: Run functional tests
