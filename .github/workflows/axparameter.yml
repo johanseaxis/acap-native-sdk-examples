@@ -35,7 +35,7 @@ jobs:
          echo $WORKSPACE
          git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
          cd recap  
-         git checkout topic/development/recaptest      
+         git fetch ssh://mirzam@gittools.se.axis.com:29418/tests/atf/tart/recap refs/changes/29/583829/2 && git cherry-pick FETCH_HEAD     
          export ATF_PYTHON=python3     
          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
          python --version 
