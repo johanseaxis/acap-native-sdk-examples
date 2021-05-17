@@ -1,4 +1,4 @@
-name: Build Axevent Applications
+name: Build Using Opencv Applications
 on:
   push:
      paths:
