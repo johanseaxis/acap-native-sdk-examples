@@ -3,7 +3,7 @@ on:
   push:
      paths:
       - 'subscribe-to-object-detection/**'
-      - '.github/workflows/object-detection.yml'
+      - '.github/workflows/subscribe-object-detection.yml'
 jobs:
   build:
 
