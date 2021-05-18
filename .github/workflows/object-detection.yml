@@ -31,7 +31,7 @@ jobs:
         cd ..
         mkdir -p acap3/examples/object-detection/build
         cp object-detection/build/object_detection_app_1_0_0_armv7hf.eap acap3/examples/object-detection/build/object_detection_app_1_0_0_armv7hf.eap
-        ls acap3/examples/hello-world/build
+        ls acap3/examples/object-detection/build/
     
     - name: Run functional tests
       run: |
