@@ -32,6 +32,7 @@ jobs:
         cd ..
         pwd
         mkdir -p vdo-larod-preprocessing/build_cpu_preprocessing/
+        ls vdo-larod-preprocessing/build/
         cp vdo-larod-preprocessing/build/vdo_larod_cpu_1_0_0_armv7hf.eap vdo-larod-preprocessing/build_cpu_preprocessing/vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap
         ls vdo-larod-preprocessing/build_cpu_preprocessing/
   
