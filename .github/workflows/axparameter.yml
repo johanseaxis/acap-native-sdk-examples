@@ -29,6 +29,7 @@ jobs:
         mkdir -p acap3/examples/axparameter/build
         cp axparameter/build/axparameter_1_0_0_armv7hf.eap acap3/examples/axparameter/build/axparameter_1_0_0_armv7hf.eap
          
+         
     - name: Run functional tests
       run: |
          export WORKSPACE=$(pwd)
