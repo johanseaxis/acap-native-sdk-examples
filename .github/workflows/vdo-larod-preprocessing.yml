@@ -31,7 +31,7 @@ jobs:
         docker cp $(docker create vdo_larod_preprocessing_cpu:1.0):/opt/app ./build
         cd ..
         pwd
-        mkdir -p vdo-larod/build_cpu_preprocessing/
+        mkdir -p vdo-larod-preprocessing/build_cpu_preprocessing/
         cp vdo-larod-preprocessing/build/vdo_larod_cpu_1_0_0_armv7hf.eap vdo-larod-preprocessing/build_cpu_preprocessing/vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap
         ls vdo-larod-preprocessing/build_cpu_preprocessing/
   
