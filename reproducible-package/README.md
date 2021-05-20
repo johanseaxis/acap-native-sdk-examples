@@ -55,27 +55,27 @@ The file that needs those settings is: *~/.docker/config.json.*
 For reference please see: https://docs.docker.com/network/proxy/ and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
+In all examples the option `--no-cache` is used to ensure that image is rebuilt.
+
 Start with an ordinary build which will not give a reproducible package and
 copy the result from the container image to a local directory *build1*.
-
 ```bash
-docker build --tag rep1 .
+docker build --no-cache --tag rep1 .
 docker cp $(docker create rep1):/opt/app ./build1
 ```
 
-Now let's create a reproducible package and add option `--no-cache` to ensure
-that it's rebuilt. Set the build argument TIMESTAMP which in its' turn set
-[SOURCE_DATE_EPOCH](https://reproducible-builds.org/docs/source-date-epoch/)
+Now let's create a reproducible package. Set the build argument TIMESTAMP which
+in turn set [SOURCE_DATE_EPOCH](https://reproducible-builds.org/docs/source-date-epoch/)
 to a fix time. The chosen timestamp here is the latest commit in the current
 git repository. Copy the output to *build2*.
 ```bash
-docker build --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep2 .
+docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep2 .
 docker cp $(docker create rep2):/opt/app ./build2
 ```
 
 Build a second reproducible application and copy the output to *build3*.
 ```bash
-docker build --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep3 .
+docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep3 .
 docker cp $(docker create rep3):/opt/app ./build3
 ```
 
