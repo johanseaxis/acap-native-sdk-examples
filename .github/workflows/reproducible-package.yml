@@ -1,4 +1,4 @@
-name: Build Axparameter Applications
+name: Build Reproducible Package Applications
 on:
   push:
      paths:
