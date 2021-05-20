@@ -5,7 +5,18 @@ This README file explains how to build a simple and reproducible ACAP applicatio
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "reproducible-package" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
-The example follows the guidelines in [Reproducible builds practices](https://reproducible-builds.org/) but might not be enough for more complex use cases.
+The example follows the guidelines in [Reproducible builds practices](https://reproducible-builds.org/)
+and the steps taken in this example are:
+* Set *SOURCE_DATE_EPOCH* to a specific date, in Dockerfile for standard
+  procedure and in connection to build command `acap-build` if running
+  interactively.
+* Add a code section in Makefile that if *SOURCE_DATE_EPOCH*  is set, do set
+  *BUILD_DATE* to the specified date.
+
+**N.b.** These are the steps for a very basic example but might not be enough
+for more complex applications. See the link above for more tips on how to get
+your application reproducible.
+
 
 ## Getting started
 Below is the structure and scripts used in the example:
@@ -27,6 +38,10 @@ reproducible-package
 * **app/manifest.json** - Defines the application and its configuration.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
+
+### Limitations
+* The support to create reproducible packages was introduced in acap-sdk 3.4.
+
 
 ### Build the application
 The following build steps are to show the reproducibility and not how a real
