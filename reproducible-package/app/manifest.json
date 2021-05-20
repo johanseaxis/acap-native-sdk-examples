@@ -2,7 +2,7 @@
     "schemaVersion": "1.1",
     "acapPackageConf": {
         "setup": {
-            "appName": "reproducible_acap",
+            "appName": "reproducible_package",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
             "user": {

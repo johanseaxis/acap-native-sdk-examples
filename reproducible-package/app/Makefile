@@ -1,11 +1,11 @@
-PROG1	= reproducible_acap
+PROG1	= reproducible_package
 OBJS1	= $(PROG1).c
 
 PROGS	= $(PROG1)
 
 CFLAGS-y  = -W -Wformat=2 -Wpointer-arith -Wbad-function-cast -Wstrict-prototypes -Wmissing-prototypes -Winline -Wdisabled-optimization -Wfloat-equal -Wall -Werror
 
-# Variables to set to create a reproducible package
+# Set to create a reproducible package
 DATE_FMT = +%Y-%m-%d
 ifdef SOURCE_DATE_EPOCH
     BUILD_DATE ?= $(shell \
