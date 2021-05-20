@@ -1,0 +1,49 @@
+name: Build Axparameter Applications
+on:
+  push:
+     paths:
+      - 'reproducible-package/**'
+      - '.github/workflows/reproducible-package.yml'
+jobs:
+  build:
+
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+      #- uses: actions/checkout@master
+      # this will enable shellCheck to be performed
+      # on every push to the repo.
+    #- name: Run ShellCheck
+      #uses: ludeeus/action-shellcheck@master
+      # If shellCheck complains about unnecessery things, ignore it.
+      #env:
+        #SHELLCHECK_OPTS: -e SC2153 -e SC2148
+
+    # Build reproducible-package application
+    - name: Build reproducible-package application
+      run: |
+        cd reproducible-package
+        docker build --no-cache --tag rep1 .
+        docker cp $(docker create rep:1):/opt/app ./build1
+
+        docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep2 .
+        docker cp $(docker create rep2):/opt/app ./build2
+
+        docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep3 .
+        docker cp $(docker create rep3):/opt/app ./build3
+
+        # Check that standard and reproducible packages diff
+        if cmp build1/*.eap build2/*.eap; then
+          printf "Error: The standard and reproducible packages are identical which was not expected"
+          exit 1
+        else
+          printf "The packages diff as expected\n"
+        fi
+
+        # Check that the two reproducible packages are identical
+        if cmp build2/*.eap build3/*.eap; then
+          printf "The packages are identical as expected\n"
+        else
+          printf "Error: The reproducbile packages diff which was not expected"
+          exit 1
+        fi
