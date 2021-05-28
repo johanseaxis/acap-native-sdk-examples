@@ -47,6 +47,21 @@ The ACAP SDK image can be used as a basis for custom built images to run your ap
 
 * [ACAP SDK](https://hub.docker.com/r/axisecp/acap-sdk) This image is based on Ubuntu and contains the environment needed for building an AXIS Camera Application Platform (ACAP) application. This includes all tools for building and packaging an ACAP 3 application as well as API components (header and library files) needed for accessing different parts of the camera firmware.
 
+# Issues
+If you encounter issues with the examples, make sure your product is running the latest firmware version or one that is compatible with the ACAP SDK used. 
+The examples use the ACAP SDK during the build process, of which each version is compatible with a set of firmware versions. 
+The specific SDK version that each example is based on is specified in the Dockerfile used to build the application, through the `VERSION` variable. 
+The full compatibility schema for ACAP SDK version and firmware version is available at [Find the right SDK for software compatibility](https://www.axis.com/products/online-manual/s00004#t10164987).
+
+If the issue persists with a compatible firmware, please create an issue containing the information specified in the template below.
+
+### Issue template
+*Axis product/device (e.g. Q1615 Mk III):*
+
+*Device firmware version:*
+
+*Issue description:*
+
 # Frequently asked questions
 Please visit [FAQs page](FAQs.md) for frequently asked questions.
 
