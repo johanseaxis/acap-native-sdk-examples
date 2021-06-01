@@ -5,7 +5,7 @@
 * Camera feature plug-ins that add value beyond the Axis product's core functionality
 
 # Prerequisites for ACAP development
-ACAP is Axis own open platform for applications that run on-board an Axis product. If you are new to ACAP, start with learning more about the platform, [prerequisites](https://www.axis.com/developer-community/acap-fundamentals), [compatible architectures](https://www.axis.com/developer-community/acap-sdk) and [SDK user manual](https://www.axis.com/products/online-manual/s00004).
+ACAP is Axis own open platform for applications that run on-board an Axis product. If you are new to ACAP, start with learning more about the platform, [prerequisites](https://www.axis.com/developer-community/acap-fundamentals), [compatible architectures](https://www.axis.com/developer-community/acap-sdk) and [SDK user manual](https://help.axis.com/acap-3-developer-guide).
 
 ## Getting started with the repo
 This repository contains a set of application examples which aims to enrich the
@@ -51,7 +51,7 @@ The ACAP SDK image can be used as a basis for custom built images to run your ap
 If you encounter issues with the examples, make sure your product is running the latest firmware version or one that is compatible with the ACAP SDK used. 
 The examples use the ACAP SDK during the build process, of which each version is compatible with a set of firmware versions. 
 The specific SDK version that each example is based on is specified in the Dockerfile used to build the application, through the `VERSION` variable. 
-The full compatibility schema for ACAP SDK version and firmware version is available at [Find the right SDK for software compatibility](https://www.axis.com/products/online-manual/s00004#t10164987).
+The full compatibility schema for ACAP SDK version and firmware version is available at [Find the right SDK for software compatibility](https://help.axis.com/acap-3-developer-guide#find-the-right-sdk-for-software-compatibility).
 
 If the issue persists with a compatible firmware, please create an issue containing the information specified in the template below.
 
