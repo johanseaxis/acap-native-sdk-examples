@@ -118,8 +118,8 @@ vdo-larod
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── model
-|   │   ├── mobilenet_v2_1.9_224_quant_edgetpu.larod
-|   │   └── mobilenet_v2_1.9_224_quant.larod
+|   │   ├── mobilenet_v2_1.9_224_quant_edgetpu.tflite
+|   │   └── mobilenet_v2_1.9_224_quant.tflite
 │   ├── package.conf
 │   ├── package.conf.cpu
 │   ├── package.conf.edgetpu
@@ -134,8 +134,8 @@ vdo-larod
 * **build/label** - Folder containing label files used in this application.
 * **build/label/imagenet_labels.txt** - Label file for MobileNet V2 (ImageNet).
 * **build/model** - Folder containing models used in this application.
-* **build/model/mobilenet_v2_1.9_224_quant_edgetpu.larod** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
-* **build/model/mobilenet_v2_1.9_224_quant.larod** - Model file for MobileNet V2 (ImageNet), used for CPU with TensorFlow Lite.
+* **build/model/mobilenet_v2_1.9_224_quant_edgetpu.tflite** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
+* **build/model/mobilenet_v2_1.9_224_quant.tflite** - Model file for MobileNet V2 (ImageNet), used for CPU with TensorFlow Lite.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.
@@ -195,7 +195,7 @@ vdo_larod[4840]: Calculate crop image
 vdo_larod[4840]: Create larod models
 vdo_larod[4840]: Create preprocessing maps
 vdo_larod[4840]: Crop VDO image X=40 Y=0 (240 x 240)
-vdo_larod[4840]: Setting up larod connection with chip 2 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant.larod
+vdo_larod[4840]: Setting up larod connection with chip 2 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant.tflite
 vdo_larod[4840]: Available chip ids:
 vdo_larod[4840]: 2: CPU with TensorFlow Lite
 vdo_larod[4840]: 4: Google TPU
@@ -233,7 +233,7 @@ vdo_larod[3440]: Calculate crop image
 vdo_larod[3440]: Create larod models
 vdo_larod[3440]: Create preprocessing maps
 vdo_larod[3440]: Crop VDO image X=40 Y=0 (240 x 240)
-vdo_larod[3440]: Setting up larod connection with chip 4 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant_edgetpu.larod
+vdo_larod[3440]: Setting up larod connection with chip 4 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite
 vdo_larod[3440]: Available chip ids:
 vdo_larod[3440]: 11: CPU with libyuv
 vdo_larod[3440]: 2: CPU with TensorFlow Lite

@@ -54,7 +54,7 @@ const struct argp argp = {
     "larod and then uses vdo to fetch frames of size WIDTH x HEIGHT in a yuv "
     "format which are converted to an interleaved rgb format and then sent to "
     "larod for inference on MODEL. \n\nExample call:\n"
-    "larod-vdo-example-app /tmp/mobilenet_v2_1.0_224_quant.larod 224 224 "
+    "larod-vdo-example-app /tmp/mobilenet_v2_1.0_224_quant.tflite 224 224 "
     "-c 2\nwhere 2 here refers to the tflite cpu backend. The numbers for "
     "each type of chip can be found at the top of the file larod.h.",
     NULL,
