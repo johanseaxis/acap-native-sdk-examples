@@ -43,7 +43,7 @@ jobs:
          python --version
 
          chmod +x test_starter.sh
-         # TODO ./test_starter.sh vdo-opencl-filtering
+         ./test_starter.sh vdo_opencl_filtering
          ls recap/output
 
     # Save functional test report as artifact
