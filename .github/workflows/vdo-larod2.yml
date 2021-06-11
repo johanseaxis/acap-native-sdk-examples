@@ -41,7 +41,7 @@ jobs:
         export DOCKER_CONFIG="$WORKSPACE/.docker"
         mkdir -p "$DOCKER_CONFIG"
         echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
-        cd vdo-larod
+        cd vdo-larod2
         rm -rf build/
         cp app/package.conf.edgetpu app/package.conf
         docker build --tag vdo_larod2_tpu:1.0 .
