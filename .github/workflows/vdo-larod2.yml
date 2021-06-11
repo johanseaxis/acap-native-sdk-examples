@@ -32,7 +32,7 @@ jobs:
         cd ..
         pwd
         mkdir -p vdo-larod2/build_cpu/
-        cp vdo-larod2/build/vdo_larod_cpu_1_0_0_armv7hf.eap vdo-larod2/build_cpu/vdo_larod_cpu_1_0_0_armv7hf.eap
+        cp vdo-larod2/build/vdo_larod_cpu_2_0_0_armv7hf.eap vdo-larod2/build_cpu/vdo_larod_cpu_2_0_0_armv7hf.eap
         ls vdo-larod2/build_cpu/
   
     # Build VDO larod application to run on TPU
@@ -48,5 +48,5 @@ jobs:
         docker cp $(docker create vdo_larod2_tpu:1.0):/opt/app ./build
         cd ..
         mkdir -p vdo-larod2/build_tpu/
-        cp vdo-larod2/build/vdo_larod_edgetpu_1_0_0_armv7hf.eap vdo-larod2/build_tpu/vdo_larod_edgetpu_1_0_0_armv7hf.eap
+        cp vdo-larod2/build/vdo_larod_edgetpu_2_0_0_armv7hf.eap vdo-larod2/build_tpu/vdo_larod_edgetpu_2_0_0_armv7hf.eap
         ls vdo-larod2/build_tpu/
