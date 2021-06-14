@@ -64,7 +64,7 @@ jobs:
          python --version
          
          chmod +x test_starter.sh
-         ./test_starter.sh vdo_larod_preprcoessing
+         ./test_starter.sh vdo_larod_preprocessing
          ls recap/output
          
         
