@@ -1,7 +1,7 @@
 ARG ARCH=armv7hf
-ARG VERSION=3.4
+ARG VERSION=3.4_rc1
 ARG UBUNTU_VERSION=20.04
-ARG REPO=axisecp
+ARG REPO=docker-prod.se.axis.com/axisecp
 ARG SDK=acap-sdk
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}

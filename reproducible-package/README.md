@@ -44,8 +44,8 @@ reproducible-package
 
 
 ### Build the application
-The following build steps are to show the reproducibility and not how a real
-application would be built.
+The following build steps demonstrates how an application may be reproducible
+and not how a real application would be built.
 
 Standing in your working directory follow the commands below:
 
@@ -60,8 +60,8 @@ In all examples the option `--no-cache` is used to ensure that image is rebuilt.
 Start with an ordinary build which will not give a reproducible package and
 copy the result from the container image to a local directory *build1*.
 ```bash
-docker build --no-cache --tag rep1 .
-docker cp $(docker create rep1):/opt/app ./build1
+docker build --no-cache --tag rep:1 .
+docker cp $(docker create rep:1):/opt/app ./build1
 ```
 
 Now let's create a reproducible package. Set the build argument TIMESTAMP which
@@ -69,14 +69,14 @@ in turn set [SOURCE_DATE_EPOCH](https://reproducible-builds.org/docs/source-date
 to a fix time. The chosen timestamp here is the latest commit in the current
 git repository. Copy the output to *build2*.
 ```bash
-docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep2 .
-docker cp $(docker create rep2):/opt/app ./build2
+docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep:2 .
+docker cp $(docker create rep:2):/opt/app ./build2
 ```
 
 Build a second reproducible application and copy the output to *build3*.
 ```bash
-docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep3 .
-docker cp $(docker create rep3):/opt/app ./build3
+docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep:3 .
+docker cp $(docker create rep:3):/opt/app ./build3
 ```
 
 Now you will have three eap-files in your working directory
