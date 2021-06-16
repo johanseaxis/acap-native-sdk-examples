@@ -102,6 +102,11 @@ cmp build2/*.eap build3/*.eap
 
 ```
 
+All these steps are also available in a utility script
+```bash
+./reproducible_package.sh
+```
+
 #### Build the application interactively
 To get reproducible packages running inside a container, make sure to export the
 environment variable before running build command.
