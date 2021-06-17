@@ -1,7 +1,7 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # An example of how to create a reproducible ACAP application
-This README file explains how to build a simple and reproducible ACAP application. It is achieved by using the containerized Axis API and toolchain images.
+This README file explains how to build a simple and reproducible ACAP application. It is achieved by using the containerized API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "reproducible-package" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
