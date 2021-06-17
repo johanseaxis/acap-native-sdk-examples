@@ -28,6 +28,8 @@ Below is the list of examples available in the repository.
   * The example code is written in C which connects to [larod](./FAQs.md#WhatisLarod?) and loads a model, runs inference on it and then finally deletes the loaded model from [larod](./FAQs.md#WhatisLarod?).
 * [licensekey](./licensekey/)
   * The example code is written in C which illustrates how to check the licensekey status.
+* [reproducible-package](./reproducible-package/)
+  * An example of how to create a reproducible application package.
 * [subscribe-to-object-detection](./subscribe-to-object-detection/)
   * The example code is written in C and exemplifies how to subscribe to video object detection, filter detections based on calibration data and points out ways to optimize object detection.
 * [tensorflow-to-larod](./tensorflow-to-larod/)
