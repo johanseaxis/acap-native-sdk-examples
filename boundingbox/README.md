@@ -17,12 +17,15 @@ boundingbox
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── package.conf
 │   └── bbox_example.cc
+├── build.sh*
 ├── Dockerfile
 └── README.md
 ```
 
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+* **package.conf** - Defines the application and its configuration.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
 * **app/bbox_example.cc** - Application that draws boundingboxes in C++.
