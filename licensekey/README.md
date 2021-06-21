@@ -49,7 +49,7 @@ For reference please see: https://docs.docker.com/network/proxy/ and a
 docker build --tag <APP_IMAGE> .
 ```
 
-<APP_IMAGE> is the name to tag the image with, e.g., licensekey_handler:1.0
+<APP_IMAGE> is the name to tag the image with, e.g., licensekey-handler:1.0
 
 Default architecture is **armv7hf**. To build for **aarch64** it's possible to
 update the *ARCH* variable in the Dockerfile or to set it in the docker build

@@ -13,7 +13,7 @@ The following instructions can be executed to simply run the example.
 
 1. Compile the ACAP:
 ```sh
-./build_acap.sh object_detection_acap:1.0
+./build_acap.sh object-detection-acap:1.0
 ```
 2. Find the ACAP `.eap` file
 ```sh
