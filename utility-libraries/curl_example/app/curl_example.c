@@ -15,8 +15,8 @@
  */
 
 /**
- * brief This example illustrates how to use external curl library in Axis
- * products.
+ * brief This example illustrates how to use external curl library in an
+ * ACAP application
  *
  * This example explain how curl library can be used to fetch a file from the
  * URL and store the content locally into the file.
@@ -59,7 +59,7 @@ static size_t my_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
 
 /** 
  * brief Main function which access user defined link and fetch content to
- * user defined location.
+ * application directory localdata.
  *
  */ 
 int main(void)
@@ -94,9 +94,7 @@ int main(void)
      */ 
     curl_easy_setopt(curl, CURLOPT_PROXY, "http://wwwproxy.se.axis.com:3128/");
 
-    /*
-     * Temporary URL is given, later modify with more suitable URL 
-     */
+    // Temporary URL is given, later modify with more suitable URL  
     curl_easy_setopt(curl, CURLOPT_URL,
         "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js");
 

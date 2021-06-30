@@ -11,7 +11,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 	libtool \
 	automake
 
-ENV ARCHDIR=arm-linux-gnueabihf
+ENV CROSS_COMP_ARCH=arm-linux-gnueabihf
 
 WORKDIR /opt/build
 RUN git clone https://github.com/curl/curl.git
@@ -19,7 +19,7 @@ WORKDIR /opt/build/curl
 
 # Curl lib generate
 RUN autoreconf -fi
-RUN ./configure --prefix=${PWD}/build --host=arm-linux-gnueabihf --without-ssl && make \
+RUN ./configure --prefix=${PWD}/build --host=${CROSS_COMP_ARCH} --without-ssl && make \
        && make install
 
 # Delete manual directory from curl built result
@@ -29,7 +29,7 @@ RUN rm -rf /opt/build/curl/build/share/man
 ARG BUILDDIR=/opt/build/curl
 COPY ./app /opt/app/
 WORKDIR /opt/app
-RUN mkdir -p lib && \
+RUN mkdir lib && \
 	cp -r ${BUILDDIR}/build lib
 
 # Building the ACAP application

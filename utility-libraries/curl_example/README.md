@@ -1,8 +1,8 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A guide to building and running libcurl on ACAP3
-This README file explains how to build libcurl from source and bundle it for use in an ACAP. The example application uses libcurl library and API to fetch information from
-URL provided by user and store the information in the user defined path in AXIS Camera application platform.
+This README file explains how to build libcurl from source and bundle it for use in an ACAP. The example application uses libcurl library and to fetch data from
+URL and store the data in the application directory in AXIS Camera application platform.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "curl_example" application source code which can easily
 be compiled and run with the help of the tools and step by step below.
@@ -25,9 +25,6 @@ curl_example
 * **app/curl_example.c** - Example application.
 * **Dockerfile**         - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md**          - Step by step instructions on how to run the example.
-
-### Limitations
-* The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
 
 ### How to run the code
 Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device:
@@ -108,7 +105,7 @@ The working dir now contains a build folder with the following files:
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.
 * **build/curl_example*** - Application executable binary file.
-* **build/lib - Folder containing compiled library files for libcurl
+* **build/lib** - Folder containing compiled library files for libcurl
 * **build/curl_example_1_0_0_armv7hf.eap** - Application package .eap file.
 * **build/curl_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
@@ -133,27 +130,21 @@ The application will fetch the content from user specified URL and store the con
 #### The expected output
 In this example, when start is enabled specific URL file/content will be copied.
 
+>[!IMPORTANT]
+*> Please make sure SSH is enabled on the device to run the following commands.*
+
 Fetched URL content can be verified using below command
 
 ```bash
-cat /usr/local/packages/curl_example/localdata/jquery.min.js
+ssh root@<axis_device_ip>
+ls -la /usr/local/packages/curl_example/localdata/
+cat /usr/local/packages/curl_example/localdata/jquery.min.js 
 ```
 
-Open a second web browser window and open the application log, update the web page every time you expect a new event to have occured.
+##### Conclusion
 
-```bash
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=curl_example
-```
-
->[!IMPORTANT]
-*> Please make sure SSH is enabled on the device to run the following commands.*
-```bash
-tail -f /var/log/info.log | grep curl_example
-```
-### Conclusion
-
-* ** The URL used in example is just test URL
-* ** Path used to store output content is for reference purpose 
+- The URL used in example is just test URL
+- Path used to store output content is for reference purpose
 
 ## License
 **[Apache License 2.0](../../LICENSE)**
