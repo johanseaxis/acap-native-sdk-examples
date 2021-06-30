@@ -7,6 +7,8 @@ URL and store the data in the application directory in AXIS Camera application p
 Together with this README file, you should be able to find a directory called app. That directory contains the "curl_example" application source code which can easily
 be compiled and run with the help of the tools and step by step below.
 
+APIs specification is available on https://curl.se/libcurl/c
+
 ## Getting started
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 

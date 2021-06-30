@@ -3,8 +3,6 @@
 # ACAP3 applications interacting with external libraries
 This README file lists examples of how to build and use libraries in an application
 
-APIs specification is available on https://curl.se/libcurl/c
-
 ## Getting started
 Below is the structure of the files and folders on the top level:
 
