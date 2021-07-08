@@ -63,7 +63,7 @@ http://<axis_device_ip>/#settings/apps
 ```
 
 *Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
-the newly built **containerExample_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+the newly built **Container_Example_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
 ## Test the application
 
