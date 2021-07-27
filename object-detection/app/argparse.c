@@ -41,17 +41,17 @@ const struct argp_option opts[] = {
 const struct argp argp = {
     opts,
     parseOpt,
-    "MODEL WIDTH HEIGHT OUTPUTBYTES RAW_WIDTH RAW_HEIGHT THRESHOLD LABELSFILE",
+    "MODEL WIDTH HEIGHT QUALITY RAW_WIDTH RAW_HEIGHT THRESHOLD LABELSFILE",
     "This is an example app which loads an object detection MODEL to "
     "larod and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv "
     "format which are converted to interleaved rgb format and then sent to "
     "larod for inference on MODEL. RAW_WIDTH x RAW_HEIGHT is the original "
-    "resolution of frames from the camera. OUTPUTBYTES denotes the size in "
-    "bytes of the tensor output by MODEL. THRESHOLD ranging from 1 to 100 is the "
+    "resolution of frames from the camera. QUALITY denotes the desired jpeg "
+    "image quality ranging from 0 to 100. THRESHOLD ranging from 0 to 100 is the "
     "min score required to show the detected objects and crop them. LABELSFILE "
     "is the path of a txt where labes names are saved. \n\nExample call: "
     "\n/usr/local/packages/object_detection/model/converted_model.tflite 300 "
-    "300 20 1920 1080 10 /usr/local/packages/object_detection/label/labels.txt "
+    "300 80 1920 1080 50 /usr/local/packages/object_detection/label/labels.txt "
     "-c 4 \nwhere 4 here refers to the Edge TPU backend. The numbers for "
     "each type of chip can be found at the top of the file larod.h.",
     NULL,
@@ -102,12 +102,12 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
             }
             args->height = (unsigned int) height;
         } else if (state->arg_num == 3) {
-            unsigned long long outputBytes;
-            int ret = parsePosInt(arg, &outputBytes, SIZE_MAX);
+            unsigned long long quality;
+            int ret = parsePosInt(arg, &quality, UINT_MAX);
             if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid output size");
+                argp_failure(state, EXIT_FAILURE, ret, "invalid quality");
             }
-            args->outputBytes = (size_t) outputBytes;
+            args->quality = (unsigned int) quality;
         } else if (state->arg_num == 4) {
             unsigned long long raw_width;
             int ret = parsePosInt(arg, &raw_width, UINT_MAX);
@@ -138,10 +138,10 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
     case ARGP_KEY_INIT:
         args->width = 0;
         args->height = 0;
-        args->outputBytes = 0;
+        args->quality = 0;
         args->raw_width = 0;
         args->raw_height = 0;
-        args->threshold = 0.0;
+        args->threshold = 0;
         args->chip = 0;
         args->modelFile = NULL;
         args->labelsFile = NULL;

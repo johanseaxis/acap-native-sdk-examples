@@ -25,7 +25,7 @@
 #include "larod.h"
 
 typedef struct args_t {
-    size_t outputBytes;
+    unsigned quality;
     char* modelFile;
     char* labelsFile;
     unsigned width;

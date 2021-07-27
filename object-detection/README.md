@@ -13,7 +13,7 @@ The following instructions can be executed to simply run the example.
 
 1. Compile the ACAP:
 ```sh
-./build_acap.sh object-detection-acap:1.0
+./build_acap.sh object_detection_acap:1.0
 ```
 2. Find the ACAP `.eap` file
 ```sh
@@ -86,10 +86,10 @@ int larodOutput3Fd = -1;
 int larodOutput4Fd = -1;
 
 createAndMapTmpFile(CONV_INP_FILE_PATTERN,  args.width * args.height * CHANNELS, &larodInputAddr, &larodInputFd);
-createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, 4 * args.outputBytes, &larodOutput1Addr, &larodOutput1Fd);
-createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, args.outputBytes, &larodOutput2Addr, &larodOutput2Fd);
-createAndMapTmpFile(CONV_OUT3_FILE_PATTERN, args.outputBytes, &larodOutput3Addr, &larodOutput3Fd);
-createAndMapTmpFile(CONV_OUT4_FILE_PATTERN, args.outputBytes, &larodOutput4Addr, &larodOutput4Fd);
+createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, TENSOR1SIZE, &larodOutput1Addr, &larodOutput1Fd);
+createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, TENSOR2SIZE, &larodOutput2Addr, &larodOutput2Fd);
+createAndMapTmpFile(CONV_OUT3_FILE_PATTERN, TENSOR3SIZE, &larodOutput3Addr, &larodOutput3Fd);
+createAndMapTmpFile(CONV_OUT4_FILE_PATTERN, TENSOR4SIZE, &larodOutput4Addr, &larodOutput4Fd);
 ```
 
 In terms of the crop part, another temporary file is created.
@@ -123,7 +123,7 @@ larodSetTensorFd(outputTensors[3], larodOutput4Fd, &error);
 Finally, the `larodCreateInferenceRequest` method creates an inference request to use the model.
 
 ```c
-infReq = larodCreateInferenceRequest(model, inputTensors, numInputs, outputTensors,numOutputs, &error);
+infReq = larodCreateInferenceRequest(model, inputTensors, numInputs, outputTensors, numOutputs, &error);
 ```
 
 #### Fetching a frame and performing inference

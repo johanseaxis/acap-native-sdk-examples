@@ -22,17 +22,17 @@
   * objects in the image.
   *
   * The application expects eight arguments on the command line in the
-  * following order: MODEL WIDTH HEIGHT OUTPUTBYTES RAW_WIDTH RAW_HEIGHT
-  * THRESHOLD LABELSFILE.
+  * following order: MODEL WIDTH HEIGHT QUALITY RAW_WIDTH RAW_HEIGHT
+  * THRESHOLD LABELSFILE. 
   *
   * First argument, MODEL, is a string describing path to the model.
   *
   * Second argument, WIDTH, is an integer for the input width.
   *
   * Third argument, HEIGHT, is an integer for the input height.
-  * 
-  * Forth argument, OUTPUTBYTES, is an integer for the output bytes.
   *
+  * Fourth argument, QUALITY, is an integer for the desired jpeg quality.
+  * 
   * Fifth argument, RAW_WIDTH is an integer for camera width resolution.
   *
   * Sixth argument, RAW_HEIGHT is an integer for camera height resolution.
@@ -366,6 +366,12 @@ end:
 int main(int argc, char** argv) {
     // Hardcode to use three image "color" channels (eg. RGB).
     const unsigned int CHANNELS = 3;
+    // Hardcode to set output bytes of four tensors from MobileNet V2 model.
+    const unsigned int FLOATSIZE = 4;
+    const unsigned int TENSOR1SIZE = 80 * FLOATSIZE;
+    const unsigned int TENSOR2SIZE = 20 * FLOATSIZE;
+    const unsigned int TENSOR3SIZE = 20 * FLOATSIZE;
+    const unsigned int TENSOR4SIZE = 1 * FLOATSIZE;
 
     // Name patterns for the temp file we will create.
     char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
@@ -465,7 +471,7 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    // Allocate space to save a hige quality frame for crop
+    // Allocate space to save a high resolution frame for crop
     if (!createAndMapTmpFile(CROP_FILE_PATTERN,
                              args.raw_width * args.raw_height * CHANNELS,
                              &cropAddr, &cropFd)) {
@@ -473,25 +479,25 @@ int main(int argc, char** argv) {
     }
 
     // Allocate space for output tensor 1 (Locations)
-    if (!createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, 4 * args.outputBytes,
+    if (!createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, TENSOR1SIZE,
                              &larodOutput1Addr, &larodOutput1Fd)) {
         goto end;
     }
 
     // Allocate space for output tensor 2 (Classes)
-    if (!createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, args.outputBytes,
+    if (!createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, TENSOR2SIZE,
                              &larodOutput2Addr, &larodOutput2Fd)) {
         goto end;
     }
 
     // Allocate space for output tensor 3 (Scores)
-    if (!createAndMapTmpFile(CONV_OUT3_FILE_PATTERN, args.outputBytes,
+    if (!createAndMapTmpFile(CONV_OUT3_FILE_PATTERN, TENSOR3SIZE,
                              &larodOutput3Addr, &larodOutput3Fd)) {
         goto end;
     }
 
     // Allocate space for output tensor 4 (Number of detections)
-    if (!createAndMapTmpFile(CONV_OUT4_FILE_PATTERN, args.outputBytes,
+    if (!createAndMapTmpFile(CONV_OUT4_FILE_PATTERN, TENSOR4SIZE,
                              &larodOutput4Addr, &larodOutput4Fd)) {
         goto end;
     }
@@ -675,7 +681,7 @@ int main(int argc, char** argv) {
                     unsigned long jpeg_size = 0;
                     unsigned char* jpeg_buffer = NULL;
                     struct jpeg_compress_struct jpeg_conf;
-                    set_jpeg_configuration(crop_w, crop_h, CHANNELS, args.outputBytes, &jpeg_conf);
+                    set_jpeg_configuration(crop_w, crop_h, CHANNELS, args.quality, &jpeg_conf);
                     buffer_to_jpeg(crop_buffer, &jpeg_conf, &jpeg_size, &jpeg_buffer);
                     char file_name[32];
                     snprintf(file_name, sizeof(char) * 32, "/tmp/detection_%i.jpg", i);
@@ -729,19 +735,19 @@ end:
         close(cropFd);
     }
     if (larodOutput1Addr != MAP_FAILED) {
-        munmap(larodOutput1Addr, args.outputBytes);
+        munmap(larodOutput1Addr, TENSOR1SIZE);
     }
 
     if (larodOutput2Addr != MAP_FAILED) {
-        munmap(larodOutput2Addr, args.outputBytes);
+        munmap(larodOutput2Addr, TENSOR2SIZE);
     }
 
     if (larodOutput3Addr != MAP_FAILED) {
-        munmap(larodOutput3Addr, args.outputBytes);
+        munmap(larodOutput3Addr, TENSOR3SIZE);
     }
 
     if (larodOutput4Addr != MAP_FAILED) {
-        munmap(larodOutput4Addr, args.outputBytes);
+        munmap(larodOutput4Addr, TENSOR4SIZE);
     }
 
     if (larodOutput1Fd >= 0) {
