@@ -17,11 +17,11 @@ RUN git clone -b v1.5.6 https://github.com/monkey/monkey . &&\
         --prefix=/usr/local \
         --bindir=/usr/local/bin \
         --libdir=/usr/local/lib \
-        --sysconfdir=/usr/local/packages/quiz/html \
-        --datadir=/usr/local/packages/quiz/html \
+        --sysconfdir=/usr/local/packages/monkey/html \
+        --datadir=/usr/local/packages/monkey/html \
         --mandir=/usr/local/man \
         --logdir=/tmp \
-        --plugdir=/usr/local/packages/quiz/lib \
+        --plugdir=/usr/local/packages/monkey/lib \
         --pidfile=/tmp/monkey.pid \
         --incdir=/usr/local/include/monkey \
         --systemddir=/usr/lib/systemd/system &&\
@@ -30,12 +30,13 @@ RUN git clone -b v1.5.6 https://github.com/monkey/monkey . &&\
 
 WORKDIR /opt/app
 COPY ./app .
+RUN cp /usr/local/bin/monkey .
 
 # Build examples
 RUN . /opt/axis/acapsdk/environment-setup* &&\
     mkdir -p $SDKTARGETSYSROOT/usr/local &&\
     cp -r /usr/local $SDKTARGETSYSROOT/usr &&\
     mkdir -p lib &&\
-    cp /usr/local/lib/libmonkey.so.1.5 /usr/local/packages/quiz/lib/*.so -t lib/ &&\
-    cp -r /usr/local/packages/quiz/html . &&\
+    cp /usr/local/lib/libmonkey.so.1.5 /usr/local/packages/monkey/lib/*.so -t lib/ &&\
+    cp -r /usr/local/packages/monkey/html . &&\
     acap-build ./
