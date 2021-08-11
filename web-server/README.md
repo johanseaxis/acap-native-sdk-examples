@@ -20,14 +20,8 @@ web-server
 └── README.md - Step by step instructions on how to run the example
 ```
 
-## Prerequisites
-The following items are required to run this example:
-* Camera: Q1615-MkIII
-* ACAP4 Docker version 19.03.5 or higher
-* Camera Firmware: 10.2
-
 ## Limitations
-* Apache Reverse Proxy does not work with content, i.e. images, in the HTML page
+* Apache Reverse Proxy can not translate content with absolute addresses (i.e. /image.png) in the HTML page. Use only relative content (i.e. image.png or ../image.png)).
 
 ## How to build the code
 
@@ -82,9 +76,9 @@ Goto your device web page above > Click on the tab **App** in the device GUI > A
 the newly built **monkey_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch
 
 ## Browse to the web server
-The Web Server can be accessed from a Web Browser eighter directly using a port number (i.e. http://mycamera:2001) or through the Apache Server in the camera using an extension to the camera web URL (i.e http://mycamera/monkey). To configure the Apache Server as a Reverse Proxy Server, use the procedure below:
+The Web Server can be accessed from a Web Browser eighter directly using a port number (i.e. http://mycamera:2001) or through the Apache Server in the camera using an extension to the camera web URL (i.e http://mycamera/monkey/). To configure the Apache Server as a Reverse Proxy Server, make sure you have root access to the camera and use the procedure below:
 ```sh
-# Do ssh login to the camera
+# Do root ssh login to the camera
 ssh root@<CAMERA_IP>
 
 # Add Reverse Proxy configuration to the Apache Server, example:

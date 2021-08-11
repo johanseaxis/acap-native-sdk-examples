@@ -2,14 +2,17 @@ ARG ARCH=armv7hf
 ARG REPO=axisecp
 ARG SDK=acap-sdk
 ARG UBUNTU_VERSION=20.04
-ARG VERSION=3.3
+ARG VERSION=3.4
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
-WORKDIR /opt/monkey
+# Build Monkey server and library
+WORKDIR /opt
+COPY monkey.patch .
 
-# Build server and library
-RUN git clone -b v1.5.6 https://github.com/monkey/monkey . &&\
+RUN git clone -b v1.5.6 https://github.com/monkey/monkey &&\
+    cd monkey &&\
+    git apply ../monkey.patch &&\
     . /opt/axis/acapsdk/environment-setup* &&\
     ./configure \
         --enable-shared \
@@ -28,7 +31,7 @@ RUN git clone -b v1.5.6 https://github.com/monkey/monkey . &&\
     make &&\
     make install
 
-WORKDIR /opt/app
+WORKDIR /opt/monkey/examples
 COPY ./app .
 RUN cp /usr/local/bin/monkey .
 
