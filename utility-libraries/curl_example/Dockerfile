@@ -1,5 +1,5 @@
 ARG ARCH=armv7hf
-ARG VERSION=3.4
+ARG VERSION=3.4.2
 ARG UBUNTU_VERSION=20.04
 ARG REPO=axisecp
 ARG SDK=acap-sdk
@@ -11,16 +11,18 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 	libtool \
 	automake
 
-ENV CROSS_COMP_ARCH=arm-linux-gnueabihf
-
 WORKDIR /opt/build
 RUN git clone https://github.com/curl/curl.git
-WORKDIR /opt/build/curl
 
 # Curl lib generate
-RUN autoreconf -fi
-RUN ./configure --prefix=${PWD}/build --host=${CROSS_COMP_ARCH} --without-ssl && make \
-       && make install
+# - Source the SDK environment script to get links to cross compiler through
+# - CONFIGURE_FLAGS environment variable
+WORKDIR /opt/build/curl
+RUN . /opt/axis/acapsdk/environment-setup* && \
+  autoreconf -fi && \
+  ./configure --prefix=${PWD}/build ${CONFIGURE_FLAGS} --without-ssl && \
+  make && \
+  make install
 
 # Delete manual directory from curl built result
 RUN rm -rf /opt/build/curl/build/share/man
@@ -29,8 +31,7 @@ RUN rm -rf /opt/build/curl/build/share/man
 ARG BUILDDIR=/opt/build/curl
 COPY ./app /opt/app/
 WORKDIR /opt/app
-RUN mkdir lib && \
-	cp -r ${BUILDDIR}/build lib
+RUN mkdir lib && cp -r ${BUILDDIR}/build lib
 
 # Building the ACAP application
 RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh
