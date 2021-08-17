@@ -54,4 +54,4 @@ RUN mkdir -p lib include && \
 ADD https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite converted_model_edgetpu.tflite
 
 # Building the ACAP application
-RUN . /opt/axis/acapsdk/environment-setup* && acap-build .  -a 'label/labels.txt' -a 'model/converted_model.larod'
+RUN . /opt/axis/acapsdk/environment-setup* && acap-build .  -a 'label/labels.txt' -a 'model/converted_model.tflite'
