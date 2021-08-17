@@ -33,5 +33,9 @@ COPY ./app /opt/app/
 WORKDIR /opt/app
 RUN mkdir lib && cp -r ${BUILDDIR}/build lib
 
+# Proxy setting for curl 
+ARG CURL_PROXY
+ENV CURL_PROXY ${CURL_PROXY}
+
 # Building the ACAP application
 RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh

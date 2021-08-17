@@ -92,7 +92,7 @@ int main(void)
      * Without proxy setting, unable to copy file, this needs to
      * be relooked as giving axis proxy is not a good idea
      */ 
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://wwwproxy.se.axis.com:3128/");
+    curl_easy_setopt(curl, CURLOPT_PROXY, CURL_PROXY);
 
     // Temporary URL is given, later modify with more suitable URL  
     curl_easy_setopt(curl, CURLOPT_URL,

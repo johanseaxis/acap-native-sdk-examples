@@ -53,6 +53,12 @@ command via build argument:
 docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
 
+If the device is inside a network with a proxy, then it can be passed on as
+a build argument:
+```bash
+docker build --build-arg CURL_PROXY=<my_proxy> --tag <APP_IMAGE> .
+```
+
 Copy the result from the container image to a local directory build:
 
 ```bash
