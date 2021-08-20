@@ -23,22 +23,3 @@ jobs:
           cd ..
           mkdir -p acap3/examples/subscribe-to-object-detection/build
           cp subscribe-to-object-detection/build/subscribe_to_object_detection_1_0_0_armv7hf.eap acap3/examples/subscribe-to-object-detection/build/subscribe_to_object_detection_1_0_0_armv7hf.eap
-
-      - name: Run functional tests
-        run: |
-          export WORKSPACE=$(pwd)
-          echo $WORKSPACE
-          git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
-          cd recap  
-          git checkout topic/development/recaptest      
-          export ATF_PYTHON=python3     
-          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
-          python --version
-
-          chmod +x test_starter.sh
-
-      # Save functional test report as artifact
-      - uses: actions/upload-artifact@master
-        with:
-          name: Test report
-          path: recap/recap/output/report.xml

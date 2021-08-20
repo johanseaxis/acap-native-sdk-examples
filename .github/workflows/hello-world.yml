@@ -26,12 +26,9 @@ jobs:
         run: |
           export WORKSPACE=$(pwd)
           echo $WORKSPACE
-          git clone "https://${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASS }}@gittools.se.axis.com/gerrit/a/tests/atf/tart/recap"
+          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
           cd recap
-          export ATF_PYTHON=python3     
-          ATF_INSTALL=yes source /github-runner/github-runner/init/atf_init.sh
-          python --version 
-          chmod +x test_starter.sh
+          source /github-runner/github-runner/init/atf_init.sh
           ./test_starter.sh hello_world
           ls recap/output
 
