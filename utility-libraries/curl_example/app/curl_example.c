@@ -18,8 +18,8 @@
  * brief This example illustrates how to use external curl library in an
  * ACAP application
  *
- * This example explain how curl library can be used to fetch a file from the
- * URL and store the content locally into the file.
+ * This example shows how curl library can be used to fetch a file from the
+ * URL and store the content locally.
  *
  */
 
@@ -78,21 +78,26 @@ int main(void)
   curl_global_init(CURL_GLOBAL_DEFAULT);
 
   /** 
-   * This function must be the first function to call, and it returns a
-   * CURL easy handle that you must use as input to other functions in
-   * the easy interface. This call MUST have a corresponding call to
-   * curl_easy_cleanup when the operation is complete.
+   * This function must be the first function to be called, and it
+   * returns a CURL easy handle that you must use as input to other
+   * functions in the easy interface. This call MUST have a
+   * corresponding call to curl_easy_cleanup when the operation is
+   * complete.
    */ 
   curl = curl_easy_init();
 
   if(curl) {
-    syslog(LOG_INFO,"CURL init succesfull - Curl handle is created");
+    syslog(LOG_INFO,"CURL init succesful - Curl handle is created");
 
     /**
      * Without proxy setting, unable to copy file, this needs to
      * be relooked as giving axis proxy is not a good idea
-     */ 
+     */
+#ifdef CURL_PROXY
     curl_easy_setopt(curl, CURLOPT_PROXY, CURL_PROXY);
+#else
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+#endif
 
     // Temporary URL is given, later modify with more suitable URL  
     curl_easy_setopt(curl, CURLOPT_URL,

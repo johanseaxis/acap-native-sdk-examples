@@ -1,8 +1,8 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A guide to building and running libcurl on ACAP3
-This README file explains how to build libcurl from source and bundle it for use in an ACAP. The example application uses libcurl library and to fetch data from
-URL and store the data in the application directory in AXIS Camera application platform.
+This README file explains how to build libcurl from source and bundle it for the use in an ACAP. The example application uses the libcurl library to fetch data from
+URL and store the data in the application directory on the Camera.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "curl_example" application source code which can easily
 be compiled and run with the help of the tools and step by step below.
@@ -53,8 +53,7 @@ command via build argument:
 docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
 
-If the device is inside a network with a proxy, then it can be passed on as
-a build argument:
+If the device is inside a network with a proxy, then it can be passed on as a build argument:
 ```bash
 docker build --build-arg CURL_PROXY=<my_proxy> --tag <APP_IMAGE> .
 ```
@@ -132,8 +131,7 @@ the newly built **curl_example_1_0_0_armv7hf.eap** > Click **Install** > Run the
 Application curl_example is now available as an application on the device.
 
 ### libcurl application
-The application will fetch the content from user specified URL and store the content in user defined path in AXIS Camera Platform  
-
+The application will fetch the content from "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" and store the content at /usr/local/packages/curl_example/localdata/jquery.min.js on the camera.
 
 #### The expected output
 In this example, when start is enabled specific URL file/content will be copied.
@@ -141,18 +139,13 @@ In this example, when start is enabled specific URL file/content will be copied.
 >[!IMPORTANT]
 *> Please make sure SSH is enabled on the device to run the following commands.*
 
-Fetched URL content can be verified using below command
+Fetched URL content can be verified using below command to check that the file contains data.
 
 ```bash
 ssh root@<axis_device_ip>
 ls -la /usr/local/packages/curl_example/localdata/
 cat /usr/local/packages/curl_example/localdata/jquery.min.js 
 ```
-
-##### Conclusion
-
-- The URL used in example is just test URL
-- Path used to store output content is for reference purpose
 
 ## License
 **[Apache License 2.0](../../LICENSE)**

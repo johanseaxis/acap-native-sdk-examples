@@ -17,7 +17,9 @@ CFLAGS += -Wall \
 	  -Werror
 
 # Pre-prcessing proxy setting
+ifneq ($(strip $(CURL_PROXY)),)
 CFLAGS += -DCURL_PROXY="\"$(CURL_PROXY)\""
+endif
 
 SHLIB_DIR = ./lib
 LDFLAGS = -L$(SHLIB_DIR) -Wl,--no-as-needed,-rpath,'$$ORIGIN/lib'
