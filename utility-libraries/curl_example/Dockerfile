@@ -20,7 +20,7 @@ RUN git clone https://github.com/curl/curl.git
 WORKDIR /opt/build/curl
 RUN . /opt/axis/acapsdk/environment-setup* && \
   autoreconf -fi && \
-  ./configure --prefix=${PWD}/build ${CONFIGURE_FLAGS} --without-ssl && \
+  ./configure --prefix=${PWD}/build ${CONFIGURE_FLAGS} --with-openssl && \
   make && \
   make install
 
@@ -28,10 +28,10 @@ RUN . /opt/axis/acapsdk/environment-setup* && \
 RUN rm -rf /opt/build/curl/build/share/man
 
 # Copy the library to application folder
-ARG BUILDDIR=/opt/build/curl
+ARG BUILDDIR=/opt/build/curl/build
 COPY ./app /opt/app/
 WORKDIR /opt/app
-RUN mkdir lib && cp -r ${BUILDDIR}/build lib
+RUN mkdir lib && cp -r ${BUILDDIR}/lib/libcurl.so* lib
 
 # Proxy setting for curl
 ARG CURL_PROXY

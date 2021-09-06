@@ -95,9 +95,8 @@ int main(void)
      */
 #ifdef CURL_PROXY
     curl_easy_setopt(curl, CURLOPT_PROXY, CURL_PROXY);
-#else
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
     // Temporary URL is given, later modify with more suitable URL  
     curl_easy_setopt(curl, CURLOPT_URL,

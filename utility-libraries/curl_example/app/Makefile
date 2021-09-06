@@ -2,8 +2,8 @@ PROG1	= curl_example
 OBJS1	= $(PROG1).c
 PROGS	= $(PROG1)
 
-LDLIBS += -Llib/build/lib/
-CFLAGS += -Ilib/build/include/curl/
+LDLIBS += -Llib
+CFLAGS += -I/opt/build/curl/build/include/curl
 CFLAGS += -Wall \
 	  -Wformat=2 \
 	  -Wpointer-arith \
@@ -23,7 +23,7 @@ endif
 
 SHLIB_DIR = ./lib
 LDFLAGS = -L$(SHLIB_DIR) -Wl,--no-as-needed,-rpath,'$$ORIGIN/lib'
-SHLIBS += -lm -lcurl
+SHLIBS += -lm -lcurl -lssl
 
 all:	$(PROGS)
 

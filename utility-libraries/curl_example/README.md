@@ -75,33 +75,9 @@ The working dir now contains a build folder with the following files:
 │   ├── param.conf
 │   ├── curl_example*
 │   ├── lib
-│   │   └── build
-│   │       ├── bin
-│   │       │   ├── curl*
-│   │       │   └── curl-config*
-│   │       ├── include
-│   │       │   └── curl
-│   │       │       ├── curl.h  
-│   │       │       ├── curlver.h
-│   │       │       ├── easy.h
-│   │       │       ├── mprintf.h
-│   │       │       ├── multi.h
-│   │       │       ├── options.h
-│   │       │       ├── stdcheaders.h
-│   │       │       ├── system.h
-│   │       │       ├── typecheck-gcc.h 
-│   │       │       └── urlapi.h
-│   │       ├── lib
-│   │       │   ├── libcurl.a
-│   │       │   ├── libcurl.la*
-│   │       │   ├── libcurl.so@
-│   │       │   ├── libcurl.so.4@
-│   │       │   ├── libcurl.so.4.7.0*   
-│   │       │   └── pkgconfig
-│   │       │       └── libcurl.pc 
-│   │       └── share
-│   │           └── aclocal
-│   │               └── libcurl.m4
+│   │   ├── libcurl.so@
+│   │   ├── libcurl.so.4@
+│   │   └── libcurl.so.4.7.0*
 │   ├── curl_example_1_0_0_armv7hf.eap
 │   ├── curl_example_1_0_0_LICENSE.txt
 │   └── curl_example.c
