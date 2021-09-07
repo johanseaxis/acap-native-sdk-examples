@@ -1,7 +1,7 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A boundingbox based ACAP3 application on an edge device
-This README file explains how to build an ACAP3 application using the boundingbox API. It is achieved by using the containerized Axis API and toolchain images.
+This README file explains how to build an ACAP3 application using the boundingbox API. It is achieved by using the containerized API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "boundingbox example" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -15,20 +15,20 @@ These instructions will guide you on how to execute the code. Below is the struc
 ```bash
 boundingbox
 ├── app
+│   ├── bbox_example.cc
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── package.conf
-│   └── bbox_example.cc
+│   └── manifest.json
 ├── build.sh*
 ├── Dockerfile
 └── README.md
 ```
 
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **package.conf** - Defines the application and its configuration.
+* **app/bbox_example.cc** - Application that draws boundingboxes in C++.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
-* **app/bbox_example.cc** - Application that draws boundingboxes in C++.
+* **app/manifest.json** - Defines the application and its configuration.
 * **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
@@ -73,6 +73,7 @@ boundingbox
 ├── build
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
@@ -81,6 +82,7 @@ boundingbox
 │   └── boundingbox_example_1_0_0_LICENSE.txt
 ```
 
+* **build/manifest.json** - Defines the application and its configuration.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.
