@@ -1,10 +1,10 @@
 ARG http_proxy
 ARG https_proxy
 ARG ARCH=armv7hf
-ARG VERSION=3.4
+ARG VERSION=1.0_beta1
 ARG UBUNTU_VERSION=20.04
 ARG REPO=axisecp
-ARG SDK=acap-sdk
+ARG SDK=acap-native-sdk
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
