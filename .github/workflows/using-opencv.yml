@@ -17,8 +17,8 @@ jobs:
           cd using-opencv
           ./build.sh $imagetag
           cd ..
-          mkdir -p acap3/examples/using-opencv/build
-          cp using-opencv/build/opencv_example_1_0_0_armv7hf.eap acap3/examples/using-opencv/build/opencv_example_1_0_0_armv7hf.eap
+          mkdir -p acap4-native/examples/using-opencv/build
+          cp using-opencv/build/opencv_example_1_0_0_armv7hf.eap acap4-native/examples/using-opencv/build/opencv_example_1_0_0_armv7hf.eap
 
       - name: Run functional tests
         run: |

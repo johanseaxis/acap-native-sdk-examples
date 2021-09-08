@@ -1,7 +1,7 @@
  *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# An axoverlay based ACAP3 application on an edge device
-This README file explains how to build an ACAP3 application that uses the axoverlay API. It is achieved by using the containerized Axis API and toolchain images.
+# An axoverlay based ACAP4 Native application on an edge device
+This README file explains how to build an ACAP4 Native application that uses the axoverlay API. It is achieved by using the containerized Axis API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "axoverlay" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -27,7 +27,7 @@ axoverlay
 
 * **app/axoverlay.c** - Application to draw overlays using axoverlay in C.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
+* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
 

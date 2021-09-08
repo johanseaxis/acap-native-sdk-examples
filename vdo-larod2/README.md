@@ -1,7 +1,7 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# A combined vdo stream and larod based ACAP3 application running inference on an edge device
-This README file explains how to build an ACAP3 application that uses:
+# A combined vdo stream and larod based ACAP4 Native application running inference on an edge device
+This README file explains how to build an ACAP4 Native application that uses:
 - vdo to fetch frames from e.g. a camera
 - [larod API](../FAQs.md#WhatisLarod?) to load a graph model and run preprocessing and classification inferences on it
 
@@ -41,7 +41,7 @@ vdo-larod
 * **app/argparse.c/h** - Implementation of argument parser, written in C.
 * **app/imageprovider.c/h** - Implementation of vdo parts, written in C.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
+* **app/Makefile** - Makefile containing the build and link instructions for building the aACAP4 Native application.
 * **app/package.conf.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
 * **app/package.conf.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
 * **app/vdo-larod.c** - Application using larod, written in C.

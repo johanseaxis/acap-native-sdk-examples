@@ -18,8 +18,8 @@ jobs:
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          mkdir -p acap3/examples/vdostream/build
-          cp vdostream/build/vdoencodeclient_1_0_0_armv7hf.eap acap3/examples/vdostream/build/vdoencodeclient_1_0_0_armv7hf.eap
+          mkdir -p acap4-native/examples/vdostream/build
+          cp vdostream/build/vdoencodeclient_1_0_0_armv7hf.eap acap4-native/examples/vdostream/build/vdoencodeclient_1_0_0_armv7hf.eap
 
       - name: Run functional tests
         run: |

@@ -18,9 +18,9 @@ jobs:
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag .):/opt/app ./build
           cd ..
-          mkdir -p acap3/examples/axoverlay/build
-          cp axoverlay/build/axoverlay_1_0_0_armv7hf.eap acap3/examples/axoverlay/build/axoverlay_1_0_0_armv7hf.eap
-          ls acap3/examples/axoverlay/build
+          mkdir -p acap4-native/examples/axoverlay/build
+          cp axoverlay/build/axoverlay_1_0_0_armv7hf.eap acap4-native/examples/axoverlay/build/axoverlay_1_0_0_armv7hf.eap
+          ls acap4-native/examples/axoverlay/build
 
       - name: Run functional tests
         run: |

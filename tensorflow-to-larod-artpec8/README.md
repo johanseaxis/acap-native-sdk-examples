@@ -9,8 +9,8 @@ to actually running inference on a camera by interfacing with the
 This example is somewhat more comprehensive in detail and covers e.g.,
 model conversion, model quantization, image formats and creation and use of a model with multiple output tensors in
 greater depth than the
-[larod](https://github.com/AxisCommunications/acap3-examples/tree/master/larod)
-and [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master/vdo-larod) examples.
+[larod](https://github.com/AxisCommunications/acap4-native-sdk-examples/tree/master/larod)
+and [vdo-larod](https://github.com/AxisCommunications/acap4-native-sdk-examples/tree/master/vdo-larod) examples.
 
 ## Table of contents
 1. [Prerequisites](#prerequisites)
@@ -41,7 +41,7 @@ tensorflow_to_larod
 │   │   ├── larod-vdo-utils.h
 │   │   ├── LICENSE
 │   │   ├── Makefile
-│   │   ├── package.conf 
+│   │   ├── package.conf
 │   │   └── tensorflow_to_larod.c
 │   ├── .dockerignore
 │   ├── build_acap.sh
@@ -57,7 +57,7 @@ tensorflow_to_larod
 - **build_env.sh** - Builds the environment in which this example is run.
 - **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 - **env/app/larod-vdo-utils.c** - Various helper functions for interacting with the larod and vdo libraries.
-- **env/app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
+- **env/app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
 - **env/app/package.conf** - Defines the ACAP and its configuration.
 - **env/app/tensorflow_to_larod.c** - The file implementing the core functionality of the ACAP.
 - **env/build_acap.sh** - Builds the ACAP and the .eap file.
@@ -111,19 +111,19 @@ In this example, we're going to be working within a Docker container environment
 The environment can be started without GPU support by supplying the `--no-gpu` flag to the `run_env.sh` script after the environment name.
 
 Note that the MS COCO 2017 validation dataset is downloaded during the building of the environment. This is roughly 1GB in size which means this could take a few minutes to download.
-If you wish to get a model with better performance, you can download the COCO 2017 training dataset by uncommenting the 
+If you wish to get a model with better performance, you can download the COCO 2017 training dataset by uncommenting the
 [corresponding lines in the Dockerfile](Dockerfile#L36).
 
 
 ## The example model
-In this example, we'll train a simple model with one input and two outputs. 
+In this example, we'll train a simple model with one input and two outputs.
 The input to the model is a FP32 RGB image scaled to the [0, 1] range and of shape `(480, 270, 3)`.
 The output of the model are two separate tensors of shape `(1,)`, representing the model's confidences for the presence of `person`  and `car`. The outputs are configured as such, and not as one tensor with a SoftMax activation, in order to demonstrate how to use multiple outputs.
 However, the general process of making a camera-compatible model is the same irrespective of the dimensions or number of inputs or outputs.
 
 The model primarily consist of convolutional layers.
 These are ordered in a [ResNet architecture](https://en.wikipedia.org/wiki/Residual_neural_network), which eventually feeds into a pooling operation, fully-connected layers and finally the output tensors.
-The output values are compressed into the `[0,1]` range by a sigmoid function. 
+The output values are compressed into the `[0,1]` range by a sigmoid function.
 
 Notable with the model is the specifics of the ResNet blocks.
 In order to produce a model with BatchNormalization layers that are fused with the convolutional layers during the conversion to `.tflite` in Tensorflow 1.15, a few modifications need to be made.
@@ -154,17 +154,17 @@ accuracy.
 As noted previously, this example uses an ARTPEC-8 camera.
 The camera DLPU uses INT8 precision, which means that the model will need to be quantized from
 32-bit floating-point (FP32) precision to 8-bit integer (INT8) precision. The quantization can be done either
-during training ([quantization-aware training](https://www.tensorflow.org/model_optimization/guide/quantization/training)) or 
-after training ([post-training quantization](https://www.tensorflow.org/lite/performance/post_training_quantization)). 
+during training ([quantization-aware training](https://www.tensorflow.org/model_optimization/guide/quantization/training)) or
+after training ([post-training quantization](https://www.tensorflow.org/lite/performance/post_training_quantization)).
 
 The ARTPEC-8 DLPU uses per-tensor quantization, as opposed to per-axis quantization. This needs to be taken into account when
-choosing how to train the model, as the per-tensor quantization scheme strongly favours quantization-aware training. Because 
+choosing how to train the model, as the per-tensor quantization scheme strongly favours quantization-aware training. Because
 of this, quantization-aware training is used in the [training script](env/training/train.py) for this example.
 Currently, per-tensor quantization is not supported in Tensorflow 2.x, which is why the `tf.contrib.quantize` module from Tensorflow 1.15 is used to perform the quantization-aware training.
 
 Per-axis quantized models can be used, but at a penalty.
 Using a model that is per-axis quantized will perform inference significantly slower than an equivalent per-tensor quantized model.
-For this reason, it is not advised to use such a per-axis quantized model if inference latency is important to the application. 
+For this reason, it is not advised to use such a per-axis quantized model if inference latency is important to the application.
 
 The training used in this example is divided into three steps. First, the model is initiated and trained
 without any quantization. Next, quantization nodes that learn the quantization parameters for each tensor are added to the model
@@ -193,7 +193,7 @@ multiple outputs of the model in the same manner as described in the [tensorflow
 
 ## Installing the application
 As the container has the `env` directory mounted, the build files, including the `.eap` ACAP file, should now be available in the `env/build/` directory.
-To install the ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI. 
+To install the ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI.
 Then go to your camera -> Settings -> Apps -> Add -> Browse to `tensorflow_to_larod.eap` and press Install.
 
 

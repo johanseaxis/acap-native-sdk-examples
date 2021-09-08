@@ -9,8 +9,8 @@ to actually running inference on a camera by interfacing with the
 This example is somewhat more comprehensive and covers e.g.,
 model conversion, model quantization, image formats and models with multiple output tensors in
 greater depth than the
-[larod](https://github.com/AxisCommunications/acap3-examples/tree/master/larod)
-and [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master/vdo-larod) examples.
+[larod](https://github.com/AxisCommunications/acap4-native-sdk-examples/tree/master/larod)
+and [vdo-larod](https://github.com/AxisCommunications/acap4-native-sdk-examples/tree/master/vdo-larod) examples.
 
 ## Table of contents
 1. [Prerequisites](#prerequisites)
@@ -65,7 +65,7 @@ tensorflow_to_larod
 - **env/app/argparse.c/h** - Implementation of argument parser, written in C.
 - **env/app/imgconverter.c/h** - Implementation of libyuv parts, written in C.
 - **env/app/imgprovider.c/h** - Implementation of vdo parts, written in C.
-- **env/app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
+- **env/app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
 - **env/app/package.conf** - Defines the ACAP and its configuration.
 - **env/app/tensorflow_to_larod.c** - The file implementing the core functionality of the ACAP.
 - **env/build_acap.sh** - Builds the ACAP and the .eap file.
@@ -226,7 +226,7 @@ cp models/converted_model_edgetpu.tflite app/
 
 ## Designing the algorithm's application
 
-To upload the algorithm to the camera, it needs to be packaged as an [ACAP](https://www.axis.com/products/analytics/acap) and compiled. As this ACAP is going to perform inference on images captured by the camera and output a prediction on if there are any persons or cars present in the image, some C code is needed. The ACAP code that is relevant to this example is located in [/env/app/tensorflow_to_larod.c](env/app/tensorflow_to_larod.c). This code is similar to the [vdo-larod](https://github.com/AxisCommunications/acap3-examples/tree/master/vdo-larod) example, with emphasis put on the differences, such as input to and multiple outputs from the model as well as handling these predictions.
+To upload the algorithm to the camera, it needs to be packaged as an [ACAP](https://www.axis.com/products/analytics/acap) and compiled. As this ACAP is going to perform inference on images captured by the camera and output a prediction on if there are any persons or cars present in the image, some C code is needed. The ACAP code that is relevant to this example is located in [/env/app/tensorflow_to_larod.c](env/app/tensorflow_to_larod.c). This code is similar to the [vdo-larod](https://github.com/AxisCommunications/acap4-native-sdk-examples/tree/master/vdo-larod) example, with emphasis put on the differences, such as input to and multiple outputs from the model as well as handling these predictions.
 
 In this section we will go over the _rough outline_ of what needs to be done to run inference for our model, but again, the full code is available in [/env/app/tensorflow_to_larod.c](env/app/tensorflow_to_larod.c).
 

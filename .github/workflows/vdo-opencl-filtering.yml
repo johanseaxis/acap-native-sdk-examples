@@ -18,8 +18,8 @@ jobs:
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          mkdir -p acap3/examples/vdo-opencl-filtering/build
-          cp vdo-opencl-filtering/build/vdo_cl_filter_demo_1_0_0_armv7hf.eap acap3/examples/vdo-opencl-filtering/build/vdo_cl_filter_demo_1_0_0_armv7hf.eap
+          mkdir -p acap4-native/examples/vdo-opencl-filtering/build
+          cp vdo-opencl-filtering/build/vdo_cl_filter_demo_1_0_0_armv7hf.eap acap4-native/examples/vdo-opencl-filtering/build/vdo_cl_filter_demo_1_0_0_armv7hf.eap
 
       - name: Run functional tests
         run: |

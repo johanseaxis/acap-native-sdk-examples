@@ -10,7 +10,7 @@ Please use the following commands to clone the examples repository on your local
 
 **Clone it**
 ```
-git clone https://github.com/AxisCommunications/acap3-examples.git
+git clone https://github.com/AxisCommunications/acap4-native-sdk-examples.git
 ```
 **Create your feature branch**
 ```

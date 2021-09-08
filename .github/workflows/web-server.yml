@@ -18,9 +18,9 @@ jobs:
           docker build . --build-arg ARCH=armv7hf --build-arg http_proxy --build-arg https_proxy --no-cache --tag $imagetag
           docker cp $(docker create $imagetag):/opt/monkey/examples ./build
           cd ..
-          mkdir -p acap3/examples/web-server/build
-          cp web-server/build/monkey_1_0_0_armv7hf.eap acap3/examples/web-server/build/monkey_1_0_0_armv7hf.eap
-          ls acap3/examples/web-server/build
+          mkdir -p acap4-native/examples/web-server/build
+          cp web-server/build/monkey_1_0_0_armv7hf.eap acap4-native/examples/web-server/build/monkey_1_0_0_armv7hf.eap
+          ls acap4-native/examples/web-server/build
 
       - name: Run functional tests
         run: |

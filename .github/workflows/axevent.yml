@@ -19,8 +19,8 @@ jobs:
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           cd ..
-          mkdir -p acap3/examples/axevent/send_event/build
-          cp axevent/send_event/build/send_event_1_0_0_armv7hf.eap acap3/examples/axevent/send_event/build/send_event_1_0_0_armv7hf.eap
+          mkdir -p acap4-native/examples/axevent/send_event/build
+          cp axevent/send_event/build/send_event_1_0_0_armv7hf.eap acap4-native/examples/axevent/send_event/build/send_event_1_0_0_armv7hf.eap
 
       - name: Build subscribe to event application
         run: |
@@ -31,8 +31,8 @@ jobs:
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           cd ..
-          mkdir -p acap3/examples/axevent/subscribe_to_event/build
-          cp axevent/subscribe_to_event/build/subscribe_to_event_1_0_0_armv7hf.eap acap3/examples/axevent/subscribe_to_event/build/subscribe_to_event_1_0_0_armv7hf.eap
+          mkdir -p acap4-native/examples/axevent/subscribe_to_event/build
+          cp axevent/subscribe_to_event/build/subscribe_to_event_1_0_0_armv7hf.eap acap4-native/examples/axevent/subscribe_to_event/build/subscribe_to_event_1_0_0_armv7hf.eap
 
       - name: Build subscribe to events application
         run: |
@@ -43,8 +43,8 @@ jobs:
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           cd ..
-          mkdir -p acap3/examples/axevent/subscribe_to_events/build
-          cp axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap acap3/examples/axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap
+          mkdir -p acap4-native/examples/axevent/subscribe_to_events/build
+          cp axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap acap4-native/examples/axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap
 
       - name: Run functional tests
         run: |

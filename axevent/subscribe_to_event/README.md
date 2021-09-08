@@ -1,7 +1,7 @@
  *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# ACAP3 application subscribing to an ONVIF event on an edge device
-This README file explains how to build an ACAP3 application that uses axevent library for subscribing to an ONVIF event.
+# ACAP4 Native application subscribing to an ONVIF event on an edge device
+This README file explains how to build an ACAP4 Native application that uses axevent library for subscribing to an ONVIF event.
 
 It is achieved by using the containerized Axis API and toolchain images.
 
@@ -23,7 +23,7 @@ subscribe_to_event
 ```
 
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application "subscribe_to_event".
+* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application "subscribe_to_event".
 * **app/subscribe_to_event.c** - Application which subscribes for event, written in C.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example "subscribe_to_event".
 * **README.md** - Step by step instructions on how to run the example.

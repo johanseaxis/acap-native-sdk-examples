@@ -1,6 +1,6 @@
  *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# ACAP3 applications interacting with event system on an edge device
+# ACAP4 Native applications interacting with event system on an edge device
 This README file explains how to use the axevent library, which provides an interface to the event system found in Axis device.
 
 The purpose is to provide applications a mechanism to send and receive events.
@@ -29,9 +29,9 @@ axevent
 
 * **get_eventlist.py** - Wrapper to find declared and sent events, using ONVIF APIs.
 * **README.md** - Step by step instructions on how to use the examples.
-* **send_event** - Folder containing files for building ACAP3 application "send_event".
-* **subscribe_to_event** - Folder containing files for building ACAP3 application "subscribe_to_event".
-* **subscribe_to_events** - Folder containing files for building ACAP3 application "subscribe_to_events".
+* **send_event** - Folder containing files for building ACAP4 Native application "send_event".
+* **subscribe_to_event** - Folder containing files for building ACAP4 Native application "subscribe_to_event".
+* **subscribe_to_events** - Folder containing files for building ACAP4 Native application "subscribe_to_events".
 
 ### Example applications
 Each example has as a README file in its directory which shows overview, example directory structure and step-by-step instructions on how to run applications on the device.
