@@ -44,8 +44,7 @@
 static std::atomic<bool> should_run{true};
 
 // Structure to hold application user data
-struct app_data_t
-{
+struct app_data_t {
     // Queue with scene data
     std::queue<Scene> scene_queue;
     // Mutex to guard the scene queue
@@ -77,8 +76,7 @@ struct app_data_t
  * param scene_data Data buffer
  * param user_data User data
  */
-void on_message_arrived(char *scene_data, void *user_data)
-{
+void on_message_arrived(char *scene_data, void *user_data) {
     // Unpack the header which is expected to be the size
     // of the protobuf payload and the header size according to
     // the library documentation for data format SCENE_PROTO_1
@@ -88,8 +86,7 @@ void on_message_arrived(char *scene_data, void *user_data)
     const char *payload = scene_data + sizeof(uint32_t);
     std::string payload_string(payload, message_size);
     Scene scene;
-    if (!scene.ParseFromString(payload_string))
-    {
+    if (!scene.ParseFromString(payload_string)) {
         throw std::runtime_error("Failed to unpack protobuf scene data");
     }
     // Free the scene data after it is deserialized
@@ -99,8 +96,7 @@ void on_message_arrived(char *scene_data, void *user_data)
     app_data_t *app_data = (app_data_t *)user_data;
 
     // Put the scene data with objects or events in queue for further processing
-    if (scene.objects_size() > 0 || scene.events_size() > 0)
-    {
+    if (scene.objects_size() > 0 || scene.events_size() > 0) {
         std::lock_guard<std::mutex> lock(app_data->scene_queue_mutex);
         app_data->scene_queue.push(scene);
     }
@@ -115,35 +111,29 @@ void on_message_arrived(char *scene_data, void *user_data)
  * param scene scene data object
  * param app_data User data
  */
-static void process_scene(const Scene scene, app_data_t *app_data)
-{
+static void process_scene(const Scene scene, app_data_t *app_data) {
     time_t scene_time = scene.real_time() / 1E9; // convert nanoseconds to seconds
     syslog(LOG_INFO, "%s: %d objects, %d events\n", ctime(&scene_time),
            scene.objects_size(), scene.events_size());
 
     // Iterate over all objects in scene data
-    for (int i = 0; i < scene.objects_size(); i++)
-    {
+    for (int i = 0; i < scene.objects_size(); i++) {
         const Object &object = scene.objects(i);
 
         // Check if object is new or already in active set
-        if (app_data->objects_all_set.find(object.id()) == app_data->objects_all_set.end())
-        {
+        if (app_data->objects_all_set.find(object.id()) == app_data->objects_all_set.end()) {
             app_data->objects_all_set.insert(object.id());
             app_data->objects_total++;
         }
 
         // Check for "speeding" object if velocity is enabled and present in scene data
-        if (object.has_velocity())
-        {
+        if (object.has_velocity()) {
             float vx = object.velocity().vx();
             float vy = object.velocity().vy();
             float object_speed = std::sqrt(vx * vx + vy * vy);
             // Check speed limit and increase statistic if speeding object
-            if (object_speed > app_data->speed_limit)
-            {
-                if (app_data->objects_speeding_set.find(object.id()) == app_data->objects_speeding_set.end())
-                {
+            if (object_speed > app_data->speed_limit) {
+                if (app_data->objects_speeding_set.find(object.id()) == app_data->objects_speeding_set.end()) {
                     app_data->objects_speeding_set.insert(object.id());
                     app_data->objects_total_speeding++;
                 }
@@ -151,17 +141,14 @@ static void process_scene(const Scene scene, app_data_t *app_data)
         }
 
         // Check if "large" object if bounding box is enabled and present in scene data
-        if (object.has_bounding_box())
-        {
+        if (object.has_bounding_box()) {
             const BoundingBox &bbox = object.bounding_box();
             float width = bbox.right() - bbox.left();
             float height = bbox.top() - bbox.bottom();
             float area = width * height;
             // Check area limit and increase statistic if large object
-            if (area > app_data->speed_limit)
-            {
-                if (app_data->objects_large_set.find(object.id()) == app_data->objects_large_set.end())
-                {
+            if (area > app_data->speed_limit) {
+                if (app_data->objects_large_set.find(object.id()) == app_data->objects_large_set.end()) {
                     app_data->objects_large_set.insert(object.id());
                     app_data->objects_total_large++;
                 }
@@ -170,12 +157,10 @@ static void process_scene(const Scene scene, app_data_t *app_data)
     }
 
     // Iterate over all events in scene data
-    for (int i = 0; i < scene.events_size(); i++)
-    {
+    for (int i = 0; i < scene.events_size(); i++) {
         // Check event and remove deleted object from active sets
         const Event &event = scene.events(i);
-        if (event.action() == EVENT_DELETE)
-        {
+        if (event.action() == EVENT_DELETE) {
             app_data->objects_all_set.erase(event.object_id());
             app_data->objects_large_set.erase(event.object_id());
             app_data->objects_speeding_set.erase(event.object_id());
@@ -188,8 +173,7 @@ static void process_scene(const Scene scene, app_data_t *app_data)
  *
  * param sig Caught signal
  */
-static void terminationHandler(int sig)
-{
+static void terminationHandler(int sig) {
     (void)sig;
     should_run = false;
 }
@@ -197,8 +181,7 @@ static void terminationHandler(int sig)
 /**
  * brief Main function
  */
-int main(void)
-{
+int main(void) {
     // Setup logging and signal handling
     openlog(NULL, LOG_PID, LOG_USER);
     syslog(LOG_INFO, "Started app!\n");
@@ -220,20 +203,17 @@ int main(void)
     video_scene_subscriber_set_reconnect(subscriber, true);
 
     // Subscribe to the video scene data
-    if (video_scene_subscriber_subscribe(subscriber) < 0)
-    {
+    if (video_scene_subscriber_subscribe(subscriber) < 0) {
         throw std::runtime_error("Failed to subscribe");
     }
 
     // Main loop processing the scene data queue
-    while (should_run)
-    {
+    while (should_run) {
         // Poll the queue 10 times per second to avoid busy wait
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         // Process any scene data in queue
-        while (app_data.scene_queue.size() > 0)
-        {
+        while (app_data.scene_queue.size() > 0) {
             std::unique_lock<std::mutex> lock(app_data.scene_queue_mutex);
             Scene scene = app_data.scene_queue.front();
             app_data.scene_queue.pop();

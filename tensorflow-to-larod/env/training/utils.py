@@ -97,7 +97,7 @@ class SimpleCOCODataGenerator(Sequence):
                        self.sample_classes['has_car']]
             samples_per_class = np.max([len(c) for c in classes])
             self.indices = np.concatenate([np.random.choice(list(c),
-                                                            size=int(weights[idx] * samples_per_class)) for idx, c
+                                           size=int(weights[idx] * samples_per_class)) for idx, c
                                            in enumerate(classes)])
         if self.shuffle is True:
             np.random.shuffle(self.indices)
