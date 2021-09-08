@@ -20,8 +20,6 @@ Below is the list of examples available in the repository.
   * The example code is written in C which illustrates both how to subscribe to different events and how to send an event.
 * [axoverlay](./axoverlay/)
   * The example code is written in C which illustrates how to draw plain boxes and text as overlays in a stream.
-* [axparameter](./axparameter/)
-  * The example code is written in C which shows how to handle application parameters from the device.
 * [hello-world](./hello-world/)
   * The example code is written in C and shows how to build a simple hello world application.
 * [larod](./larod/)
