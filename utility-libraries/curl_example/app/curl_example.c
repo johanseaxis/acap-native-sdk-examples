@@ -89,11 +89,8 @@ int main(void)
   if(curl) {
     syslog(LOG_INFO,"CURL init succesful - Curl handle is created");
 
-    /**
-     * Without proxy setting, unable to copy file, this needs to
-     * be relooked as giving axis proxy is not a good idea
-     */
 #ifdef CURL_PROXY
+    //Set the proxy for upcoming request, if it is defined.
     curl_easy_setopt(curl, CURLOPT_PROXY, CURL_PROXY);
 #endif
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
