@@ -1,11 +1,10 @@
 # What is Axis Camera Application Platform?
-[AXIS Camera Application Platform (ACAP)](https://www.axis.com/support/developer-support/axis-camera-application-platform) is an open application platform that enables members of [Axis Application Development Partner](https://www.axis.com/partners/adp-partner-program) (ADP) Program to develop applications that can be downloaded and installed on Axis network cameras and video encoders. ACAP makes it possible to develop applications for a wide range of use cases:
-* Security applications that improve surveillance systems and facilitate investigation.
-* Business intelligence applications that improve business efficiency.
-* Camera feature plug-ins that add value beyond the Axis product's core functionality
+AXIS Camera Application Platform (ACAP) is an open application platform from Axis. It provides a development platform for software-based solutions and systems built around Axis devices. ACAP is available for various types of Axis products such as cameras, speakers and intercoms.
+TODO: add link to documentation on github pages
 
-# Prerequisites for ACAP development
-ACAP is Axis own open platform for applications that run on-board an Axis product. If you are new to ACAP, start with learning more about the platform, [prerequisites](https://www.axis.com/developer-community/acap-fundamentals), [compatible architectures](https://www.axis.com/developer-community/acap-sdk) and [SDK user manual](https://help.axis.com/acap-3-developer-guide).
+## ACAP Native SDK
+The ACAP Native SDK is targeted towards users that want to develop plug-in style, event generating applications that fit well into a VMS centric system. This SDK offers high performance by integrating closely with AXIS OS and hardware. Already existing ACAP users should feel at home using this SDK and migrating from previous version ACAP 3 to this SDK should be straightforward.
+TODO: add link to documentation on github pages
 
 ## Getting started with the repo
 This repository contains a set of application examples which aims to enrich the
@@ -47,15 +46,16 @@ and [vdo-larod](./vdo-larod) examples.
 
 
 ### DockerHub Image
-The ACAP SDK image can be used as a basis for custom built images to run your application or as a developer environment inside the container. The image is public and free to use for anyone.
+The ACAP Native SDK image can be used as a basis for custom built images to run your application or as a developer environment inside the container.
 
-* [ACAP SDK](https://hub.docker.com/r/axisecp/acap-sdk) This image is based on Ubuntu and contains the environment needed for building an AXIS Camera Application Platform (ACAP) application. This includes all tools for building and packaging an ACAP 3 application as well as API components (header and library files) needed for accessing different parts of the camera firmware.
+* [ACAP Native SDK](https://hub.docker.com/r/axisecp/acap-native-sdk) This image is based on Ubuntu and contains the environment needed for building an AXIS Camera Application Platform (ACAP) Native application. This includes all tools for building and packaging an ACAP Native application as well as API components (header and library files) needed for accessing different parts of the camera firmware.
 
 # Issues
 If you encounter issues with the examples, make sure your product is running the latest firmware version or one that is compatible with the ACAP SDK used.
 The examples use the ACAP SDK during the build process, of which each version is compatible with a set of firmware versions.
 The specific SDK version that each example is based on is specified in the Dockerfile used to build the application, through the `VERSION` variable.
-The full compatibility schema for ACAP SDK version and firmware version is available at [Find the right SDK for software compatibility](https://help.axis.com/acap-3-developer-guide#find-the-right-sdk-for-software-compatibility).
+The full compatibility schema for ACAP SDK version and firmware version is available at
+TODO: add link to documentation on github pages
 
 If the issue persists with a compatible firmware, please create an issue containing the information specified in the template below.
 
@@ -71,4 +71,3 @@ Please visit [FAQs page](FAQs.md) for frequently asked questions.
 
 # License
 [Apache 2.0](LICENSE)
-
