@@ -1,0 +1,22 @@
+{
+    "schemaVersion": "1.0",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "vdo_larod_edgetpu",
+            "appName": "vdo_larod",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "2.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "runOptions": "/usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite 224 224 -c 4 -l /usr/local/packages/vdo_larod/label/imagenet_labels.txt",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "2.0.0"
+        },
+        "copyProtection": {
+            "method": "none"
+        }
+    }
+}

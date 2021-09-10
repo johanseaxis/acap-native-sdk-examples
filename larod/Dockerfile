@@ -15,8 +15,10 @@ RUN curl -o model/mobilenet_v1_1.0_224_quant.tgz http://download.tensorflow.org/
 RUN tar -xvf model/mobilenet_v1_1.0_224_quant.tgz -C model
 RUN rm -f model/*.tgz  model/*.pb* model/*.ckpt* model/*.txt
 RUN curl -L -o model/labels_mobilenet_quant_v1_224.txt https://github.com/google-coral/edgetpu/raw/master/test_data/imagenet_labels.txt
+RUN ls
+RUN ls model
 
 RUN . /opt/axis/acapsdk/environment-setup* && acap-build . \
     -a 'input/veiltail-11457_640_RGB_224x224.bin' \
-    -a 'model/mobilenet_v1_1.0_224_quant.larod' \
+    -a 'model/mobilenet_v1_1.0_224_quant.tflite' \
     -a 'model/labels_mobilenet_quant_v1_224.txt'

@@ -9,4 +9,4 @@ ARG SDK=acap-sdk
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 WORKDIR /opt/app
 COPY ./app .
-RUN . /opt/axis/acapsdk/environment-setup* && create-package.sh
+RUN . /opt/axis/acapsdk/environment-setup* && acap-build .  -a 'converted_model.tflite'

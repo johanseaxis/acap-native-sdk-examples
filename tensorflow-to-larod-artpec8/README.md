@@ -41,7 +41,7 @@ tensorflow_to_larod
 │   │   ├── larod-vdo-utils.h
 │   │   ├── LICENSE
 │   │   ├── Makefile
-│   │   ├── package.conf 
+│   │   ├── manifest.json
 │   │   └── tensorflow_to_larod.c
 │   ├── .dockerignore
 │   ├── build_acap.sh
@@ -58,7 +58,7 @@ tensorflow_to_larod
 - **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 - **env/app/larod-vdo-utils.c** - Various helper functions for interacting with the larod and vdo libraries.
 - **env/app/Makefile** - Makefile containing the build and link instructions for building the ACAP3 application.
-- **env/app/package.conf** - Defines the ACAP and its configuration.
+- **env/app/manifest.json** - Defines the ACAP and its configuration.
 - **env/app/tensorflow_to_larod.c** - The file implementing the core functionality of the ACAP.
 - **env/build_acap.sh** - Builds the ACAP and the .eap file.
 - **env/convert_model.py** - A script used to convert Tensorflow models to Tensorflow Lite models.

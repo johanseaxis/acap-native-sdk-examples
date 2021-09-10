@@ -19,10 +19,10 @@ ARG CHIP=CPU
 # Building the ACAP application
 RUN if [ "$CHIP" = CPU ]; then \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant.larod'; \
+    -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant.tflite'; \
     elif [ "$CHIP" = EDGETPU ]; then \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.larod'; \
+    -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite'; \
     else \
     echo 'Error:' $CHIP 'is not a valid value for the CHIP variable'; \
     exit 1; \
