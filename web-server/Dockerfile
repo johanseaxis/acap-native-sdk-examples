@@ -42,4 +42,4 @@ RUN . /opt/axis/acapsdk/environment-setup* &&\
     mkdir -p lib &&\
     cp /usr/local/lib/libmonkey.so.1.5 /usr/local/packages/monkey/lib/*.so -t lib/ &&\
     cp -r /usr/local/packages/monkey/html . &&\
-    acap-build ./
+    acap-build . -a reverseproxy.conf
