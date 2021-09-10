@@ -4,7 +4,7 @@ ARG ARCH=armv7hf
 ARG REPO=axisecp
 ARG SDK=acap-native-sdk
 ARG UBUNTU_VERSION=20.04
-ARG VERSION=1.0_beta1
+ARG VERSION=latest
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
