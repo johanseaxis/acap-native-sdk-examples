@@ -95,9 +95,9 @@ Building is done using the following command:
 docker build --tag <APP_IMAGE> . --build-arg CHIP=<CHIP>
 ```
 
-<APP_IMAGE> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
+\<APP_IMAGE\> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
 
-<CHIP> is the chip type. Supported values are CPU and EDGETPU.
+\<CHIP\> is the chip type. Supported values are CPU and EDGETPU.
 
 Following is examples of how to build for both CPU with Tensorflow Lite and Google TPU.
 
