@@ -18,13 +18,11 @@
 """ model.py
     Defines the model's structure and configuration.
 """
-
-
-
-
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
 from tensorflow.keras import backend as K
+
+
 def _residual_block(x, n_filters, strides=1):
     """ Produces a residual convolutional block as seen in
         https://en.wikipedia.org/wiki/Residual_neural_network

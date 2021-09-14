@@ -12,9 +12,6 @@
             },
             "runMode": "never",
             "version": "1.0.0"
-        },
-        "copyProtection": {
-            "method": "none"
         }
     }
 }

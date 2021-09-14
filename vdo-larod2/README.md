@@ -77,31 +77,28 @@ The CHIP argument in the Dockerfile also needs to be changed depending on model.
 
 Different devices support different chips and models.
 
-Select one of the chip alternatives, CPU or Google TPU, to build an application for that chip:
-
-##### Alternative Chip 2 - CPU with TensorFlow Lite
-Standing in your working directory run the following command, to copy configuration for CPU with TensorFlow Lite:
-
-```
-cp app/manifest.conf.cpu app/manifest.json
-```
-Also supply CPU as value to the CHIP argument. See [Build steps]($build-steps) below.
-
-##### Alternative Chip 4 - Google TPU
-Standing in your working directory run the following command, to copy configuration for Google TPU:
-
-```
-cp app/manifest.json.edgetpu app/manifest.json
-```
-Also supply EDGETPU as value to the CHIP argument. See [Build steps]($build-steps) below.
-
-##### Build steps
+Building is done using the following command:
 ```bash
 docker build --tag <APP_IMAGE> . --build-arg CHIP=<CHIP>
 ```
 
-<APP_IMAGE> is the name to tag the image with, e.g., vdo_larod:1.0
+<APP_IMAGE> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
+
 <CHIP> is the chip type. Supported values are CPU and EDGETPU.
+
+Following is examples of how to build for both CPU with Tensorflow Lite and Google TPU.
+
+To build a package for CPU with Tensorflow Lite, run the following command standing in your working directory:
+```bash
+cp app/manifest.conf.cpu app/manifest.json
+docker build --build-arg CHIP=CPU --tag <APP_IMAGE> .
+```
+To build a package for Google TPU instead, run the following command:
+```bash
+cp app/manifest.json.edgetpu app/manifest.json
+docker build --build-arg CHIP=EDGETPU --tag <APP_IMAGE> .
+```
+The following steps are identical for both CPU with Tensorflow Lite and Google TPU.
 
 Copy the result from the container image to a local directory build:
 

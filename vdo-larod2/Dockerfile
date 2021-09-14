@@ -16,18 +16,16 @@ WORKDIR /opt/app
 COPY ./app /opt/app/
 
 # Setup model and label directories
-RUN mkdir -p model
-RUN curl -o model/mobilenet_v2_1.0_224_quant.tgz http://download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224_quant.tgz
-RUN tar -xvf model/mobilenet_v2_1.0_224_quant.tgz -C model
-RUN rm -f model/*.tgz  model/*.pb* model/*.ckpt* model/*.meta model/*.txt
+RUN mkdir -p model && \
+    curl -o model/mobilenet_v2_1.0_224_quant.tgz http://download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224_quant.tgz && \
+    tar -xvf model/mobilenet_v2_1.0_224_quant.tgz -C model && \
+    rm -f model/*.tgz  model/*.pb* model/*.ckpt* model/*.meta model/*.txt && \
+    curl -L -o model/mobilenet_v2_1.0_224_quant_edgetpu.tflite https://github.com/google-coral/edgetpu/raw/master/test_data/mobilenet_v2_1.0_224_quant_edgetpu.tflite
 
-RUN mkdir -p model
-RUN curl -L -o model/mobilenet_v2_1.0_224_quant_edgetpu.tflite https://github.com/google-coral/edgetpu/raw/master/test_data/mobilenet_v2_1.0_224_quant_edgetpu.tflite
+RUN mkdir -p label && \
+    curl -L -o label/imagenet_labels.txt https://github.com/google-coral/edgetpu/raw/master/test_data/imagenet_labels.txt
 
-RUN mkdir -p label
-RUN curl -L -o label/imagenet_labels.txt https://github.com/google-coral/edgetpu/raw/master/test_data/imagenet_labels.txt
-
-ARG CHIP=CPU
+ARG CHIP=
 # Building the ACAP application
 RUN if [ "$CHIP" = CPU ]; then \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \

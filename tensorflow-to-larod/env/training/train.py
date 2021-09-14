@@ -21,13 +21,12 @@
         -a <path to dataset annotation json-file>
 """
 
-
-
-
 import argparse
 import tensorflow as tf
 from model import create_model
 from utils import SimpleCOCODataGenerator as DataGenerator
+
+
 def train(image_dir, annotation_path):
     """ Initiates a model and and trains it using a data generator. The model
         is then saved to the output path.

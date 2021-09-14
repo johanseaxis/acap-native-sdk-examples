@@ -20,20 +20,19 @@
     data generator.
 """
 
-
-
-
 from tensorflow.keras.utils import Sequence
 import numpy as np
 import json
 import os
+
 from PIL import Image
+
+
 class SimpleCOCODataGenerator(Sequence):
     """ A data generator which reads data on the MS COCO format and
         reprocesses it to simply output whether a certain class exists in
         a given image.
     """
-
     def __init__(self, samples_dir, annotation_path, data_shape=(256, 256),
                  batch_size=16, shuffle=True, balance=True):
         """ Initializes the data generator.
@@ -97,8 +96,8 @@ class SimpleCOCODataGenerator(Sequence):
                        self.sample_classes['has_car']]
             samples_per_class = np.max([len(c) for c in classes])
             self.indices = np.concatenate([np.random.choice(list(c),
-                                           size=int(weights[idx] * samples_per_class)) for idx, c
-                                           in enumerate(classes)])
+               size=int(weights[idx] * samples_per_class)) for idx, c
+               in enumerate(classes)])
         if self.shuffle is True:
             np.random.shuffle(self.indices)
 

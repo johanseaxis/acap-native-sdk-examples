@@ -7,9 +7,9 @@ ARG SDK=acap-sdk
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-	autoconf \
-	libtool \
-	automake
+    autoconf \
+    libtool \
+    automake
 
 WORKDIR /opt/build
 RUN git clone https://github.com/curl/curl.git
@@ -19,10 +19,10 @@ RUN git clone https://github.com/curl/curl.git
 # - CONFIGURE_FLAGS environment variable
 WORKDIR /opt/build/curl
 RUN . /opt/axis/acapsdk/environment-setup* && \
-  autoreconf -fi && \
-  ./configure --prefix=${PWD}/build ${CONFIGURE_FLAGS} --with-openssl && \
-  make && \
-  make install
+    autoreconf -fi && \
+    ./configure --prefix=${PWD}/build ${CONFIGURE_FLAGS} --with-openssl && \
+    make && \
+    make install
 
 # Delete manual directory from curl built result
 RUN rm -rf /opt/build/curl/build/share/man
