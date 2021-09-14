@@ -1,5 +1,9 @@
 # How to use Web Server in ACAP4 Native Application
-This document explains briefly how to build and use [Monkey Web Server](https://github.com/monkey/monkey) in ACAP4 Native. Monkey is a fast and lightweight Web Server for Linux. It has been designed to be very scalable with low memory and CPU consumption, the perfect solution for Embedded Linux and high end production environments. Besides the common features as HTTP server, it expose a flexible C API which aims to behave as a fully HTTP development framework, so it can be extended as desired through the plugins interface. The Monkey Web Server [documentation](http://monkey-project.com/documentation/1.5) describes the configuration in detail.
+This example explains how to build and use [Monkey Web Server](https://github.com/monkey/monkey) in ACAP4 Native SDK with a reverse proxy configuration in Apache server.
+
+The Apache server is configured using post-install and pre-uninstall scripts features in a native ACAP. The post-install script adds a configuration file to apache configuration with reverse configuration for monkey server and applies it to apache, and in the pre-uninstall the configuration is removed.
+
+Monkey is a fast and lightweight Web Server for Linux. It has been designed to be very scalable with low memory and CPU consumption, the perfect solution for Embedded Linux and high end production environments. Besides the common features as HTTP server, it expose a flexible C API which aims to behave as a fully HTTP development framework, so it can be extended as desired through the plugins interface. The Monkey Web Server [documentation](http://monkey-project.com/documentation/1.5) describes the configuration in detail.
 
 ## Getting started
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
@@ -7,16 +11,14 @@ These instructions will guide you on how to execute the code. Below is the struc
 ```bash
 web-server
 ├── app
-│   ├── hello.c - Example hello
-│   ├── image.h - Image used by one example
 │   ├── LICENSE - Text file which lists all open source licensed source code distributed with the application
-│   ├── list.c - Example list
-│   ├── Makefile - Makefile containing the build and link instructions for building the ACAP application
 │   ├── manifest.json - Defines the application and its configuration
-│   ├── quiz.c - Example quiz
-│   └── README - Examples description and license
+│   ├── postinstall.sh - Shell script for adding configration to apache
+│   ├── preuninstall.sh - Shell script for removing  configration to apache
+│   └── reverseproxy.conf - Configuration for reverse proxy
 ├── build.sh - Build script
 ├── Dockerfile - Docker file with the specified Axis toolchain and API container to build the example specified
+├── monkey.patch - Patch for using monkey examples in a native ACAP
 └── README.md - Step by step instructions on how to run the example
 ```
 
@@ -76,20 +78,7 @@ Goto your device web page above > Click on the tab **App** in the device GUI > A
 the newly built **monkey_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch
 
 ## Browse to the web server
-The Web Server can be accessed from a Web Browser eighter directly using a port number (i.e. http://mycamera:2001) or through the Apache Server in the camera using an extension to the camera web URL (i.e http://mycamera/monkey/). To configure the Apache Server as a Reverse Proxy Server, make sure you have root access to the camera and use the procedure below:
-```sh
-# Do root ssh login to the camera
-ssh root@<CAMERA_IP>
-
-# Add Reverse Proxy configuration to the Apache Server, example:
-cat >> /etc/apache2/httpd.conf <<EOF
-ProxyPass /monkey http://localhost:2001
-ProxyPassReverse /monkey http://localhost:2001
-EOF
-
-# Restart the Apache Server
-systemctl restart httpd
-```
+The Web Server can be accessed from a Web Browser eighter directly using a port number (i.e. http://mycamera:2001) or through the Apache Server in the camera using an extension to the camera web URL (i.e http://mycamera/monkey/).
 
 ## C API Examples
 Some C API examples are included in the app folder. To build any of the examples, use the build and install procedure as described above after making following changes to the build files:
