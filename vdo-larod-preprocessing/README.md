@@ -105,20 +105,14 @@ To build a package for CPU with Tensorflow Lite, run the following command stand
 ```bash
 cp app/manifest.conf.cpu app/manifest.json
 docker build --build-arg CHIP=CPU --tag <APP_IMAGE> .
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 To build a package for Google TPU instead, run the following command:
 ```bash
 cp app/manifest.json.edgetpu app/manifest.json
 docker build --build-arg CHIP=EDGETPU --tag <APP_IMAGE> .
-```
-The following steps are identical for both CPU with Tensorflow Lite and Google TPU.
-
-Copy the result from the container image to a local directory build:
-
-```bash
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
-
 The working dir now also contains a build folder with the following content:
 
 ```bash
