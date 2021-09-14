@@ -25,20 +25,9 @@ RUN mkdir -p /env/app
 # Get dataset
 RUN apt-get install -y wget
 RUN mkdir -p /env/data/images && mkdir -p /env/data/annotations
-
-
-
 RUN curl -o /env/data/images/val2017.zip http://images.cocodataset.org/zips/val2017.zip && \
     unzip -q /env/data/images/val2017.zip -d /env/data/images/ && \
     rm /env/data/images/val2017.zip
-
-RUN curl -o /env/data/images/val2017.zip http://images.cocodataset.org/zips/val2017.zip && \
-    unzip -q /env/data/images/val2017.zip -d /env/data/images/ && \
-    rm /env/data/images/val2017.zip
-
-
-
-
 RUN curl -o /env/data/annotations_trainval2017.zip http://images.cocodataset.org/annotations/annotations_trainval2017.zip && \
     unzip -q /env/data/annotations_trainval2017.zip -d /env/data/ && \
     rm /env/data/annotations_trainval2017.zip
