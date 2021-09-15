@@ -19,7 +19,7 @@ jobs:
           echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
           cd vdo-larod
           cp app/manifest.json.cpu app/manifest.json
-          docker build --no-cache --build-arg CHIP=CPU --tag $imagetag .
+          docker build --no-cache --build-arg CHIP=cpu --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           pwd
@@ -37,7 +37,7 @@ jobs:
           cd vdo-larod
           rm -rf build/
           cp app/manifest.json.edgetpu app/manifest.json
-          docker build --no-cache --build-arg CHIP=EDGETPU --tag $imagetag .
+          docker build --no-cache --build-arg CHIP=edgetpu --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           mkdir -p vdo-larod/build_tpu/

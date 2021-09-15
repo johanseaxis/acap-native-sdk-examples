@@ -27,10 +27,10 @@ RUN mkdir -p label && \
 
 ARG CHIP=
 # Building the ACAP application
-RUN if [ "$CHIP" = CPU ]; then \
+RUN if [ "$CHIP" = cpu ]; then \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \
     -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant.tflite'; \
-    elif [ "$CHIP" = EDGETPU ]; then \
+    elif [ "$CHIP" = edgetpu ]; then \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \
     -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite'; \
     else \

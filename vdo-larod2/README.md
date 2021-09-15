@@ -73,31 +73,33 @@ The attributes in manifest.json that configures model are:
 - runOptions, which contains the application command line options.
 - friendlyName, a user friendly package name which is also part of the .eap file name.
 
-The CHIP argument in the Dockerfile also needs to be changed depending on model. Supported values are CPU and EDGETPU. This argument controls which files are to be included in the package e.g. model. These files are copied to the application directory during installation.
+The CHIP argument in the Dockerfile also needs to be changed depending on model. Supported values are cpu and edgetpu. This argument controls which files are to be included in the package e.g. model. These files are copied to the application directory during installation.
 
 Different devices support different chips and models.
 
-Building is done using the following command:
+Building is done using the following commands:
 ```bash
+cp app/manifest.conf.<CHIP> app/manifest.json
 docker build --tag <APP_IMAGE> . --build-arg CHIP=<CHIP>
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
 \<APP_IMAGE\> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
 
-\<CHIP\> is the chip type. Supported values are CPU and EDGETPU.
+\<CHIP\> is the chip type. Supported values are cpu and edgetpu.
 
 Following is examples of how to build for both CPU with Tensorflow Lite and Google TPU.
 
 To build a package for CPU with Tensorflow Lite, run the following command standing in your working directory:
 ```bash
 cp app/manifest.conf.cpu app/manifest.json
-docker build --build-arg CHIP=CPU --tag <APP_IMAGE> .
+docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 To build a package for Google TPU instead, run the following command:
 ```bash
 cp app/manifest.json.edgetpu app/manifest.json
-docker build --build-arg CHIP=EDGETPU --tag <APP_IMAGE> .
+docker build --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 The working dir now contains a build folder with the following files:
